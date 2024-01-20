@@ -22,7 +22,6 @@ def setup_db(cur, con):
                 "CREATE TABLE IF NOT EXISTS TBL_Job (job_id INT AUTO_INCREMENT PRIMARY KEY, curr_Hash VARCHAR(255),"
                 "time_created DATETIME, status INT, command_id INT, FOREIGN KEY (status)"
                 "REFERENCES TBL_Status(command_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
-                "TBL_Status(command_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
                 "CREATE TABLE IF NOT EXISTS TBL_Customer (lfd_nr INT PRIMARY KEY, curr_hash VARCHAR(255))"
                 "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
                 "CREATE OR REPLACE VIEW V_Status AS SELECT command_id FROM TBL_Job WHERE job_id = (SELECT MAX(job_id)"
