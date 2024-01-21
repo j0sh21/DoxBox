@@ -71,7 +71,7 @@ def getInstruction():
     command_id = cur.fetchone()
     if command_id:
         command_id = command_id[0]
-    return command_id
+        return command_id
 
 
 def finishJob():
