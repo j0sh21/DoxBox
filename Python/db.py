@@ -69,6 +69,8 @@ def getInstruction():
     e = f"Select * from V_Status"
     cur.execute(e)
     command_id = cur.fetchone()
+    if command_id:
+        command_id = command_id[0]
     return command_id
 
 
