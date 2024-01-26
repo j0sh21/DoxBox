@@ -55,7 +55,7 @@ def main_loop():
 
     # Load images and fonts
     # QR Code image
-    image1 = pygame.image.load("madeirax3.png")  # Load your image
+    image1 = pygame.image.load(r"Python\images\qr\madeirax3.png")  # Load your image
     font = pygame.font.Font(None, 36)  # Choose a font and font size
 
     running = True  # Add this to control the main loop
