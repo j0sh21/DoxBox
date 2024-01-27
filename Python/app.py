@@ -1,150 +1,114 @@
-import cv2
-import pygame
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
+from PyQt5.QtMultimedia import QCamera, QCameraInfo
+from PyQt5.QtMultimediaWidgets import QCameraViewfinder
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import Qt, pyqtSignal, QObject
 import sys
-import av
-import numpy as np
 import threading
 import socket
 
-global state
+# Import the configuration variables
+import config  # Assuming config.py is in the same directory
 
-def adjust_image(image, height_scale, width_scale):
-    # Resize the image
-    new_width = int(image.get_width() * width_scale)
-    new_height = int(image.get_height() * height_scale)
-    resized_image = pygame.transform.scale(image, (new_width, new_height))
-    return resized_image
+# A class for managing the application state and communication
+class AppState(QObject):
+    stateChanged = pyqtSignal(str)
 
-def handle_client_connection(client_socket):
+    def __init__(self):
+        super().__init__()
+        self._state = "0"
+
+    @property
+    def state(self):
+        return self._state
+
+    @state.setter
+    def state(self, value):
+        self._state = value
+        self.stateChanged.emit(self._state)
+
+# Main application class
+class VendingMachineDisplay(QWidget):
+    def __init__(self, appState):
+        super().__init__()
+        self.appState = appState
+        self.initUI()
+        self.appState.stateChanged.connect(self.onStateChanged)
+
+    def initUI(self):
+        # Set the layout
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+
+        # Set up the webcam viewfinder
+        self.viewfinder = QCameraViewfinder(self)
+        layout.addWidget(self.viewfinder)
+
+        # Initialize and start the camera
+        self.camera = QCamera(QCameraInfo.defaultCamera())
+        self.camera.setViewfinder(self.viewfinder)
+        self.camera.start()
+
+        # Display a static image (e.g., QR code) with a smaller size
+        self.imageLabel = QLabel(self)
+        pixmap = QPixmap(config.IMAGE_PATH)  # Use the image path from config.py
+        self.imageLabel.setPixmap(pixmap.scaled(config.IMAGE_WIDTH, config.IMAGE_HEIGHT, Qt.KeepAspectRatio))  # Use image dimensions from config.py
+        layout.addWidget(self.imageLabel)
+
+        # Display text
+        self.textLabel = QLabel(config.DEFAULT_TEXT, self)  # Use the default text from config.py
+        self.textLabel.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.textLabel)
+
+        # Window settings
+        self.setWindowTitle(config.WINDOW_TITLE)  # Use the window title from config.py
+        if config.FULLSCREEN_MODE:  # Check if fullscreen mode is enabled in config.py
+            self.showFullScreen()
+        else:
+            self.show()  # Show in windowed mode if fullscreen is not enabled
+
+    def onStateChanged(self, state):
+        # Handle state changes here
+        if state == "1":
+            # For example, update the text label
+            self.textLabel.setText("State changed to 1")
+        # Add more state handling as needed
+
+def handle_client_connection(client_socket, appState):
     try:
         message = client_socket.recv(1024).decode()
-        print(f"Received message: {str(message)}")
-        global state
-        state = message
+        print(f"Received message: {message}")
+        appState.state = message
         client_socket.close()
     except Exception as e:
         print(f"Error in handling client connection: {e}")
 
-def start_server():
+def start_server(appState):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(('localhost', 9999))
-    server_socket.listen(5)
-    print("App server listening on port 9999")
+    server_socket.bind((config.SERVER_HOST, config.SERVER_PORT))  # Use server host and port from config.py
+    server_socket.listen(config.MAX_CONNECTIONS)  # Use max connections from config.py
+    print(f"App server listening on {config.SERVER_HOST}:{config.SERVER_PORT}")
 
     while True:
         client_socket, addr = server_socket.accept()
         print(f"Connection established with {addr}")
-        client_thread = threading.Thread(target=handle_client_connection, args=(client_socket,))
+        client_thread = threading.Thread(target=handle_client_connection, args=(client_socket, appState))
         client_thread.start()
 
-def main_loop():
-    # QR-Code Size Adjustment in %
-    height_scale, width_scale = 0.17, 0.17
-
-    pygame.init()
-    width, height = 1280, 720  # Set your desired HDMI display resolution with width and height swapped
-    display = pygame.display.set_mode((width, height), pygame.FULLSCREEN)
-
-    # Open the webcam
-    cap = cv2.VideoCapture(0)  # 0 for the default camera (if it's the only camera connected)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-
-    # Create an H.264 encoder using PyAV
-    encoder = av.codec.CodecContext.create('h264', 'w')
-
-    # Load images and fonts
-    # QR Code image
-    image1 = pygame.image.load(r"Python\images\qr\madeirax3.png")  # Load your image
-    font = pygame.font.Font(None, 36)  # Choose a font and font size
-
-    running = True  # Add this to control the main loop
-
-    while running:
-        print(state)
-        if state == "0":
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-
-            ret, frame = cap.read()
-            if not ret:
-                break
-
-            # Convert the frame to a format suitable for encoding
-            av_frame = av.VideoFrame.from_ndarray(frame, format='bgr24')
-            # Convert the frame to 'rgb24' format
-            rgb_frame = av_frame.to_ndarray(format='rgb24')
-
-            # Display the resulting rgb_frame
-
-            # Rotate the frame 90 degrees counterclockwise
-            rotated_frame = np.rot90(rgb_frame, k=1)
-
-            pygame_frame = pygame.surfarray.make_surface(rotated_frame)
-
-            display.blit(pygame_frame, (300, 100))  # Display the webcam stream
-
-            # Adjust the image
-            adjusted_image = adjust_image(image1, height_scale, width_scale)
-
-            # Display the adjusted image
-            display.blit(adjusted_image, (100, 100))
-
-            # Display text
-            text = font.render("Hello, World!", True, (255, 255, 255))
-            display.blit(text, (250, 400))
-
-            pygame.display.flip()
-        elif state == "1":
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-
-            ret, frame = cap.read()
-            if not ret:
-                break
-
-            display.fill(pygame.Color("black"))
-
-            # Convert the frame to a format suitable for encoding
-            av_frame = av.VideoFrame.from_ndarray(frame, format='bgr24')
-            # Convert the frame to 'rgb24' format
-            rgb_frame = av_frame.to_ndarray(format='rgb24')
-
-            # Display the resulting rgb_frame
-
-            # Rotate the frame 90 degrees counterclockwise
-            rotated_frame = np.rot90(rgb_frame, k=1)
-
-            pygame_frame = pygame.surfarray.make_surface(rotated_frame)
-
-            display.blit(pygame_frame, (300, 100))  # Display the webcam stream
-
-            # Adjust the image
-            adjusted_image = adjust_image(image1, height_scale, width_scale)
-
-            # Display the adjusted image
-            display.blit(adjusted_image, (100, 100))
-
-            # Display text
-            text = font.render("Fuck, World!", True, (255, 255, 255))
-            display.blit(text, (250, 400))
-
-            pygame.display.flip()
-
-    # Release resources
-    cap.release()
-    cv2.destroyAllWindows()
-    pygame.quit()
-    sys.exit()
-
 if __name__ == '__main__':
-    state = "0"
+    print("building app...")
+    app = QApplication(sys.argv)
+    print("building app completed!")
+    print("building state object...")
+    appState = AppState()
+    print("building state object completed!")
+    print("building Display...")
+    ex = VendingMachineDisplay(appState)
+    print("building Display completed!")
 
     # Start the server in a separate thread
-    server_thread = threading.Thread(target=start_server)
+    print("Start server...")
+    server_thread = threading.Thread(target=start_server, args=(appState,))
     server_thread.start()
-
-    # Start the main application loop
-    main_loop()
+    print("Start app")
+    sys.exit(app.exec_())

@@ -1,18 +1,13 @@
+import config
 import requests
 import time
 import threading
 import socket
-#import img_capture as capture
-
-# Existing variables and functionalities
-
-inKey = '74001006d12743e1a1f5ac3eea8def9c'
-apiUrl = 'http://lnbits.twnty.one/api/v1/payments?limit=1'
 
 def send_message_to_app(message):
     try:
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client_socket.connect(('localhost', 9999))
+        client_socket.connect((config.HOST, config.PORT))
         client_socket.sendall(message.encode())
         client_socket.close()
     except Exception as e:
@@ -22,12 +17,12 @@ def main_loop():
     prevHash = ''
     currHash = ''
     rsJson = ''
-    response = requests.get(apiUrl, headers={'X-API-Key': inKey})
+    response = requests.get(config.API_URL, headers={'X-API-Key': config.API_KEY})
     prevHash = response.json()[0]['payment_hash']
     response = None
 
     while True:
-        response = requests.get(apiUrl, headers={'X-API-Key': inKey})
+        response = requests.get(config.API_URL, headers={'X-API-Key': config.API_KEY})
         if (response.status_code == 200):
             rsJson = response.json()
 
@@ -38,15 +33,15 @@ def main_loop():
 
                 amount = rsJson[0]['amount'] / 1000  # Amount in SATS
 
-                if (amount == 1.00):
+                if (amount == config.AMOUNT_THRESHOLD):
                     print("Starting DoxBox")
                     send_message_to_app("1")
                     # capture.main()
-                    time.sleep(50)
+                    time.sleep(config.POST_PAYMENT_DELAY)
                 else:
-                    time.sleep(5)
+                    time.sleep(config.CHECK_INTERVAL)
             else:
-                time.sleep(5)
+                time.sleep(config.CHECK_INTERVAL)
         else:
             exit(response.status_code)
 
