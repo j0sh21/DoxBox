@@ -9,7 +9,7 @@ def run_app():
 def run_switch_or_debug_as_subprocess():
     if DEBUG:
         # Running debug_client.py as a subprocess when DEBUG is True
-        subprocess.run(["python", "./dev/debug_client.py"])
+        subprocess.run(["python", r"./dev/debug_client.py"])
     else:
         # Running switch.py as a subprocess when DEBUG is False
         subprocess.run(["python", "switch.py"])
