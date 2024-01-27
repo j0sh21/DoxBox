@@ -1,11 +1,13 @@
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
 from PyQt5.QtMultimedia import QCamera, QCameraInfo
 from PyQt5.QtMultimediaWidgets import QCameraViewfinder
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtGui import QPixmap, QMovie
 from PyQt5.QtCore import Qt, pyqtSignal, QObject
 import sys
 import threading
 import socket
+import os
+import random
 
 # Import the configuration variables
 import config  # Assuming config.py is in the same directory
@@ -55,16 +57,20 @@ class VendingMachineDisplay(QWidget):
         self.imageLabel.setPixmap(pixmap.scaled(config.IMAGE_WIDTH, config.IMAGE_HEIGHT, Qt.KeepAspectRatio))  # Use image dimensions from config.py
         layout.addWidget(self.imageLabel)
 
+        # Initialize the QLabel for displaying GIFs
+        self.gifLabel = QLabel(self)
+        layout.addWidget(self.gifLabel)  # Add the gifLabel to the layout
+
         # Display text
         self.textLabel = QLabel(config.DEFAULT_TEXT, self)  # Use the default text from config.py
         self.textLabel.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.textLabel)
 
-        # Window settings
-        self.setWindowTitle(config.WINDOW_TITLE)  # Use the window title from config.py
+        # Window configurations
         if config.FULLSCREEN_MODE:  # Check if fullscreen mode is enabled in config.py
             self.showFullScreen()
         else:
+            self.setWindowTitle(config.WINDOW_TITLE)  # Use the window title from config.py
             self.show()  # Show in windowed mode if fullscreen is not enabled
 
     def onStateChanged(self, state):
@@ -73,6 +79,45 @@ class VendingMachineDisplay(QWidget):
             # For example, update the text label
             self.textLabel.setText("State changed to 1")
         # Add more state handling as needed
+
+        # Update GIF based on the state
+        self.updateGIF(state)
+
+    def updateGIF(self, state):
+        # Map states to subfolders
+        subfolder_map = {
+            "0": "0_welcome",
+            "1": "1_payment",
+            "2": "2_countdown",
+            "3": "3_smile",
+            "4": "4_print",
+            "5": "5_thx",
+            "100": "100_error"
+        }
+
+        #default value if state not in subfolder map
+        subfolder = subfolder_map.get(state, "0_welcome")
+
+
+        # Construct the path to the subfolder
+        gif_folder_path = os.path.join("..", "images", "gifs", subfolder)
+
+        # List all GIF files in the subfolder
+        try:
+            gifs = [file for file in os.listdir(gif_folder_path) if file.endswith(".gif")]
+            if gifs:
+                # Randomly select a GIF
+                selected_gif = random.choice(gifs)
+                gif_path = os.path.join(gif_folder_path, selected_gif)
+
+                # Use QMovie to display the selected GIF
+                movie = QMovie(gif_path)
+                self.gifLabel.setMovie(movie)
+                movie.start()
+            else:
+                print("No GIF files found in the specified folder.")
+        except FileNotFoundError:
+            print(f"The folder {gif_folder_path} does not exist.")
 
 def handle_client_connection(client_socket, appState):
     try:
