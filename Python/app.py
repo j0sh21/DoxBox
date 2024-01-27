@@ -7,6 +7,9 @@ import sys
 import threading
 import socket
 
+# Import the configuration variables
+import config  # Assuming config.py is in the same directory
+
 # A class for managing the application state and communication
 class AppState(QObject):
     stateChanged = pyqtSignal(str)
@@ -48,19 +51,21 @@ class VendingMachineDisplay(QWidget):
 
         # Display a static image (e.g., QR code) with a smaller size
         self.imageLabel = QLabel(self)
-        pixmap = QPixmap(r"images/qr/madeirax3.png")  # Replace with your image path
-        self.imageLabel.setPixmap(pixmap.scaled(150, 150, Qt.KeepAspectRatio))  # Resize QR code
+        pixmap = QPixmap(config.IMAGE_PATH)  # Use the image path from config.py
+        self.imageLabel.setPixmap(pixmap.scaled(config.IMAGE_WIDTH, config.IMAGE_HEIGHT, Qt.KeepAspectRatio))  # Use image dimensions from config.py
         layout.addWidget(self.imageLabel)
 
         # Display text
-        self.textLabel = QLabel("Your Text Here", self)
+        self.textLabel = QLabel(config.DEFAULT_TEXT, self)  # Use the default text from config.py
         self.textLabel.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.textLabel)
 
         # Window settings
-        self.setWindowTitle('Vending Machine Display')
-        #self.setGeometry(100, 100, 1024, 600)  # Set fixed size for window
-        self.showFullScreen()
+        self.setWindowTitle(config.WINDOW_TITLE)  # Use the window title from config.py
+        if config.FULLSCREEN_MODE:  # Check if fullscreen mode is enabled in config.py
+            self.showFullScreen()
+        else:
+            self.show()  # Show in windowed mode if fullscreen is not enabled
 
     def onStateChanged(self, state):
         # Handle state changes here
@@ -80,9 +85,9 @@ def handle_client_connection(client_socket, appState):
 
 def start_server(appState):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(('localhost', 9999))
-    server_socket.listen(5)
-    print("App server listening on port 9999")
+    server_socket.bind((config.SERVER_HOST, config.SERVER_PORT))  # Use server host and port from config.py
+    server_socket.listen(config.MAX_CONNECTIONS)  # Use max connections from config.py
+    print(f"App server listening on {config.SERVER_HOST}:{config.SERVER_PORT}")
 
     while True:
         client_socket, addr = server_socket.accept()

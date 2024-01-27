@@ -1,3 +1,4 @@
+import config
 from datetime import datetime
 from sh import gphoto2 as gp
 import signal
@@ -12,7 +13,7 @@ def kill_process():
 
         # Look for the process pid
         for line in out.split():
-            if b'gvfsd-gphoto2' in line:
+            if config.PROCESS_TO_KILL.encode() in line:
                 # Kill the process
                 pid = int(line.split(None, 1)[0])
                 os.kill(pid, signal.SIGKILL)
@@ -50,9 +51,9 @@ def run_gphoto2_command(command):
         print(f"An unexpected error occurred: {str(e)}")
 
 def make_picture():
-    trigger_photo_cmd = "gphoto2 --capture-image"
-    download_pics_cmd = "gphoto2 --get-all-files"
-    clear_files_cmd = "gphoto2 --delete-all-files"
+    trigger_photo_cmd = config.TRIGGER_PHOTO_COMMAND
+    download_pics_cmd = config.DOWNLOAD_PHOTOS_COMMAND
+    clear_files_cmd = config.CLEAR_FILES_COMMAND
 
     try:
         start_download = datetime.now()
@@ -90,7 +91,7 @@ if __name__ == '__main__':
     shot_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     clear_files_cmd = ["--folder", "/store_00020001/DCIM/100CANON", "-R", "--delete-all-files"]
     folder_name = shot_date
-    save_pic_to = "/home/odemsloh/Desktop/DoxBox/pics/" + folder_name
+    save_pic_to = os.path.join(config.PICTURE_SAVE_DIRECTORY, folder_name)
     kill_process()
     gp(clear_files_cmd)
     create_output_folder()
