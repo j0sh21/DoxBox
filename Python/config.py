@@ -4,7 +4,7 @@ config = configparser.ConfigParser()
 
 # Attempt to read the config file
 try:
-    config.read('cfg.ini')
+    config.read(r'../config/cfg.ini')
 except Exception as e:
     print(f"Error reading the config file: {e}")
 
@@ -39,8 +39,6 @@ CLEAR_FILES_COMMAND = get_config_value('Camera', 'CLEAR_FILES_COMMAND')
 
 # Storage Configuration
 PICTURE_SAVE_DIRECTORY = get_config_value('Storage', 'PICTURE_SAVE_DIRECTORY')
-FOLDER_NAME_FORMAT = get_config_value('Storage', 'FOLDER_NAME_FORMAT')
-PICTURE_NAME_FORMAT = get_config_value('Storage', 'PICTURE_NAME_FORMAT')
 
 # System Configuration
 PROCESS_TO_KILL = get_config_value('System', 'PROCESS_TO_KILL')
@@ -57,3 +55,5 @@ DEFAULT_TEXT = get_config_value('Display', 'DEFAULT_TEXT')
 SERVER_HOST = get_config_value('Server', 'SERVER_HOST')
 SERVER_PORT = config.getint('Server', 'SERVER_PORT')  # Assuming SERVER_PORT will always be present and correctly formatted
 MAX_CONNECTIONS = config.getint('Server', 'MAX_CONNECTIONS')  # Assuming MAX_CONNECTIONS will always be present and correctly formatted
+
+print("Config successfully loaded!")
