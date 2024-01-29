@@ -1,3 +1,4 @@
+import subprocess
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout
 from PyQt5.QtMultimedia import QCamera, QCameraInfo
 from PyQt5.QtMultimediaWidgets import QCameraViewfinder
@@ -115,13 +116,59 @@ class VendingMachineDisplay(QWidget):
 
     def onStateChanged(self, state):
         # Handle state changes here
-        if state == "1":
-            # For example, update the text label
-            self.textLabel.setText("State changed to 1")
+
+
+        # Mapping of states to messages
+        state_messages = {
+            "0": "State changed to 0",
+            "1": "State changed to 1",
+            "2": "State changed to 2",
+            "3": "State changed to 3",
+            "4": "State changed to 4",
+            "5": "State changed to 5",
+            "100": "State changed to 100"
+        }
+
+        # Update the text label based on the state
+        message = state_messages.get(state, "Unknown state")
+        self.textLabel.setText(message)
+
         # Add more state handling as needed
 
         # Update GIF based on the state
         self.updateGIF(state)
+
+        if state == "1":
+
+            # start countdown gif
+            try:
+                #time.sleep(5)
+                if config.DEBUG_MODE:
+                    print("Simulate Photo")
+                else:
+
+                    #subprocess.Popen(["python", "img_capture.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    print("img_capture.py started successfully.")
+
+                    # Update the UI or perform other actions based on the new state
+                    #self.onStateChanged(self.appState.state)
+            except Exception as e:
+                print(f"Failed to start img_capture.py: {e}")
+        if state == "2":
+
+              # Update the state
+            print("ffffff")
+
+            # Update the UI or perform other actions based on the new state
+            #self.onStateChanged(self.appState.state)
+
+        elif state == "4":
+            print("es")
+            #TODO start print.py when print py finished it sends 5 to the app
+            #start print gif
+        elif state == "5":
+            print("w")
+
 
     def updateGIF(self, state):
         # Map states to subfolders
@@ -151,6 +198,7 @@ class VendingMachineDisplay(QWidget):
                 self.gifLabel.setAlignment(Qt.AlignCenter)  # Center the content
                 # Load the GIF
                 movie = QMovie(gif_path)
+                print(f"{gif_path}")
                 # Scale the GIF
                 movie.setScaledSize(QSize(500, 500))
                 # Set the QMovie to the QLabel
@@ -168,6 +216,15 @@ class VendingMachineDisplay(QWidget):
                 print("No GIF files found in the specified folder.")
         except FileNotFoundError:
             print(f"The folder {gif_folder_path} does not exist.")
+
+def send_message_to_app(message):
+    try:
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client_socket.connect((config.HOST, config.PORT))
+        client_socket.sendall(message.encode())
+        client_socket.close()
+    except Exception as e:
+        print(f"Error in sending message to app: {e}")
 
 def handle_client_connection(client_socket, appState):
     try:
