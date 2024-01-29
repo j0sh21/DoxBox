@@ -47,7 +47,6 @@ class VendingMachineDisplay(QWidget):
         header.setFixedHeight(50)
         # Set the background color of the header to dark purple
         header.setStyleSheet("background-color: #301934; color: white;")  # Added color: white for the text
-
         header.setAlignment(Qt.AlignCenter)
         layout.addWidget(header)
 
@@ -97,7 +96,6 @@ class VendingMachineDisplay(QWidget):
         self.textLabel.setAlignment(Qt.AlignCenter)
         self.textLabel.setStyleSheet(
             "background-color: rgba(255, 255, 255, 128);")  # Optional: Semi-transparent background
-
         self.textLabel.adjustSize()  # Adjust size based on text content
         self.repositionTextLabel()
         self.textLabel.raise_()
@@ -140,7 +138,6 @@ class VendingMachineDisplay(QWidget):
         #default value if state not in subfolder map
         subfolder = subfolder_map.get(state, "0_welcome")
 
-
         # Construct the path to the subfolder
         gif_folder_path = os.path.join("..", "images", "gifs", subfolder)
 
@@ -151,10 +148,7 @@ class VendingMachineDisplay(QWidget):
                 # Randomly select a GIF
                 selected_gif = random.choice(gifs)
                 gif_path = os.path.join(gif_folder_path, selected_gif)
-
-
                 self.gifLabel.setAlignment(Qt.AlignCenter)  # Center the content
-
                 # Load the GIF
                 movie = QMovie(gif_path)
                 # Scale the GIF
