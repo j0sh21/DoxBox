@@ -1,8 +1,8 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout
 from PyQt5.QtMultimedia import QCamera, QCameraInfo
 from PyQt5.QtMultimediaWidgets import QCameraViewfinder
 from PyQt5.QtGui import QPixmap, QMovie
-from PyQt5.QtCore import Qt, pyqtSignal, QObject
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QSize, QRect, QPoint
 import sys
 import threading
 import socket
@@ -42,36 +42,78 @@ class VendingMachineDisplay(QWidget):
         layout = QVBoxLayout()
         self.setLayout(layout)
 
+        # Header setup
+        header = QLabel("Header")  # Or use a QWidget and customize it
+        header.setFixedHeight(50)
+        # Set the background color of the header to dark purple
+        header.setStyleSheet("background-color: #301934; color: white;")  # Added color: white for the text
+
+        header.setAlignment(Qt.AlignCenter)
+        layout.addWidget(header)
+
+        # Content area with sidebar and viewfinder
+        contentLayout = QHBoxLayout()
+
+        # Sidebar setup
+        sidebar = QWidget()
+        sidebar.setFixedWidth(150)
+        sidebar.setStyleSheet("background-color: #301934; color: white;")  # Added color: white for the text
+        sidebarLayout = QVBoxLayout(sidebar)
+        sidebarLayout.setContentsMargins(0, 0, 0, 0)  # Remove any margins to ensure the QR code is at the very top
+        sidebarLayout.setSpacing(0)  # Remove spacing between widgets in the sidebar
+
+        # QR Code setup
+        self.qrCodeLabel = QLabel(sidebar)
+        pixmap = QPixmap(config.IMAGE_PATH)  # Use the image path from config.py
+        self.qrCodeLabel.setPixmap(pixmap.scaled(config.IMAGE_WIDTH, config.IMAGE_HEIGHT,
+                                                Qt.KeepAspectRatio))  # Use image dimensions from config.py
+        self.qrCodeLabel.setAlignment(Qt.AlignCenter)  # Center the QR code horizontally in the sidebar
+        # Add the QR code to the sidebar layout
+        sidebarLayout.addWidget(self.qrCodeLabel)
+
         # Set up the webcam viewfinder
         self.viewfinder = QCameraViewfinder(self)
         layout.addWidget(self.viewfinder)
+
+        contentLayout.addWidget(sidebar)
+        contentLayout.addWidget(self.viewfinder, 1)  # The '1' makes the viewfinder expand
+
+        # Add the content layout to the main layout
+        layout.addLayout(contentLayout)
 
         # Initialize and start the camera
         self.camera = QCamera(QCameraInfo.defaultCamera())
         self.camera.setViewfinder(self.viewfinder)
         self.camera.start()
 
-        # Display a static image (e.g., QR code) with a smaller size
-        self.imageLabel = QLabel(self)
-        pixmap = QPixmap(config.IMAGE_PATH)  # Use the image path from config.py
-        self.imageLabel.setPixmap(pixmap.scaled(config.IMAGE_WIDTH, config.IMAGE_HEIGHT, Qt.KeepAspectRatio))  # Use image dimensions from config.py
-        layout.addWidget(self.imageLabel)
+        # Initialize the QLabel for displaying GIFs with the viewfinder as its parent
+        self.gifLabel = QLabel(self.viewfinder)
+        self.gifLabel.setAlignment(Qt.AlignCenter)  # Center the content
+        self.gifLabel.setGeometry(QRect(0, 0, 500, 500))  # Set the geometry to 500x500 pixels
+        self.gifLabel.hide()  # Initially hide the gifLabel
 
-        # Initialize the QLabel for displaying GIFs
-        self.gifLabel = QLabel(self)
-        layout.addWidget(self.gifLabel)  # Add the gifLabel to the layout
-
-        # Display text
-        self.textLabel = QLabel(config.DEFAULT_TEXT, self)  # Use the default text from config.py
+        # Display text in the middle of the screen, always on top
+        self.textLabel = QLabel(config.DEFAULT_TEXT, self)
         self.textLabel.setAlignment(Qt.AlignCenter)
-        layout.addWidget(self.textLabel)
+        self.textLabel.setStyleSheet(
+            "background-color: rgba(255, 255, 255, 128);")  # Optional: Semi-transparent background
+
+        self.textLabel.adjustSize()  # Adjust size based on text content
+        self.repositionTextLabel()
+        self.textLabel.raise_()
 
         # Window configurations
         if config.FULLSCREEN_MODE:  # Check if fullscreen mode is enabled in config.py
             self.showFullScreen()
         else:
-            self.setWindowTitle(config.WINDOW_TITLE)  # Use the window title from config.py
-            self.show()  # Show in windowed mode if fullscreen is not enabled
+            self.setWindowTitle(config.WINDOW_TITLE)
+            self.show()
+
+    def repositionTextLabel(self):
+        # Center the textLabel within the window
+        rect = self.textLabel.rect()
+        self.textLabel.move((self.width() - rect.width()) // 2, (self.height() - rect.height()) // 2)
+
 
     def onStateChanged(self, state):
         # Handle state changes here
@@ -110,10 +152,24 @@ class VendingMachineDisplay(QWidget):
                 selected_gif = random.choice(gifs)
                 gif_path = os.path.join(gif_folder_path, selected_gif)
 
-                # Use QMovie to display the selected GIF
+
+                self.gifLabel.setAlignment(Qt.AlignCenter)  # Center the content
+
+                # Load the GIF
                 movie = QMovie(gif_path)
+                # Scale the GIF
+                movie.setScaledSize(QSize(500, 500))
+                # Set the QMovie to the QLabel
                 self.gifLabel.setMovie(movie)
+                # Start the GIF animation
                 movie.start()
+
+                # Position the gifLabel in the center of the viewfinder
+                vfCenter = self.viewfinder.geometry().center()
+                gifTopLeft = vfCenter - QPoint(250, 250)  # Adjust for the size of the gifLabel
+                self.gifLabel.move(gifTopLeft)
+                self.gifLabel.show()  # Make sure the gifLabel is visible
+
             else:
                 print("No GIF files found in the specified folder.")
         except FileNotFoundError:
