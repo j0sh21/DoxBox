@@ -1,11 +1,14 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
+import subprocess
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout
 from PyQt5.QtMultimedia import QCamera, QCameraInfo
 from PyQt5.QtMultimediaWidgets import QCameraViewfinder
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt, pyqtSignal, QObject
+from PyQt5.QtGui import QPixmap, QMovie
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QSize, QRect, QPoint
 import sys
 import threading
 import socket
+import os
+import random
 
 # Import the configuration variables
 import config  # Assuming config.py is in the same directory
@@ -31,48 +34,260 @@ class AppState(QObject):
 class VendingMachineDisplay(QWidget):
     def __init__(self, appState):
         super().__init__()
+        self.loopCount = 0
+        self.desiredLoops = 2
         self.appState = appState
         self.initUI()
         self.appState.stateChanged.connect(self.onStateChanged)
+        self.movie = QMovie(self)
+        self.movieLabel = QLabel()
+
+        self.movie.frameChanged.connect(self.checkLoop) #TODO
+
+        #
+
+    def calculateDuration(self, frame_number):
+        if frame_number == 0:  # Check if this is the first frame
+            # Calculate the total duration of the GIF
+            frame_count = self.movie.frameCount()
+            frame_rate = self.movie.nextFrameDelay()  # Delay between frames in milliseconds
+            total_duration = frame_count * frame_rate / 1000  # Total duration in seconds
+
+            # Disconnect the signal to prevent recalculating on every frame change
+            self.movie.frameChanged.disconnect()
+
+            print(str(total_duration))
+
+            # You can now use total_duration for further logic
+            # For example, connect to the finished signal if needed
+
+    def onGIFFinished(self, movie, total_duration, state):
+        print("GIFF finished")
+        if total_duration < 3.0 and movie.loopCount() < 2:
+            # If the GIF is shorter than 3 seconds and hasn't looped twice, play it again
+            movie.setLoopCount(2)  # Ensure it will loop twice
+            movie.start()
+        else:
+            # Once the GIF has completed its loops, select a new GIF for the same state
+            self.updateGIF(state)
 
     def initUI(self):
         # Set the layout
         layout = QVBoxLayout()
         self.setLayout(layout)
 
+        # Header setup
+        header = QLabel("Header")  # Or use a QWidget and customize it
+        header.setFixedHeight(50)
+        # Set the background color of the header to dark purple
+        header.setStyleSheet("background-color: #301934; color: white;")  # Added color: white for the text
+        header.setAlignment(Qt.AlignCenter)
+        layout.addWidget(header)
+
+        # Content area with sidebar and viewfinder
+        contentLayout = QHBoxLayout()
+
+        # Sidebar setup
+        sidebar = QWidget()
+        sidebar.setFixedWidth(150)
+        sidebar.setStyleSheet("background-color: #301934; color: white;")  # Added color: white for the text
+        sidebarLayout = QVBoxLayout(sidebar)
+        sidebarLayout.setContentsMargins(0, 0, 0, 0)  # Remove any margins to ensure the QR code is at the very top
+        sidebarLayout.setSpacing(0)  # Remove spacing between widgets in the sidebar
+
+        # QR Code setup
+        self.qrCodeLabel = QLabel(sidebar)
+        pixmap = QPixmap(config.IMAGE_PATH)  # Use the image path from config.py
+        self.qrCodeLabel.setPixmap(pixmap.scaled(config.IMAGE_WIDTH, config.IMAGE_HEIGHT,
+                                                Qt.KeepAspectRatio))  # Use image dimensions from config.py
+        self.qrCodeLabel.setAlignment(Qt.AlignCenter)  # Center the QR code horizontally in the sidebar
+        # Add the QR code to the sidebar layout
+        sidebarLayout.addWidget(self.qrCodeLabel)
+
         # Set up the webcam viewfinder
         self.viewfinder = QCameraViewfinder(self)
         layout.addWidget(self.viewfinder)
+
+        contentLayout.addWidget(sidebar)
+        contentLayout.addWidget(self.viewfinder, 1)  # The '1' makes the viewfinder expand
+
+        # Add the content layout to the main layout
+        layout.addLayout(contentLayout)
 
         # Initialize and start the camera
         self.camera = QCamera(QCameraInfo.defaultCamera())
         self.camera.setViewfinder(self.viewfinder)
         self.camera.start()
 
-        # Display a static image (e.g., QR code) with a smaller size
-        self.imageLabel = QLabel(self)
-        pixmap = QPixmap(config.IMAGE_PATH)  # Use the image path from config.py
-        self.imageLabel.setPixmap(pixmap.scaled(config.IMAGE_WIDTH, config.IMAGE_HEIGHT, Qt.KeepAspectRatio))  # Use image dimensions from config.py
-        layout.addWidget(self.imageLabel)
+        # Initialize the QLabel for displaying GIFs with the viewfinder as its parent
+        self.gifLabel = QLabel(self.viewfinder)
+        self.gifLabel.setAlignment(Qt.AlignCenter)  # Center the content
+        self.gifLabel.setGeometry(QRect(0, 0, 500, 500))  # Set the geometry to 500x500 pixels
+        self.gifLabel.hide()  # Initially hide the gifLabel
 
-        # Display text
-        self.textLabel = QLabel(config.DEFAULT_TEXT, self)  # Use the default text from config.py
+        # Display text in the middle of the screen, always on top
+        self.textLabel = QLabel(config.DEFAULT_TEXT, self)
         self.textLabel.setAlignment(Qt.AlignCenter)
-        layout.addWidget(self.textLabel)
+        self.textLabel.setStyleSheet(
+            "background-color: rgba(255, 255, 255, 128);")  # Optional: Semi-transparent background
+        self.textLabel.adjustSize()  # Adjust size based on text content
+        self.repositionTextLabel()
+        self.textLabel.raise_()
 
-        # Window settings
-        self.setWindowTitle(config.WINDOW_TITLE)  # Use the window title from config.py
+        # Window configurations
         if config.FULLSCREEN_MODE:  # Check if fullscreen mode is enabled in config.py
             self.showFullScreen()
         else:
-            self.show()  # Show in windowed mode if fullscreen is not enabled
+            self.setWindowTitle(config.WINDOW_TITLE)
+            self.show()
+
+    def repositionTextLabel(self):
+        # Center the textLabel within the window
+        rect = self.textLabel.rect()
+        self.textLabel.move((self.width() - rect.width()) // 2, (self.height() - rect.height()) // 2)
+
 
     def onStateChanged(self, state):
         # Handle state changes here
-        if state == "1":
-            # For example, update the text label
-            self.textLabel.setText("State changed to 1")
+
+
+        # Mapping of states to messages
+        state_messages = {
+            "0": "State changed to 0",
+            "1": "State changed to 1",
+            "2": "State changed to 2",
+            "3": "State changed to 3",
+            "4": "State changed to 4",
+            "5": "State changed to 5",
+            "100": "State changed to 100"
+        }
+
+        # Update the text label based on the state
+        message = state_messages.get(state, "Unknown state")
+        self.textLabel.setText(message)
+
         # Add more state handling as needed
+
+        # Update GIF based on the state
+        self.updateGIF(state)
+
+        if state == "1":
+
+            # start countdown gif
+            try:
+                #time.sleep(5)
+                if config.DEBUG_MODE:
+                    print("Simulate Photo")
+                else:
+
+                    #subprocess.Popen(["python", "img_capture.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    print("img_capture.py started successfully.")
+
+                    # Update the UI or perform other actions based on the new state
+                    #self.onStateChanged(self.appState.state)
+            except Exception as e:
+                print(f"Failed to start img_capture.py: {e}")
+        if state == "2":
+
+              # Update the state
+            print("ffffff")
+
+            # Update the UI or perform other actions based on the new state
+            #self.onStateChanged(self.appState.state)
+
+        elif state == "4":
+            print("es")
+            #TODO start print.py when print py finished it sends 5 to the app
+            #start print gif
+        elif state == "5":
+            print("w")
+
+    def checkLoop(self):
+        print("Checking loop")
+        print(str(self.movie.currentFrameNumber()))
+        if self.movie.currentFrameNumber() == self.movie.frameCount() - 1:  # Last frame
+            self.calculateDuration(self.movie.currentFrameNumber() )
+            self.loopCount += 1
+            if self.loopCount >= self.desiredLoops:
+                self.movie.stop()
+                self.onGIFFinished(self.movie, self.total_duration, self.appState.state)
+
+
+    def playGIF(self, gifPath):
+        self.movie.setFileName(gifPath)
+        self.gifLabel.setMovie(self.movie)
+        self.movie = QMovie(gifPath)
+        self.gifLabel.show()
+        self.loopCount = 0  # Reset loop count each time a new GIF is played
+        self.movie.start()
+        self.checkLoop() #TODO
+
+
+
+    def updateGIF(self, state):
+        # Map states to subfolders
+        subfolder_map = {
+            "0": "0_welcome",
+            "1": "1_payment",
+            "2": "2_countdown",
+            "3": "3_smile",
+            "4": "4_print",
+            "5": "5_thx",
+            "100": "100_error"
+        }
+
+        #default value if state not in subfolder map
+        subfolder = subfolder_map.get(state, "0_welcome")
+
+        # Construct the path to the subfolder
+        gif_folder_path = os.path.join("..", "images", "gifs", subfolder)
+
+        # List all GIF files in the subfolder
+        try:
+            gifs = [file for file in os.listdir(gif_folder_path) if file.endswith(".gif")]
+            if gifs:
+                # Randomly select a GIF
+                selected_gif = random.choice(gifs)
+                gif_path = os.path.join(gif_folder_path, selected_gif)
+                self.gifLabel.setAlignment(Qt.AlignCenter)  # Center the content
+                # Load the GIF
+                try:
+                    self.playGIF(gif_path)
+                except Exception as e:
+                    print(str(e))
+                print(f"{gif_path}")
+
+
+                # Scale the GIF
+                self.gifLabel.setMovie(self.movie)
+                self.movie.setScaledSize(QSize(500, 500))
+                # Connect to the frameChanged signal to calculate the duration once the first frame is displayed
+                # Start the GIF animation
+                # Ensure the movie is set to loop at least once
+                # This ensures the `finished` signal can be emitted
+
+
+
+
+                # Position the gifLabel in the center of the viewfinder
+                vfCenter = self.viewfinder.geometry().center()
+                gifTopLeft = vfCenter - QPoint(250, 250)  # Adjust for the size of the gifLabel
+                self.gifLabel.move(gifTopLeft)
+                self.gifLabel.show()  # Make sure the gifLabel is visible
+
+            else:
+                print("No GIF files found in the specified folder.")
+        except FileNotFoundError:
+            print(f"The folder {gif_folder_path} does not exist.")
+
+def send_message_to_app(message):
+    try:
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client_socket.connect((config.HOST, config.PORT))
+        client_socket.sendall(message.encode())
+        client_socket.close()
+    except Exception as e:
+        print(f"Error in sending message to app: {e}")
 
 def handle_client_connection(client_socket, appState):
     try:
