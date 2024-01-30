@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Update package lists
+sudo apt-get update
+
+# Install necessary packages
+sudo apt-get install -y libcups2-dev libcupsimage2-dev gcc python3-dev
+
 # Check if Python is installed
 if ! command -v python &> /dev/null
 then

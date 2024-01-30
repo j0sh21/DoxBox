@@ -45,9 +45,6 @@ def main_loop():
         else:
             exit(response.status_code)
 
-        # Example of sending a message to app.py
-        # send_message_to_app("Update from switch.py")
-
 if __name__ == '__main__':
     main_thread = threading.Thread(target=main_loop)
     main_thread.start()
