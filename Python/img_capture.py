@@ -111,7 +111,7 @@ def rename_pics():
 if __name__ == '__main__':
     shot_date = datetime.now().strftime("%Y-%m-%d")
     shot_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    clear_files_cmd = ["--folder", "/store_00020001/DCIM/100CABON", "-R", "--delete-all-files"]
+    clear_files_cmd = ["--folder", "/store_00020001/DCIM/100CANON", "-R", "--delete-all-files"]
     folder_name = shot_date
     save_pic_to = os.path.join(config.PICTURE_SAVE_DIRECTORY, folder_name)
     kill_process()
