@@ -53,7 +53,6 @@ Para usar pycups em seu Raspberry Pi, você precisa garantir que as dependência
 
 1. **Atualize seu Sistema**: Certifique-se de que suas listas de pacotes e pacotes instalados estejam atualizados.
 
-       ```bash
        sudo apt-get update
        sudo apt-get upgrade
 

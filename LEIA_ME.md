@@ -1,4 +1,3 @@
-"""
 # Visão Geral do Projeto
 
 Este projeto foi projetado para aproveitar as capacidades de um Raspberry Pi ou qualquer outro sistema hospedeiro baseado no Debian para interagir com uma câmera DSLR para captura de imagens de alta qualidade, enquanto gerencia e interage com um fluxo de trabalho de aplicativo específico, que inclui captura de imagem, impressão e interação dinâmica com a interface do usuário. O aplicativo é executado em Python e se integra a vários sistemas e bibliotecas externas, como o CUPS para impressão e o gphoto2 para controle da câmera, para fornecer sua funcionalidade.

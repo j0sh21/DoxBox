@@ -37,7 +37,8 @@ This project is designed to leverage the capabilities of a Raspberry Pi or any o
 
    - If you want to install  additional system-level dependencies automaticlly than run install.sh instead:
       ```sh
-      chmod install.sh +x
+      cd DoxBox/install
+      chmod u+x install.sh
       ./install.sh
 
 3. **Configure**: Review and update config/cfg.ini with your specific settings, such as device names, API keys, and file paths.

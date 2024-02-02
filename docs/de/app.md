@@ -89,9 +89,8 @@ Funktionen
 3. Multimediaunterstützung: Falls Kamerafunktionalität verwendet wird, kann sie Funktionen wie die Anzeige eines Live-Kamera-Feeds umfassen und QCamera und QCameraViewfinder nutzen.
 
 ## Klassendefinition
-### Konstruktor
-
-    __init__(self, appState): Initialisiert eine neue Instanz der VendingMachineDisplay-Klasse und nimmt ein AppState-Objekt als Argument, um das Zustandsmanagement und die Interaktion zu erleichtern.
+### Konstruktor`__init__(self, appState)`: 
+ Initialisiert eine neue Instanz der VendingMachineDisplay-Klasse und nimmt ein AppState-Objekt als Argument, um das Zustandsmanagement und die Interaktion zu erleichtern.
 
 ## Wichtige Methoden
 
