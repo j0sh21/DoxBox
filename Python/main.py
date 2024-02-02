@@ -6,19 +6,19 @@ DEBUG = config.DEBUG_MODE  # Set to True to run debug_client.py instead of switc
 
 
 def run_app2():
-    subprocess.run(["python", "./dev/process_mock.py"])
+    subprocess.run(["python3", "./dev/process_mock.py"])
 
 
 def run_app():
-    subprocess.run(["python", "app.py"])
+    subprocess.run(["python3", "app.py"])
 
 def run_switch_or_debug_as_subprocess():
     if DEBUG:
         # Running debug_client.py as a subprocess when DEBUG is True
-        subprocess.run(["python", r"./dev/debug_client.py"])
+        subprocess.run(["python3", r"./dev/debug_client.py"])
     else:
         # Running switch.py as a subprocess when DEBUG is False
-        subprocess.run(["python", "switch.py"])
+        subprocess.run(["python3", "switch.py"])
 
 def main():
     # Starting app.py in a separate thread

@@ -1,6 +1,6 @@
 import subprocess
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout
-from PyQt5.QtMultimedia import QCamera, QCameraInfo
+from PyQt5.QtMultimedia import QCamera, QCameraInfo, QCameraViewfinderSettings
 from PyQt5.QtMultimediaWidgets import QCameraViewfinder
 from PyQt5.QtGui import QPixmap, QMovie
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QSize, QRect, QPoint
@@ -36,40 +36,46 @@ class VendingMachineDisplay(QWidget):
         super().__init__()
         self.loopCount = 0
         self.desiredLoops = 2
+        self.total_duration = 0
         self.appState = appState
         self.initUI()
         self.appState.stateChanged.connect(self.onStateChanged)
         self.movie = QMovie(self)
         self.movieLabel = QLabel()
 
-        self.movie.frameChanged.connect(self.checkLoop) #TODO
+        # Connect the frameChanged signal to onFrameChanged
+        self.movie.frameChanged.connect(self.onFrameChanged)
+        #self.movie.frameChanged.connect(self.checkLoop) #TODO
 
         #
 
-    def calculateDuration(self, frame_number):
-        if frame_number == 0:  # Check if this is the first frame
-            # Calculate the total duration of the GIF
-            frame_count = self.movie.frameCount()
-            frame_rate = self.movie.nextFrameDelay()  # Delay between frames in milliseconds
-            total_duration = frame_count * frame_rate / 1000  # Total duration in seconds
-
-            # Disconnect the signal to prevent recalculating on every frame change
-            self.movie.frameChanged.disconnect()
-
-            print(str(total_duration))
+    def onFrameChanged(self, frameNumber):
+        # This method is called every time the frame changes in the QMovie
+        #print("frame changed")
+        if frameNumber == self.movie.frameCount() - 1:  # Check if it's the last frame
+            self.movie.stop()
+            self.onGIFFinished()  # Assuming onGIFFinished is properly defined elsewhere
 
             # You can now use total_duration for further logic
             # For example, connect to the finished signal if needed
 
-    def onGIFFinished(self, movie, total_duration, state):
+    def onGIFFinished(self):
+        self.updateGIF(appState.state)
         print("GIFF finished")
-        if total_duration < 3.0 and movie.loopCount() < 2:
-            # If the GIF is shorter than 3 seconds and hasn't looped twice, play it again
-            movie.setLoopCount(2)  # Ensure it will loop twice
-            movie.start()
-        else:
-            # Once the GIF has completed its loops, select a new GIF for the same state
-            self.updateGIF(state)
+        #if self.total_duration < 3.0 and self.movie.loopCount() < 2:
+        #    # If the GIF is shorter than 3 seconds and hasn't looped twice, play it again
+        #    self.movie.setLoopCount(2)  # Ensure it will loop twice
+        #    self.movie.start()
+        #else:
+         #   # Once the GIF has completed its loops, select a new GIF for the same state
+         #   self.updateGIF()
+
+    def playGIF(self, gifPath):
+        self.movie.setFileName(gifPath)
+        self.gifLabel.setMovie(self.movie)
+        self.loopCount = 0  # Reset loop count each time a new GIF is played
+        self.movie.setScaledSize(QSize(500, 500))
+        self.movie.start()
 
     def initUI(self):
         # Set the layout
@@ -116,6 +122,14 @@ class VendingMachineDisplay(QWidget):
 
         # Initialize and start the camera
         self.camera = QCamera(QCameraInfo.defaultCamera())
+
+        # Erstellen Sie eine Einstellungsinstanz für die Ansichtfinder
+        viewfinder_settings = QCameraViewfinderSettings()
+        viewfinder_settings.setResolution(1280, 720)  # Setzen Sie die gewünschte Auflösung
+
+        # Setzen Sie die Einstellungen für die Ansichtfinder
+        self.camera.setViewfinderSettings(viewfinder_settings)
+
         self.camera.setViewfinder(self.viewfinder)
         self.camera.start()
 
@@ -150,7 +164,6 @@ class VendingMachineDisplay(QWidget):
     def onStateChanged(self, state):
         # Handle state changes here
 
-
         # Mapping of states to messages
         state_messages = {
             "0": "State changed to 0",
@@ -164,17 +177,20 @@ class VendingMachineDisplay(QWidget):
 
         # Update the text label based on the state
         message = state_messages.get(state, "Unknown state")
+        print(str(state))
         self.textLabel.setText(message)
 
         # Add more state handling as needed
 
-        # Update GIF based on the state
-        self.updateGIF(state)
+
 
         if state == "1":
 
             # start countdown gif
             try:
+                # Update GIF based on the state
+                self.movie.stop()
+                self.updateGIF(state)
                 #time.sleep(5)
                 if config.DEBUG_MODE:
                     print("Simulate Photo")
@@ -188,6 +204,9 @@ class VendingMachineDisplay(QWidget):
             except Exception as e:
                 print(f"Failed to start img_capture.py: {e}")
         if state == "2":
+            # Update GIF based on the state
+            self.movie.stop()
+            self.updateGIF(state)
 
               # Update the state
             print("ffffff")
@@ -196,32 +215,17 @@ class VendingMachineDisplay(QWidget):
             #self.onStateChanged(self.appState.state)
 
         elif state == "4":
+            # Update GIF based on the state
+            self.movie.stop()
+            self.updateGIF(state)
             print("es")
             #TODO start print.py when print py finished it sends 5 to the app
             #start print gif
         elif state == "5":
+            # Update GIF based on the state
+            self.movie.stop()
+            self.updateGIF(state)
             print("w")
-
-    def checkLoop(self):
-        print("Checking loop")
-        print(str(self.movie.currentFrameNumber()))
-        if self.movie.currentFrameNumber() == self.movie.frameCount() - 1:  # Last frame
-            self.calculateDuration(self.movie.currentFrameNumber() )
-            self.loopCount += 1
-            if self.loopCount >= self.desiredLoops:
-                self.movie.stop()
-                self.onGIFFinished(self.movie, self.total_duration, self.appState.state)
-
-
-    def playGIF(self, gifPath):
-        self.movie.setFileName(gifPath)
-        self.gifLabel.setMovie(self.movie)
-        self.movie = QMovie(gifPath)
-        self.gifLabel.show()
-        self.loopCount = 0  # Reset loop count each time a new GIF is played
-        self.movie.start()
-        self.checkLoop() #TODO
-
 
 
     def updateGIF(self, state):
@@ -237,7 +241,12 @@ class VendingMachineDisplay(QWidget):
         }
 
         #default value if state not in subfolder map
-        subfolder = subfolder_map.get(state, "0_welcome")
+        try:
+            print(str(state))
+        except Exception as e:
+            print(str(e))
+
+        subfolder = subfolder_map.get(state, "dddd_welcome")
 
         # Construct the path to the subfolder
         gif_folder_path = os.path.join("..", "images", "gifs", subfolder)
@@ -252,6 +261,12 @@ class VendingMachineDisplay(QWidget):
                 self.gifLabel.setAlignment(Qt.AlignCenter)  # Center the content
                 # Load the GIF
                 try:
+
+                    # Position the gifLabel in the center of the viewfinder
+                    vfCenter = self.viewfinder.geometry().center()
+                    gifTopLeft = vfCenter - QPoint(250, 250)  # Adjust for the size of the gifLabel
+                    self.gifLabel.move(gifTopLeft)
+                    self.gifLabel.show()  # Make sure the gifLabel is visible
                     self.playGIF(gif_path)
                 except Exception as e:
                     print(str(e))
@@ -259,8 +274,8 @@ class VendingMachineDisplay(QWidget):
 
 
                 # Scale the GIF
-                self.gifLabel.setMovie(self.movie)
-                self.movie.setScaledSize(QSize(500, 500))
+                #self.gifLabel.setMovie(self.movie)
+
                 # Connect to the frameChanged signal to calculate the duration once the first frame is displayed
                 # Start the GIF animation
                 # Ensure the movie is set to loop at least once
@@ -269,11 +284,6 @@ class VendingMachineDisplay(QWidget):
 
 
 
-                # Position the gifLabel in the center of the viewfinder
-                vfCenter = self.viewfinder.geometry().center()
-                gifTopLeft = vfCenter - QPoint(250, 250)  # Adjust for the size of the gifLabel
-                self.gifLabel.move(gifTopLeft)
-                self.gifLabel.show()  # Make sure the gifLabel is visible
 
             else:
                 print("No GIF files found in the specified folder.")
