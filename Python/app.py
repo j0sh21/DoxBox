@@ -145,6 +145,8 @@ class VendingMachineDisplay(QWidget):
         self.textLabel.move((self.width() - rect.width()) // 2, (self.height() - rect.height()) // 2)
 
     def onStateChanged(self, state):
+        global stateG
+        stateG = state
         # Mapping of states to messages
         state_messages = {
             "0": "State changed to 0",
@@ -157,19 +159,19 @@ class VendingMachineDisplay(QWidget):
         }
 
         # Update the text label based on the state
-        message = state_messages.get(state, "Unknown state")
-        print(str(state))
+        message = state_messages.get(stateG, "Unknown state")
+        print(str(stateG))
         self.textLabel.setText(message)
 
         # Add more state handling as needed
         self.movie.stop()
-        self.updateGIF(state)
+        self.updateGIF(stateG)
 
-        if state == "1":
+        if stateG == "1":
             print("State changed to 1")
             time.sleep(3)
-            state = "2"
-        elif state == "2":
+            stateG = "2"
+        elif stateG == "2":
             try:
                 if config.DEBUG_MODE > 1:
                     print("Simulate Photo")
@@ -178,17 +180,17 @@ class VendingMachineDisplay(QWidget):
                     print("img_capture.py started successfully.")
             except Exception as e:
                 print(f"Failed to start img_capture.py: {e}")
-        elif state == "3":
+        elif stateG == "3":
             time.sleep(2)
             print("take photo")
             img_capture.main()
-        elif state == "4":
+        elif stateG == "4":
             if config.DEBUG_MODE > 2:
                 print("Simulate print")
                 subprocess.run(["python3", "./dev/printer_mock.py"])
             else:
                 subprocess.run(["python3", ".print.py"])
-        elif state == "5":
+        elif stateG == "5":
             print("Tahnk You!")
 
     def updateGIF(self, state):
