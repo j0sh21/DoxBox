@@ -167,6 +167,8 @@ class VendingMachineDisplay(QWidget):
 
         if state == "1":
             print("State changed to 1")
+            time.sleep(3)
+            state == "2"
         elif state == "2":
             try:
                 if config.DEBUG_MODE > 1:
