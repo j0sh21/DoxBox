@@ -1,7 +1,6 @@
 import socket
 import time
 
-
 def send_number_to_server(number):
     try:
         # Establishing connection with the server
@@ -18,18 +17,11 @@ def send_number_to_server(number):
     except Exception as e:
         print(f"Error in sending number to server: {e}")
 
-def test_process():
-    time.sleep(2)
-    print("Start automated process test without taking photo or printing image")
-    send_number_to_server(1)
-    time.sleep(5)
-    send_number_to_server(2)
-    time.sleep(10)
-    send_number_to_server(3)
-    time.sleep(2)
-    send_number_to_server(4)
+def print_pic():
+    print("Start printer mock")
     time.sleep(45)
-    send_number_to_server(4)
+    print("printing simulation finished!")
+    send_number_to_server(5)
 
 if __name__ == '__main__':
-    test_process()
+    print_pic()

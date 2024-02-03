@@ -56,6 +56,6 @@ SERVER_HOST = get_config_value('Server', 'SERVER_HOST')
 SERVER_PORT = config.getint('Server', 'SERVER_PORT')  # Assuming SERVER_PORT will always be present and correctly formatted
 MAX_CONNECTIONS = config.getint('Server', 'MAX_CONNECTIONS')  # Assuming MAX_CONNECTIONS will always be present and correctly formatted
 
-DEBUG_MODE = get_config_value('DEV', 'DEBUG')
+DEBUG_MODE = int(get_config_value('DEV', 'DEBUG'))
 
 print("Config successfully loaded!")

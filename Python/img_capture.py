@@ -27,7 +27,7 @@ def kill_process():
                 # Kill the process
                 pid = int(line.split(None, 1)[0])
                 os.kill(pid, signal.SIGKILL)
-                print(f'Process with PID {pid} (gvfsd-gphoto2) killed.')
+                print(f'Process with PID {pid} (gvfsd) killed.')
     except subprocess.CalledProcessError as e:
         print(f"Error while executing 'ps': {str(e)}")
         send_message_to_app("100")
@@ -39,6 +39,9 @@ def kill_process():
         send_message_to_app("100")
 
 def create_output_folder():
+    shot_date = datetime.now().strftime("%Y-%m-%d")
+    folder_name = shot_date
+    save_pic_to = os.path.join(config.PICTURE_SAVE_DIRECTORY, folder_name)
     try:
         os.makedirs(save_pic_to)
     except FileExistsError:
@@ -89,6 +92,7 @@ def make_picture():
         send_message_to_app("100")
 
 def rename_pics():
+    shot_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     try:
         for filename in os.listdir("."):
             if len(filename) < 13:
@@ -107,15 +111,14 @@ def rename_pics():
     except Exception as e:
         print(f"An unexpected error occurred: {str(e)}")
 
-
-if __name__ == '__main__':
-    shot_date = datetime.now().strftime("%Y-%m-%d")
-    shot_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+def main():
     clear_files_cmd = ["--folder", "/store_00020001/DCIM/100CANON", "-R", "--delete-all-files"]
-    folder_name = shot_date
-    save_pic_to = os.path.join(config.PICTURE_SAVE_DIRECTORY, folder_name)
     kill_process()
     gp(clear_files_cmd)
     create_output_folder()
     make_picture()
     rename_pics()
+
+
+if __name__ == '__main__':
+    main()
