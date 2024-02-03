@@ -171,7 +171,7 @@ class VendingMachineDisplay(QWidget):
             state = "2"
         elif state == "2":
             try:
-                if config.DEBUG_MODE > 1:
+                if config.DEBUG_MODE == 1:
                     print("Simulate Photo")
                 else:
                     subprocess.Popen(["python", "img_capture.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -183,7 +183,7 @@ class VendingMachineDisplay(QWidget):
             print("take photo")
             img_capture.main()
         elif state == "4":
-            if config.DEBUG_MODE > 2:
+            if config.DEBUG_MODE == 2:
                 print("Simulate print")
                 subprocess.run(["python3", "./dev/printer_mock.py"])
             else:

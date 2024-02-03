@@ -28,9 +28,9 @@ def main():
     if DEBUG == 2:
         app_thread2 = threading.Thread(target=run_app2())
         app_thread2.start()
-
-    if DEBUG == 3:
         print("Start Debug process without payment and printing")
+
+
     else:
         print("Start SWITCH CLIENT")
         # Running switch.py as a subprocess when DEBUG is False
