@@ -71,6 +71,7 @@ def run_gphoto2_command(command):
         subprocess.run(command, shell=True, check=True)
     except subprocess.CalledProcessError as e:
         print(f"Error running command '{command}': {str(e)}")
+        send_message_to_app("100")
     except Exception as e:
         print(f"An unexpected error occurred: {str(e)}")
         send_message_to_app("100")
@@ -99,23 +100,24 @@ def make_picture():
 
 def rename_pics():
     shot_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    try:
-        for filename in os.listdir("."):
+
+    for filename in os.listdir("."):
+
             if len(filename) < 13:
                 if filename.endswith(".JPG"):
-                    os.rename(filename, (shot_time + ".JPG"))
-                    print("Picture renamed!")
-                    send_message_to_app("4")
-                elif filename.endswith(".CR2"):
-                    os.rename(filename, (shot_time + ".CR2"))
-                    send_message_to_app("100")
-                    print("Picture renamed!")
-    except FileNotFoundError:
-        print("Error: The specified file or directory does not exist.")
-    except PermissionError:
-        print("Error: Permission denied while renaming files.")
-    except Exception as e:
-        print(f"An unexpected error occurred: {str(e)}")
+                    try:
+                        os.rename(filename, (shot_time + ".JPG"))
+                        print("Picture renamed!")
+                        send_message_to_app("4")
+                    except FileNotFoundError:
+                        print("Error: The Picture does not exist.")
+                        send_message_to_app("100")
+                    except PermissionError:
+                        print("Error: Permission denied while renaming files.")
+                        send_message_to_app("100")
+                    except Exception as e:
+                        print(f"An unexpected error occurred: {str(e)}")
+                        send_message_to_app("100")
 
 def main():
     clear_files_cmd = ["--folder", "/store_00020001/DCIM/100CANON", "-R", "--delete-all-files"]
