@@ -155,11 +155,11 @@ class VendingMachineDisplay(QWidget):
         if state == "1":
             print("State changed to 1: Payment recived")
             time.sleep(3)
-            self.stateChanged.emit("2")
+            appState.stateChanged.emit("2")
         if state == "2":
             print("State changed to 2: Start Countdown")
             time.sleep(10)
-            self.stateChanged.emit("3")
+            appState.stateChanged.emit("3")
         if state == "3":
             print("State changed to 3: Smile Now")
             try:
