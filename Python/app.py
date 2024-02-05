@@ -156,11 +156,11 @@ class VendingMachineDisplay(QWidget):
             print("State changed to 1: Payment recived")
             time.sleep(3)
             self.state = "2"
-        if state == "2":
+            self.updateGIF(state)
             print("State changed to 2: Start Countdown")
             time.sleep(10)
             self.state = "3"
-        if state == "3":
+            self.updateGIF(state)
             print("State changed to 3: Smile Now")
             try:
                 if config.DEBUG_MODE == 1:
