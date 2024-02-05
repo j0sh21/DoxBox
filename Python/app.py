@@ -45,15 +45,15 @@ class VendingMachineDisplay(QWidget):
     def onFrameChanged(self, frameNumber):
         if frameNumber == self.movie.frameCount() - 1:  # Check if it's the last frame
             self.movie.stop()
-            self.onGIFFinished()
+            #self.onGIFFinished()
 
     def onGIFFinished(self):
         if self.state in("1","2","3"):
             print("GIFF finished, next State and Gif")
-            self.updateGIF(appState.state)
+            self.updateGIF(self.state)
         if self.state in("4", "100"):
             print("GIFF finished, next State and Gif")
-            self.updateGIF(appState.state)
+            self.updateGIF(self.state)
         if self.state == 5:
             print("GIFF finished, initial State and Gif")
             self.state = "0"
