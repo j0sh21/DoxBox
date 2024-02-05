@@ -7,6 +7,8 @@ import os
 import subprocess
 #sudo apt-get install gphoto2
 
+cwd = ""
+
 def send_message_to_app(message):
     try:
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -50,6 +52,8 @@ def create_output_folder():
         print(f"An error occurred while creating the folder: {str(e)}")
         send_message_to_app("100")
     try:
+        global cwd
+        cwd = os.getcwd()
         os.chdir(save_pic_to)
         print(f"Changed working directory to '{save_pic_to}'")
     except FileNotFoundError:
@@ -72,6 +76,7 @@ def run_gphoto2_command(command):
         send_message_to_app("100")
 
 def make_picture():
+    global cwd
     trigger_photo_cmd = config.TRIGGER_PHOTO_COMMAND
     download_pics_cmd = config.DOWNLOAD_PHOTOS_COMMAND
     clear_files_cmd = config.CLEAR_FILES_COMMAND
@@ -86,7 +91,8 @@ def make_picture():
         end_download = datetime.now()
         print(f"Copied file in {(end_download - start_download).total_seconds()} Seconds.")
         run_gphoto2_command(clear_files_cmd)
-
+        os.chdir(cwd)
+        print(f"Changed Working Directory to: {os.getcwd()}")
     except Exception as e:
         print(f"An error occurred during picture taking process: {str(e)}")
         send_message_to_app("100")

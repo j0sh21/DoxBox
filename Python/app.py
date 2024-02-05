@@ -168,8 +168,13 @@ class VendingMachineDisplay(QWidget):
         if state == "1":
             print("State changed to 1")
             time.sleep(3)
-            state = "2"
+            self.state = "2"
         elif state == "2":
+            print("State changed to 2")
+            time.sleep(3)
+            self.state = 3            
+        elif state == "3":
+            print("taken photo")
             try:
                 if config.DEBUG_MODE == 1:
                     print("Simulate Photo")
@@ -178,18 +183,25 @@ class VendingMachineDisplay(QWidget):
                     print("img_capture.py started successfully.")
             except Exception as e:
                 print(f"Failed to start img_capture.py: {e}")
-        elif state == "3":
-            time.sleep(2)
-            print("take photo")
-            img_capture.main()
+
         elif state == "4":
             if config.DEBUG_MODE == 2:
                 print("Simulate print")
-                subprocess.run(["python3", "./dev/printer_mock.py"])
+                subprocess.run(["python3", "/home/odemsloh/Desktop/dev/2/DoxBox/Python/dev/printer_mock.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             else:
-                subprocess.run(["python3", ".print.py"])
+                subprocess.run(["python3", ".print.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         elif state == "5":
             print("Tahnk You!")
+            
+        if state == "2":
+            try:
+                if config.DEBUG_MODE == 1:
+                    print("Simulate Photo")
+                else:
+                    subprocess.Popen(["python", "img_capture.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    print("img_capture.py started successfully.")
+            except Exception as e:
+                print(f"Failed to start img_capture.py: {e}")
 
     def updateGIF(self, state):
         # Map states to subfolders
