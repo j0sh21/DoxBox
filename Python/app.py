@@ -196,7 +196,7 @@ class VendingMachineDisplay(QWidget):
         except Exception as e:
             print(str(e))
 
-        subfolder = subfolder_map.get(state, "dddd_welcome")
+        subfolder = subfolder_map.get(state, "0_welcome")
 
         # Construct the path to the subfolder
         gif_folder_path = os.path.join("..", "images", "gifs", subfolder)
