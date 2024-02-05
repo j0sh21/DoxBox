@@ -40,7 +40,7 @@ class VendingMachineDisplay(QWidget):
         self.appState.stateChanged.connect(self.onStateChanged)
         self.movie = QMovie(self)
         self.movieLabel = QLabel()
-        self.movie.frameChanged.connect(self.onFrameChanged)
+        #self.movie.frameChanged.connect(self.onFrameChanged)
 
     def onFrameChanged(self, frameNumber):
         if frameNumber == self.movie.frameCount() - 1:  # Check if it's the last frame
@@ -156,11 +156,11 @@ class VendingMachineDisplay(QWidget):
             print("State changed to 1: Payment recived")
             time.sleep(3)
             self.state = "2"
-            self.updateGIF(state)
+        if state == "2":
             print("State changed to 2: Start Countdown")
             time.sleep(10)
             self.state = "3"
-            self.updateGIF(state)
+        if state == "3":
             print("State changed to 3: Smile Now")
             try:
                 if config.DEBUG_MODE == 1:
