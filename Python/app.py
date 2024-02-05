@@ -48,9 +48,9 @@ class VendingMachineDisplay(QWidget):
             self.onGIFFinished()
 
     def onGIFFinished(self):
-        if self.state in(1,2,3):
+        if self.state in("1","2","3"):
             print("GIFF finished, next State and Gif")
-        if self.state in(4, 100):
+        if self.state in("4", "100"):
             self.updateGIF(appState.state)
         if self.state == 5:
             self.state = "0"
