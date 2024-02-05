@@ -166,8 +166,11 @@ class VendingMachineDisplay(QWidget):
                 if config.DEBUG_MODE == 1:
                     print("DEBUG MODE: Simulate Photo")
                 else:
-                    subprocess.Popen(["python", "img_capture.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    print("img_capture.py started successfully.")
+                    try:
+                        subprocess.Popen(["python", "img_capture.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                        print("img_capture.py started successfully.")
+                    except Exception as e:
+                        print(f"Failed to start img_capture.py: {e}")
             except Exception as e:
                 print(f"Failed to start img_capture.py: {e}")
         if state == "4":
