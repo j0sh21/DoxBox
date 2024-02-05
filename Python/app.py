@@ -1,19 +1,16 @@
-import subprocess
-import time
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout
 from PyQt5.QtMultimedia import QCamera, QCameraInfo, QCameraViewfinderSettings
 from PyQt5.QtMultimediaWidgets import QCameraViewfinder
 from PyQt5.QtGui import QPixmap, QMovie
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QSize, QRect, QPoint
+import subprocess
+import time
 import sys
 import threading
 import socket
 import os
 import random
-import img_capture
-
-# Import the configuration variables
-import config  # Assuming config.py is in the same directory
+import config  #config.py from the same directory
 
 # A class for managing the application state and communication
 class AppState(QObject):
@@ -116,7 +113,6 @@ class VendingMachineDisplay(QWidget):
         # Vewfinder Settings
         self.camera.setViewfinderSettings(viewfinder_settings)
         self.camera.setViewfinder(self.viewfinder)
-
         self.camera.start()
 
         # Initialize the QLabel for displaying GIFs with the viewfinder as its parent
@@ -265,5 +261,5 @@ if __name__ == '__main__':
     print("Start server...")
     server_thread = threading.Thread(target=start_server, args=(appState,))
     server_thread.start()
-    print("Start app")
+    print("Start app (display)")
     sys.exit(app.exec_())
