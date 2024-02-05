@@ -167,7 +167,7 @@ class VendingMachineDisplay(QWidget):
                     print("DEBUG MODE: Simulate Photo")
                 else:
                     try:
-                        subprocess.Popen(["python", "img_capture.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                        subprocess.Popen(["python3", "/home/odemsloh/Desktop/dev/2/DoxBox/Python/img_capture.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                         print("img_capture.py started successfully.")
                     except Exception as e:
                         print(f"Failed to start img_capture.py: {e}")
