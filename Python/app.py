@@ -50,9 +50,12 @@ class VendingMachineDisplay(QWidget):
     def onGIFFinished(self):
         if self.state in("1","2","3"):
             print("GIFF finished, next State and Gif")
+            self.updateGIF(appState.state)
         if self.state in("4", "100"):
+            print("GIFF finished, next State and Gif")
             self.updateGIF(appState.state)
         if self.state == 5:
+            print("GIFF finished, initial State and Gif")
             self.state = "0"
 
     def playGIF(self, gifPath):
