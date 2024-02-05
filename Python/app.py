@@ -51,8 +51,10 @@ class VendingMachineDisplay(QWidget):
             self.onGIFFinished()
 
     def onGIFFinished(self):
-        self.updateGIF(appState.state)
-        print("GIFF finished")
+        if self.state in(1,2,3,5):
+            print("GIFF finished, next State and Gif")
+        elif self.state in(4, 100):
+            self.updateGIF(appState.state)
 
     def playGIF(self, gifPath):
         self.movie.setFileName(gifPath)
@@ -145,63 +147,36 @@ class VendingMachineDisplay(QWidget):
         self.textLabel.move((self.width() - rect.width()) // 2, (self.height() - rect.height()) // 2)
 
     def onStateChanged(self, state):
-        # Mapping of states to messages
-        state_messages = {
-            "0": "State changed to 0",
-            "1": "State changed to 1",
-            "2": "State changed to 2",
-            "3": "State changed to 3",
-            "4": "State changed to 4",
-            "5": "State changed to 5",
-            "100": "State changed to 100"
-        }
-
-        # Update the text label based on the state
-        message = state_messages.get(state, "Unknown state")
-        print(str(state))
-        self.textLabel.setText(message)
-
-        # Add more state handling as needed
+        # state handling
         self.movie.stop()
         self.updateGIF(state)
 
         if state == "1":
-            print("State changed to 1")
+            print("State changed to 1: Payment recived")
             time.sleep(3)
             self.state = "2"
-        elif state == "2":
-            print("State changed to 2")
-            time.sleep(3)
-            self.state = 3            
-        elif state == "3":
-            print("taken photo")
+        if state == "2":
+            print("State changed to 2: Start Countdown")
+            time.sleep(10)
+            self.state = "3"
+        if state == "3":
+            print("State changed to 3: Smile Now")
             try:
                 if config.DEBUG_MODE == 1:
-                    print("Simulate Photo")
+                    print("DEBUG MODE: Simulate Photo")
                 else:
                     subprocess.Popen(["python", "img_capture.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     print("img_capture.py started successfully.")
             except Exception as e:
                 print(f"Failed to start img_capture.py: {e}")
-
-        elif state == "4":
+        if state == "4":
             if config.DEBUG_MODE == 2:
-                print("Simulate print")
+                print("DEBUG MODE: Simulate print")
                 subprocess.run(["python3", "/home/odemsloh/Desktop/dev/2/DoxBox/Python/dev/printer_mock.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             else:
                 subprocess.run(["python3", ".print.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        elif state == "5":
-            print("Tahnk You!")
-            
-        if state == "2":
-            try:
-                if config.DEBUG_MODE == 1:
-                    print("Simulate Photo")
-                else:
-                    subprocess.Popen(["python", "img_capture.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    print("img_capture.py started successfully.")
-            except Exception as e:
-                print(f"Failed to start img_capture.py: {e}")
+        if state == "5":
+            print("State changed to 5: Tahnk You!")
 
     def updateGIF(self, state):
         # Map states to subfolders
