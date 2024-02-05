@@ -191,11 +191,6 @@ class VendingMachineDisplay(QWidget):
         }
 
         #default value if state not in subfolder map
-        try:
-            print(str(state))
-        except Exception as e:
-            print(str(e))
-
         subfolder = subfolder_map.get(state, "0_welcome")
 
         # Construct the path to the subfolder
