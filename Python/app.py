@@ -68,6 +68,8 @@ class VendingMachineDisplay(QWidget):
         elif self.appState.state == "5":
             print("Thank You GIFF finished, initial State 0 and start welcome Gif")
             appState.stateChanged.emit("0")
+        else:
+            print(f"Gif finished play next gif for state {self.appState.state}")
 
     def playGIF(self, gifPath):
         self.movie.setFileName(gifPath)
