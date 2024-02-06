@@ -1,10 +1,12 @@
+import datetime
+
 import cups
 import os
+import config
 
 def print_image(printer_name, image_path):
     # Connect to CUPS
     conn = cups.Connection()
-
     # Get a list of all printers
     printers = conn.getPrinters()
 
@@ -12,20 +14,42 @@ def print_image(printer_name, image_path):
     if printer_name not in printers:
         print(f"Printer {printer_name} not found. Available printers:")
         for printer in printers:
-            print(printer)
+            print(f"{printer}\n")
         return
 
-    # Print the image
-    print_job_id = conn.printFile(printer_name, image_path, "Photo Print", {})
-    print(f"Print job submitted. Job ID: {print_job_id}")
+    if config.DEBUG_MODE == 0:
+        # Print the image
+        print_job_id = conn.printFile(printer_name, image_path, "Photo Print", {})
+        print(f"Print job submitted. Job ID: {print_job_id}")
+    else:
+        print(f"DEBUG MODE: Simulate Print file {image_path} on {printer_name}. \nDEBUG MODE: Skip 45 sec waiting time...")
 
-# Example usage
-printer_name = "Xiaomi_Instant_Photo_Printer_1S_0057_"  # Replace with your printer's name
-image_directory = "../images/print"  # Replace with your image directory
-image_file = "IMG_0911.jpg"  # Replace with your image file name
+def move_image():
+    pic_dir = os.path.join(config.PICTURE_SAVE_DIRECTORY, datetime.now().strftime("%Y-%m-%d"))
+    print_dir = config.PRINT_DIR
+    printer_name = config.PRINTER_NAME
 
-# Construct the full image path
-image_path = os.path.join(image_directory, image_file)
+    cwd = os.getcwd()
+    os.chdir(pic_dir)
+    for filename in os.listdir():
+        picture_name = filename
+    # Construct the full source and destination paths
+        source_picture_path = os.path.join(pic_dir, picture_name)
+        destination_picture_path = os.path.join(print_dir, picture_name)
 
-# Call the print function
-print_image(printer_name, image_path)
+    # Use os.rename() to move the picture, delete after print with os.remove
+        try:
+            os.rename(source_picture_path, destination_picture_path)
+            print(f'Successfully moved {picture_name} from {pic_dir} to {print_dir}')
+            image_path = os.path.join(print_dir, picture_name)
+            print_image(printer_name, image_path)
+            os.remove(destination_picture_path)
+            print(f'Successfully removed {picture_name} from Disk.')
+        except FileNotFoundError:
+            print(f'Error: {picture_name} not found in {pic_dir}')
+        except Exception as e:
+            print(f'An error occurred while move {picture_name} to {print_dir}: {str(e)}')
+    os.chdir(cwd)
+
+if __name__ == '__main__':
+    move_image()
