@@ -50,12 +50,12 @@ class VendingMachineDisplay(QWidget):
         if self.appState.state in("1","2","3"):
             if self.appState.state == "1":
                 self.appState.state = "2"
-                print("GIFF finished, next State: 2 and Gif")
+                print("Payment GIFF finished, next State: 2 and Gif")
             elif self.appState.state == "2":
                 self.appState.state = "3"
-                print("GIFF finished, next State: 3 and Gif")
+                print("Countdown GIFF finished, next State: 3 and Gif")
             else:
-                print("GIFF finished, capture Photo next")
+                print("Smile GIFF finished, capture Photo very soon")
                 try:
                     photo_thread = threading.Thread(target=self.photo_subprocess)
                     photo_thread.start()
@@ -63,10 +63,10 @@ class VendingMachineDisplay(QWidget):
                     print(f"Failed to start img_capture.py: {e}")
                     appState.stateChanged.emit("100")
         elif self.appState.state in("4", "100"):
-            print("GIFF finished, new random gif from same folder until external state change")
+            print("GIFF for print or error finished, new random gif from same folder until external state change")
             self.updateGIF(self.appState.state)
         elif self.appState.state == "5":
-            print("GIFF finished, initial State 0 and Gif")
+            print("Thank You GIFF finished, initial State 0 and start welcome Gif")
             appState.stateChanged.emit("0")
 
     def playGIF(self, gifPath):
@@ -180,8 +180,6 @@ class VendingMachineDisplay(QWidget):
 
     def onStateChanged(self, state):
         # state handling
-        self.movie.stop()
-        self.updateGIF(state)
 
         if state == "1":
             print(f"{'_'*10}State changed to 1: Payment recived{'_'*10}")
@@ -195,6 +193,9 @@ class VendingMachineDisplay(QWidget):
             print_thread.start()
         if state == "5":
             print(f"{'_' * 10}State changed to 5: Tahnk You!{'_' * 10}")
+
+        self.movie.stop()
+        self.updateGIF(state)
 
     def updateGIF(self, state):
         # Map states to subfolders
