@@ -183,7 +183,6 @@ class VendingMachineDisplay(QWidget):
 
     def onStateChanged(self, state):
         # state handling
-
         if state == "0":
             print(f"{'_' * 10}State changed to 0: Welcome Screen{'_' * 10}")
         if state == "1":
