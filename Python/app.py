@@ -157,11 +157,11 @@ class VendingMachineDisplay(QWidget):
         self.updateGIF(state)
 
         if state == "1":
-            print(f"{"_"*10}State changed to 1: Payment recived{"_"*10}")
+            print(f"{'_'*10}State changed to 1: Payment recived{'_'*10}")
         if state == "2":
-            print(f"{"_"*10}State changed to 2: Start Countdown{"_"*10}")
+            print(f"{'_'*10}State changed to 2: Start Countdown{'_'*10}")
         if state == "3":
-            print(f"{"_"*10}State changed to 3: Smile Now{"_"*10}")
+            print(f"{'_'*10}State changed to 3: Smile Now{'_'*10}")
             try:
                 if config.DEBUG_MODE == 1:
                     print("DEBUG MODE: Simulate Photo")
