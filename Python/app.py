@@ -176,14 +176,14 @@ class VendingMachineDisplay(QWidget):
                 print(f"Failed to start img_capture.py: {e}")
                 appState.stateChanged.emit("100")
         if state == "4":
-            print(f"{"_" * 10}State changed to 4: Start printing{"_" * 10}")
+            print(f"{'_' * 10}State changed to 4: Start printing{'_' * 10}")
             if config.DEBUG_MODE == 2:
                 print("DEBUG MODE: Simulate print")
                 subprocess.run(["python3", "/home/odemsloh/Desktop/dev/2/DoxBox/Python/dev/printer_mock.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             else:
                 subprocess.run(["python3", ".print.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if state == "5":
-            print(f"{"_" * 10}State changed to 5: Tahnk You!{"_" * 10}")
+            print(f"{'_' * 10}State changed to 5: Tahnk You!{'_' * 10}")
 
     def updateGIF(self, state):
         # Map states to subfolders
