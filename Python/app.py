@@ -62,14 +62,14 @@ class VendingMachineDisplay(QWidget):
                 except Exception as e:
                     print(f"Failed to start img_capture.py: {e}")
                     appState.stateChanged.emit("100")
-        elif self.appState.state in("4", "100"):
-            print("GIFF for print or error finished, new random gif from same folder until external state change")
+        elif self.appState.state in("4", "100", "0"):
+            print(f"Gif for state {self.appState.state} finished play next gif for state {self.appState.state} until external state change")
             self.updateGIF(self.appState.state)
         elif self.appState.state == "5":
             print("Thank You GIFF finished, initial State 0 and start welcome Gif")
             self.appState.state = "0"
         else:
-            print(f"Gif finished play next gif for state {self.appState.state}")
+
             self.updateGIF(self.appState.state)
 
     def playGIF(self, gifPath):
@@ -184,12 +184,14 @@ class VendingMachineDisplay(QWidget):
     def onStateChanged(self, state):
         # state handling
 
+        if state == "0":
+            print(f"{'_' * 10}State changed to 0: Welcome Screen{'_' * 10}")
         if state == "1":
-            print(f"{'_'*10}State changed to 1: Payment recived{'_'*10}")
+            print(f"{'_' * 10}State changed to 1: Payment recived{'_' * 10}")
         if state == "2":
-            print(f"{'_'*10}State changed to 2: Start Countdown{'_'*10}")
+            print(f"{'_' * 10}State changed to 2: Start Countdown{'_' * 10}")
         if state == "3":
-            print(f"{'_'*10}State changed to 3: Smile Now{'_'*10}")
+            print(f"{'_' * 10}State changed to 3: Smile Now{'_' * 10}")
         if state == "4":
             print(f"{'_' * 10}State changed to 4: Start printing{'_' * 10}")
             print_thread = threading.Thread(target=self.print_subprocess)
