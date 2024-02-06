@@ -4,7 +4,6 @@ from PyQt5.QtMultimediaWidgets import QCameraViewfinder
 from PyQt5.QtGui import QPixmap, QMovie
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QSize, QRect, QPoint
 import subprocess
-import time
 import sys
 import threading
 import socket
@@ -56,8 +55,8 @@ class VendingMachineDisplay(QWidget):
                 self.appState.state = "3"
                 print("GIFF finished, next State: 3 and Gif")
         elif self.appState.state in("4", "100"):
-            print("GIFF finished, TODO: gif from same folder again until external state change")
-            self.updateGIF(self.appState.state) #TODO!!!
+            print("GIFF finished, new random gif from same folder until external state change")
+            self.updateGIF(self.appState.state)
         elif self.appState.state == "5":
             print("GIFF finished, initial State 0 and Gif")
             appState.stateChanged.emit("0")
@@ -151,6 +150,26 @@ class VendingMachineDisplay(QWidget):
         rect = self.textLabel.rect()
         self.textLabel.move((self.width() - rect.width()) // 2, (self.height() - rect.height()) // 2)
 
+    def print_subprocess(self):
+        if config.DEBUG_MODE == 1:
+            print("DEBUG MODE: Simulate print")
+            subprocess.run(["python3", "/home/odemsloh/Desktop/dev/2/DoxBox/Python/dev/printer_mock.py"],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        else:
+            subprocess.run(["python3", ".print.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    def photo_subprocess(self):
+        if config.DEBUG_MODE == 1:
+            print("DEBUG MODE: Simulate Photo")
+        else:
+            try:
+                subprocess.Popen(["python3", "/home/odemsloh/Desktop/dev/2/DoxBox/Python/img_capture.py"],
+                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                print("img_capture.py started successfully.")
+            except Exception as e:
+                print(f"Failed to start img_capture.py: {e}")
+                appState.stateChanged.emit("100")
+
     def onStateChanged(self, state):
         # state handling
         self.movie.stop()
@@ -163,25 +182,18 @@ class VendingMachineDisplay(QWidget):
         if state == "3":
             print(f"{'_'*10}State changed to 3: Smile Now{'_'*10}")
             try:
-                if config.DEBUG_MODE == 1:
-                    print("DEBUG MODE: Simulate Photo")
-                else:
-                    try:
-                        subprocess.Popen(["python3", "/home/odemsloh/Desktop/dev/2/DoxBox/Python/img_capture.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                        print("img_capture.py started successfully.")
-                    except Exception as e:
-                        print(f"Failed to start img_capture.py: {e}")
-                        appState.stateChanged.emit("100")
+                photo_thread = threading.Thread(target=self.photo_subprocess())
+                photo_thread.start()
             except Exception as e:
                 print(f"Failed to start img_capture.py: {e}")
                 appState.stateChanged.emit("100")
         if state == "4":
             print(f"{'_' * 10}State changed to 4: Start printing{'_' * 10}")
-            if config.DEBUG_MODE == 2:
-                print("DEBUG MODE: Simulate print")
-                subprocess.run(["python3", "/home/odemsloh/Desktop/dev/2/DoxBox/Python/dev/printer_mock.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            else:
-                subprocess.run(["python3", ".print.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+            # Start the printing subprocess in a new thread
+            print_thread = threading.Thread(target=self.print_subprocess())
+            print_thread.start()
+
         if state == "5":
             print(f"{'_' * 10}State changed to 5: Tahnk You!{'_' * 10}")
 
