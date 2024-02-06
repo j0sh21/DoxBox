@@ -54,6 +54,14 @@ class VendingMachineDisplay(QWidget):
             elif self.appState.state == "2":
                 self.appState.state = "3"
                 print("GIFF finished, next State: 3 and Gif")
+            else:
+                print("GIFF finished, capture Photo next")
+                try:
+                    photo_thread = threading.Thread(target=self.photo_subprocess())
+                    photo_thread.start()
+                except Exception as e:
+                    print(f"Failed to start img_capture.py: {e}")
+                    appState.stateChanged.emit("100")
         elif self.appState.state in("4", "100"):
             print("GIFF finished, new random gif from same folder until external state change")
             self.updateGIF(self.appState.state)
@@ -181,19 +189,10 @@ class VendingMachineDisplay(QWidget):
             print(f"{'_'*10}State changed to 2: Start Countdown{'_'*10}")
         if state == "3":
             print(f"{'_'*10}State changed to 3: Smile Now{'_'*10}")
-            try:
-                photo_thread = threading.Thread(target=self.photo_subprocess())
-                photo_thread.start()
-            except Exception as e:
-                print(f"Failed to start img_capture.py: {e}")
-                appState.stateChanged.emit("100")
         if state == "4":
             print(f"{'_' * 10}State changed to 4: Start printing{'_' * 10}")
-
-            # Start the printing subprocess in a new thread
             print_thread = threading.Thread(target=self.print_subprocess())
             print_thread.start()
-
         if state == "5":
             print(f"{'_' * 10}State changed to 5: Tahnk You!{'_' * 10}")
 
