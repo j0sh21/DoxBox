@@ -57,7 +57,7 @@ class VendingMachineDisplay(QWidget):
             else:
                 print("GIFF finished, capture Photo next")
                 try:
-                    photo_thread = threading.Thread(target=self.photo_subprocess())
+                    photo_thread = threading.Thread(target=self.photo_subprocess)
                     photo_thread.start()
                 except Exception as e:
                     print(f"Failed to start img_capture.py: {e}")
@@ -191,7 +191,7 @@ class VendingMachineDisplay(QWidget):
             print(f"{'_'*10}State changed to 3: Smile Now{'_'*10}")
         if state == "4":
             print(f"{'_' * 10}State changed to 4: Start printing{'_' * 10}")
-            print_thread = threading.Thread(target=self.print_subprocess())
+            print_thread = threading.Thread(target=self.print_subprocess)
             print_thread.start()
         if state == "5":
             print(f"{'_' * 10}State changed to 5: Tahnk You!{'_' * 10}")
