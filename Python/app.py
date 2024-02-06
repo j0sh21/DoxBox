@@ -40,23 +40,27 @@ class VendingMachineDisplay(QWidget):
         self.appState.stateChanged.connect(self.onStateChanged)
         self.movie = QMovie(self)
         self.movieLabel = QLabel()
-        #self.movie.frameChanged.connect(self.onFrameChanged)
+        self.movie.frameChanged.connect(self.onFrameChanged)
 
     def onFrameChanged(self, frameNumber):
         if frameNumber == self.movie.frameCount() - 1:  # Check if it's the last frame
             self.movie.stop()
-            #self.onGIFFinished()
+            self.onGIFFinished()
 
     def onGIFFinished(self):
         if self.state in("1","2","3"):
-            print("GIFF finished, next State and Gif")
-            self.updateGIF(self.state)
+            if self.state == "1":
+                appState.stateChanged.emit("2")
+                print("GIFF finished, next State: 2 and Gif")
+            if self.state == "2":
+                appState.stateChanged.emit("3")
+                print("GIFF finished, next State: 3 and Gif")
         if self.state in("4", "100"):
-            print("GIFF finished, next State and Gif")
-            self.updateGIF(self.state)
+            print("GIFF finished, TODO: gif from same folder again until external state change")
+            self.updateGIF(self.state) #TODO!!!
         if self.state == 5:
-            print("GIFF finished, initial State and Gif")
-            self.state = "0"
+            print("GIFF finished, initial State 0 and Gif")
+            appState.stateChanged.emit("0")
 
     def playGIF(self, gifPath):
         self.movie.setFileName(gifPath)
@@ -154,12 +158,8 @@ class VendingMachineDisplay(QWidget):
 
         if state == "1":
             print("State changed to 1: Payment recived")
-            time.sleep(3)
-            appState.stateChanged.emit("2")
         if state == "2":
             print("State changed to 2: Start Countdown")
-            time.sleep(10)
-            appState.stateChanged.emit("3")
         if state == "3":
             print("State changed to 3: Smile Now")
             try:
@@ -171,8 +171,10 @@ class VendingMachineDisplay(QWidget):
                         print("img_capture.py started successfully.")
                     except Exception as e:
                         print(f"Failed to start img_capture.py: {e}")
+                        appState.stateChanged.emit("100")
             except Exception as e:
                 print(f"Failed to start img_capture.py: {e}")
+                appState.stateChanged.emit("100")
         if state == "4":
             if config.DEBUG_MODE == 2:
                 print("DEBUG MODE: Simulate print")
