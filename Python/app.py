@@ -50,10 +50,10 @@ class VendingMachineDisplay(QWidget):
     def onGIFFinished(self):
         if self.appState.state in("1","2","3"):
             if self.appState.state == "1":
-                appState.stateChanged.emit("2")
+                self.appState.state = "2"
                 print("GIFF finished, next State: 2 and Gif")
             if self.appState.state == "2":
-                appState.stateChanged.emit("3")
+                self.appState.state = "3"
                 print("GIFF finished, next State: 3 and Gif")
         if self.appState.state in("4", "100"):
             print("GIFF finished, TODO: gif from same folder again until external state change")
@@ -157,11 +157,11 @@ class VendingMachineDisplay(QWidget):
         self.updateGIF(state)
 
         if state == "1":
-            print("State changed to 1: Payment recived")
+            print(f"{"_"*10}State changed to 1: Payment recived{"_"*10}")
         if state == "2":
-            print("State changed to 2: Start Countdown")
+            print(f"{"_"*10}State changed to 2: Start Countdown{"_"*10}")
         if state == "3":
-            print("State changed to 3: Smile Now")
+            print(f"{"_"*10}State changed to 3: Smile Now{"_"*10}")
             try:
                 if config.DEBUG_MODE == 1:
                     print("DEBUG MODE: Simulate Photo")
@@ -176,13 +176,14 @@ class VendingMachineDisplay(QWidget):
                 print(f"Failed to start img_capture.py: {e}")
                 appState.stateChanged.emit("100")
         if state == "4":
+            print(f"{"_" * 10}State changed to 4: Start printing{"_" * 10}")
             if config.DEBUG_MODE == 2:
                 print("DEBUG MODE: Simulate print")
                 subprocess.run(["python3", "/home/odemsloh/Desktop/dev/2/DoxBox/Python/dev/printer_mock.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             else:
                 subprocess.run(["python3", ".print.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if state == "5":
-            print("State changed to 5: Tahnk You!")
+            print(f"{"_" * 10}State changed to 5: Tahnk You!{"_" * 10}")
 
     def updateGIF(self, state):
         # Map states to subfolders
