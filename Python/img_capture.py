@@ -7,6 +7,8 @@ import os
 import subprocess
 #sudo apt-get install gphoto2
 
+cwd = ""
+
 def send_message_to_app(message):
     try:
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -50,6 +52,8 @@ def create_output_folder():
         print(f"An error occurred while creating the folder: {str(e)}")
         send_message_to_app("100")
     try:
+        global cwd
+        cwd = os.getcwd()
         os.chdir(save_pic_to)
         print(f"Changed working directory to '{save_pic_to}'")
     except FileNotFoundError:
@@ -67,11 +71,13 @@ def run_gphoto2_command(command):
         subprocess.run(command, shell=True, check=True)
     except subprocess.CalledProcessError as e:
         print(f"Error running command '{command}': {str(e)}")
+        send_message_to_app("100")
     except Exception as e:
         print(f"An unexpected error occurred: {str(e)}")
         send_message_to_app("100")
 
 def make_picture():
+    global cwd
     trigger_photo_cmd = config.TRIGGER_PHOTO_COMMAND
     download_pics_cmd = config.DOWNLOAD_PHOTOS_COMMAND
     clear_files_cmd = config.CLEAR_FILES_COMMAND
@@ -86,30 +92,32 @@ def make_picture():
         end_download = datetime.now()
         print(f"Copied file in {(end_download - start_download).total_seconds()} Seconds.")
         run_gphoto2_command(clear_files_cmd)
-
+        os.chdir(cwd)
+        print(f"Changed Working Directory to: {os.getcwd()}")
     except Exception as e:
         print(f"An error occurred during picture taking process: {str(e)}")
         send_message_to_app("100")
 
 def rename_pics():
     shot_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    try:
-        for filename in os.listdir("."):
+
+    for filename in os.listdir("."):
+
             if len(filename) < 13:
                 if filename.endswith(".JPG"):
-                    os.rename(filename, (shot_time + ".JPG"))
-                    print("Picture renamed!")
-                    send_message_to_app("4")
-                elif filename.endswith(".CR2"):
-                    os.rename(filename, (shot_time + ".CR2"))
-                    send_message_to_app("100")
-                    print("Picture renamed!")
-    except FileNotFoundError:
-        print("Error: The specified file or directory does not exist.")
-    except PermissionError:
-        print("Error: Permission denied while renaming files.")
-    except Exception as e:
-        print(f"An unexpected error occurred: {str(e)}")
+                    try:
+                        os.rename(filename, (shot_time + ".JPG"))
+                        print("Picture renamed!")
+                        send_message_to_app("4")
+                    except FileNotFoundError:
+                        print("Error: The Picture does not exist.")
+                        send_message_to_app("100")
+                    except PermissionError:
+                        print("Error: Permission denied while renaming files.")
+                        send_message_to_app("100")
+                    except Exception as e:
+                        print(f"An unexpected error occurred: {str(e)}")
+                        send_message_to_app("100")
 
 def main():
     clear_files_cmd = ["--folder", "/store_00020001/DCIM/100CANON", "-R", "--delete-all-files"]

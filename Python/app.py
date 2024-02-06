@@ -1,19 +1,15 @@
-import subprocess
-import time
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout
 from PyQt5.QtMultimedia import QCamera, QCameraInfo, QCameraViewfinderSettings
 from PyQt5.QtMultimediaWidgets import QCameraViewfinder
 from PyQt5.QtGui import QPixmap, QMovie
 from PyQt5.QtCore import Qt, pyqtSignal, QObject, QSize, QRect, QPoint
+import subprocess
 import sys
 import threading
 import socket
 import os
 import random
-import img_capture
-
-# Import the configuration variables
-import config  # Assuming config.py is in the same directory
+import config  #config.py from the same directory
 
 # A class for managing the application state and communication
 class AppState(QObject):
@@ -51,8 +47,30 @@ class VendingMachineDisplay(QWidget):
             self.onGIFFinished()
 
     def onGIFFinished(self):
-        self.updateGIF(appState.state)
-        print("GIFF finished")
+        if self.appState.state in("1","2","3"):
+            if self.appState.state == "1":
+                print("Payment GIFF finished, next State: 2 and Gif")
+                self.appState.state = "2"
+            elif self.appState.state == "2":
+                print("Countdown GIFF finished, next State: 3 and Gif")
+                self.appState.state = "3"
+            else:
+                print("Smile GIFF finished, capture Photo very soon")
+                try:
+                    photo_thread = threading.Thread(target=self.photo_subprocess)
+                    photo_thread.start()
+                except Exception as e:
+                    print(f"Failed to start img_capture.py: {e}")
+                    appState.stateChanged.emit("100")
+        elif self.appState.state in("4", "100", "0"):
+            print(f"Gif for state {self.appState.state} finished play next gif for state {self.appState.state} until external state change")
+            self.updateGIF(self.appState.state)
+        elif self.appState.state == "5":
+            print("Thank You GIFF finished, initial State 0 and start welcome Gif")
+            self.appState.state = "0"
+        else:
+
+            self.updateGIF(self.appState.state)
 
     def playGIF(self, gifPath):
         self.movie.setFileName(gifPath)
@@ -114,7 +132,6 @@ class VendingMachineDisplay(QWidget):
         # Vewfinder Settings
         self.camera.setViewfinderSettings(viewfinder_settings)
         self.camera.setViewfinder(self.viewfinder)
-
         self.camera.start()
 
         # Initialize the QLabel for displaying GIFs with the viewfinder as its parent
@@ -144,52 +161,46 @@ class VendingMachineDisplay(QWidget):
         rect = self.textLabel.rect()
         self.textLabel.move((self.width() - rect.width()) // 2, (self.height() - rect.height()) // 2)
 
-    def onStateChanged(self, state):
-        # Mapping of states to messages
-        state_messages = {
-            "0": "State changed to 0",
-            "1": "State changed to 1",
-            "2": "State changed to 2",
-            "3": "State changed to 3",
-            "4": "State changed to 4",
-            "5": "State changed to 5",
-            "100": "State changed to 100"
-        }
+    def print_subprocess(self):
+        if config.DEBUG_MODE == 1:
+            print("DEBUG MODE: Simulate print")
+            subprocess.run(["python3", "/home/odemsloh/Desktop/dev/2/DoxBox/Python/dev/printer_mock.py"],
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        else:
+            subprocess.run(["python3", ".print.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        # Update the text label based on the state
-        message = state_messages.get(state, "Unknown state")
-        print(str(state))
-        self.textLabel.setText(message)
-
-        # Add more state handling as needed
-        self.movie.stop()
-        self.updateGIF(state)
-
-        if state == "1":
-            print("State changed to 1")
-            time.sleep(3)
-            state = "2"
-        elif state == "2":
+    def photo_subprocess(self):
+        if config.DEBUG_MODE == 1:
+            print("DEBUG MODE: Simulate Photo")
+        else:
             try:
-                if config.DEBUG_MODE == 1:
-                    print("Simulate Photo")
-                else:
-                    subprocess.Popen(["python", "img_capture.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    print("img_capture.py started successfully.")
+                subprocess.Popen(["python3", "/home/odemsloh/Desktop/dev/2/DoxBox/Python/img_capture.py"],
+                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                print("img_capture.py started successfully.")
             except Exception as e:
                 print(f"Failed to start img_capture.py: {e}")
-        elif state == "3":
-            time.sleep(2)
-            print("take photo")
-            img_capture.main()
-        elif state == "4":
-            if config.DEBUG_MODE == 2:
-                print("Simulate print")
-                subprocess.run(["python3", "./dev/printer_mock.py"])
-            else:
-                subprocess.run(["python3", ".print.py"])
-        elif state == "5":
-            print("Tahnk You!")
+                appState.stateChanged.emit("100")
+
+    def onStateChanged(self, state):
+        # state handling
+
+        if state == "0":
+            print(f"{'_' * 10}State changed to 0: Welcome Screen{'_' * 10}")
+        if state == "1":
+            print(f"{'_' * 10}State changed to 1: Payment recived{'_' * 10}")
+        if state == "2":
+            print(f"{'_' * 10}State changed to 2: Start Countdown{'_' * 10}")
+        if state == "3":
+            print(f"{'_' * 10}State changed to 3: Smile Now{'_' * 10}")
+        if state == "4":
+            print(f"{'_' * 10}State changed to 4: Start printing{'_' * 10}")
+            print_thread = threading.Thread(target=self.print_subprocess)
+            print_thread.start()
+        if state == "5":
+            print(f"{'_' * 10}State changed to 5: Tahnk You!{'_' * 10}")
+
+        self.movie.stop()
+        self.updateGIF(state)
 
     def updateGIF(self, state):
         # Map states to subfolders
@@ -204,12 +215,7 @@ class VendingMachineDisplay(QWidget):
         }
 
         #default value if state not in subfolder map
-        try:
-            print(str(state))
-        except Exception as e:
-            print(str(e))
-
-        subfolder = subfolder_map.get(state, "dddd_welcome")
+        subfolder = subfolder_map.get(state, "0_welcome")
 
         # Construct the path to the subfolder
         gif_folder_path = os.path.join("..", "images", "gifs", subfolder)
@@ -283,5 +289,5 @@ if __name__ == '__main__':
     print("Start server...")
     server_thread = threading.Thread(target=start_server, args=(appState,))
     server_thread.start()
-    print("Start app")
+    print("Start app (display)")
     sys.exit(app.exec_())

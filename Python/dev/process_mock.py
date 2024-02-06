@@ -27,9 +27,9 @@ def test_process():
     time.sleep(10)
     send_number_to_server(3)
     time.sleep(2)
-    send_number_to_server(4)
-    time.sleep(45)
-    send_number_to_server(4)
+    #send_number_to_server(4)
+    #time.sleep(45)
+    #send_number_to_server(4)
 
 if __name__ == '__main__':
     test_process()

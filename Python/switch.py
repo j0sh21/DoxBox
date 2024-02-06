@@ -34,9 +34,8 @@ def main_loop():
                 amount = rsJson[0]['amount'] / 1000  # Amount in SATS
 
                 if (amount == config.AMOUNT_THRESHOLD):
-                    print("Starting DoxBox")
+                    print("Sats recieved!")
                     send_message_to_app("1")
-                    # capture.main()
                     time.sleep(config.POST_PAYMENT_DELAY)
                 else:
                     time.sleep(config.CHECK_INTERVAL)
