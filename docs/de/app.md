@@ -24,6 +24,22 @@ Innerhalb von `app.py` finden Sie Definitionen für Schlüsselklassen und -funkt
 
 Entwickler, die mit `app.py` arbeiten, können mit hochrangigen Abstraktionen für UI-Komponenten, unkomplizierten Mechanismen für das Zustandsmanagement und ereignisgesteuerten Programmiermustern rechnen. Dieses Modul wird in der Regel als Teil des Startprozesses der Anwendung aufgerufen, initialisiert die GUI und bindet sie an die zugrunde liegende Logik und Datenmodelle.
 
+## Stati
+
+Eine Übersicht über die verwendeten Stati:
+
+```python
+    subfolder_map = {
+            "0": "0_welcome",
+            "1": "1_payment",
+            "2": "2_countdown",
+            "3": "3_smile",
+            "4": "4_print",
+            "5": "5_thx",
+            "100": "100_error"
+        }
+```
+
 # AppState Klassendokumentation
 
 ## Übersicht
