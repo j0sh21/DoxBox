@@ -49,11 +49,11 @@ class VendingMachineDisplay(QWidget):
     def onGIFFinished(self):
         if self.appState.state in("1","2","3"):
             if self.appState.state == "1":
-                self.appState.state = "2"
                 print("Payment GIFF finished, next State: 2 and Gif")
+                self.appState.state = "2"
             elif self.appState.state == "2":
-                self.appState.state = "3"
                 print("Countdown GIFF finished, next State: 3 and Gif")
+                self.appState.state = "3"
             else:
                 print("Smile GIFF finished, capture Photo very soon")
                 try:
