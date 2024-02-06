@@ -52,13 +52,13 @@ class VendingMachineDisplay(QWidget):
             if self.appState.state == "1":
                 self.appState.state = "2"
                 print("GIFF finished, next State: 2 and Gif")
-            if self.appState.state == "2":
+            elif self.appState.state == "2":
                 self.appState.state = "3"
                 print("GIFF finished, next State: 3 and Gif")
-        if self.appState.state in("4", "100"):
+        elif self.appState.state in("4", "100"):
             print("GIFF finished, TODO: gif from same folder again until external state change")
             self.updateGIF(self.appState.state) #TODO!!!
-        if self.appState.state == "5":
+        elif self.appState.state == "5":
             print("GIFF finished, initial State 0 and Gif")
             appState.stateChanged.emit("0")
 
