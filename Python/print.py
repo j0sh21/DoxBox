@@ -33,7 +33,7 @@ def move_image():
     printer_name = config.PRINTER_NAME
     cwd = os.getcwd()
     os.chdir(pic_dir)
-    print(f"Change directory to {print_dir}")
+    print(f"Change directory to {pic_dir}")
     for filename in os.listdir():
         picture_name = filename
     # Construct the full source and destination paths
