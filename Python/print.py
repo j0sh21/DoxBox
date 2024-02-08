@@ -28,7 +28,7 @@ def print_image(printer_name, image_path):
         print(f"DEBUG MODE: Simulate Print file {image_path} on {printer_name}. \nDEBUG MODE: Skip 45 sec waiting time...")
 
 def move_image():
-    pic_dir = os.path.join(config.PICTURE_SAVE_DIRECTORY, datetime.now().strftime("%Y-%m-%d"))
+    pic_dir = os.path.join(config.PICTURE_SAVE_DIRECTORY, datetime.datetime.now().strftime("%Y-%m-%d"))
     print_dir = config.PRINT_DIR
     printer_name = config.PRINTER_NAME
     cwd = os.getcwd()
