@@ -111,8 +111,6 @@ def make_picture():
         run_gphoto2_command(clear_files_cmd)
         end_clear = datetime.now()
         print(f"Cleared file from Camera in {(end_clear - start_clear).total_seconds()} Seconds.")
-        os.chdir(cwd)
-        print(f"Changed Working Directory to: {os.getcwd()}")
     except Exception as e:
         print(f"An error occurred during picture taking process: {str(e)}")
         send_message_to_app("100")
@@ -126,6 +124,8 @@ def rename_pics():
                     try:
                         os.rename(filename, (shot_time + ".JPG"))
                         print("Picture renamed!")
+                        os.chdir(cwd)
+                        print(f"Changed Working Directory to: {os.getcwd()}")
                         send_message_to_app("4")
                     except FileNotFoundError:
                         print("Error: The Picture does not exist.")
