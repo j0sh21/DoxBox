@@ -5,13 +5,11 @@ import os
 import config
 
 def print_image(printer_name, image_path):
-
     print("Connect to the CUPS printing Server")
     # Connect to CUPS
     conn = cups.Connection()
     # Get a list of all printers
     printers = conn.getPrinters()
-    print(f"Sucessfully Connected to the print Server {printer_name}")
 
     # Check if specified printer is available
     if printer_name not in printers:
@@ -19,6 +17,8 @@ def print_image(printer_name, image_path):
         for printer in printers:
             print(f"{printer}\n")
         return
+
+    print(f"Sucessfully Connected to the print Server {printer_name}")
 
     if config.DEBUG_MODE == 0:
         # Print the image
@@ -30,7 +30,7 @@ def print_image(printer_name, image_path):
 def copy_file(source_path, destination_path):
     try:
         # Copy the source file to the destination path
-        shutil.copy(source_path, destination_path)
+        shutil.move(source_path, destination_path)
         print(f"Successfully copied {source_path} to {destination_path}")
     except FileNotFoundError:
         print(f"CWD {os.getcwd()}")
