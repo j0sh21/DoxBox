@@ -55,8 +55,7 @@ def move_image():
         source_picture_path = os.path.join(cwd_tmp, picture_name)
         destination_picture_path = print_dir
 
-        copy_file(source_picture_path, destination_picture_path)
-        print(f'Successfully moved {picture_name} from {pic_dir} to {print_dir}')
+        copy_file(picture_name, destination_picture_path)
         image_path = os.path.join(print_dir, picture_name)
         print_image(printer_name, image_path)
         os.remove(destination_picture_path)
