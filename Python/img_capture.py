@@ -116,7 +116,7 @@ def make_picture():
         send_message_to_app("100")
 
 def rename_pics():
-    shot_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    shot_time = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
     for filename in os.listdir("."):
 
             if len(filename) < 13:
