@@ -58,7 +58,7 @@ class VendingMachineDisplay(QWidget):
             self.onGIFFinished()
 
     def onGIFFinished(self):
-        if self.total_duration < 3.0:
+        if self.total_duration < 3.0 and self.appState.state not in (2, 3):
             if self.movie.currentFrameNumber() == self.movie.frameCount() - 1:  # Last frame
                 self.loopCount += 1
                 if self.loopCount >= self.desiredLoops:
