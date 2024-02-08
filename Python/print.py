@@ -50,6 +50,8 @@ def move_image():
             print(f'Successfully removed {picture_name} from Disk.')
         except FileNotFoundError:
             print(f'Error: {picture_name} not found in {pic_dir}')
+        except PermissionError:
+            print(f'Permission denied when accessing {filename}. Check file permissions.')
         except Exception as e:
             print(f'An error occurred while move {picture_name} to {print_dir}: {str(e)}')
     os.chdir(cwd)
