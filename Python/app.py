@@ -187,7 +187,17 @@ class VendingMachineDisplay(QWidget):
             subprocess.run(["python3", "dev/printer_mock.py"],
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         else:
-            subprocess.run(["python3", ".print.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            try:
+                subprocess.run(["python3", ".print.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                stdout, stderr = subprocess.communicate()
+
+                if stdout:
+                    print("Output:", stdout.decode())
+                if stderr:
+                    print("Error:", stderr.decode())
+            except Exception as e:
+                print(f"Failed to start img_capture.py: {e}")
+                appState.stateChanged.emit("100")
 
     def photo_subprocess(self):
         if config.DEBUG_MODE == 1:
@@ -197,6 +207,13 @@ class VendingMachineDisplay(QWidget):
                 subprocess.Popen(["python3", "img_capture.py"],
                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 print("img_capture.py started successfully.")
+                # Reading the output and errors for debugging
+                stdout, stderr = subprocess.communicate()
+
+                if stdout:
+                    print("Output:", stdout.decode())
+                if stderr:
+                    print("Error:", stderr.decode())
             except Exception as e:
                 print(f"Failed to start img_capture.py: {e}")
                 appState.stateChanged.emit("100")
@@ -213,8 +230,12 @@ class VendingMachineDisplay(QWidget):
             print(f"{'_' * 10}State changed to 3: Smile Now{'_' * 10}")
         if state == "4":
             print(f"{'_' * 10}State changed to 4: Start printing{'_' * 10}")
-            print_thread = threading.Thread(target=self.print_subprocess)
-            print_thread.start()
+            try:
+                print_thread = threading.Thread(target=self.print_subprocess)
+                print_thread.start()
+            except Exception as e:
+                print(f"Failed to start img_capture.py: {e}")
+                appState.stateChanged.emit("100")
         if state == "5":
             print(f"{'_' * 10}State changed to 5: Tahnk You!{'_' * 10}")
 
