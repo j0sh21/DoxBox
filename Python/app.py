@@ -58,9 +58,9 @@ class VendingMachineDisplay(QWidget):
             self.onGIFFinished()
 
     def onGIFFinished(self):
+        self.loopCount += 1
         if self.total_duration < 3.0 and self.appState.state not in ("2", "3"):
             if self.movie.currentFrameNumber() == self.movie.frameCount() - 1:  # Last frame
-                self.loopCount += 1
                 if self.loopCount >= self.desiredLoops:
                     self.movie.stop()
                     self.updateGIF(self.appState.state)
@@ -79,8 +79,9 @@ class VendingMachineDisplay(QWidget):
                 else:
                     print("Smile GIFF finished, capture Photo very soon")
                     try:
-                        photo_thread = threading.Thread(target=self.photo_subprocess)
-                        photo_thread.start()
+                        if self.loopCount == 1: #Only after 1st Loop
+                            photo_thread = threading.Thread(target=self.photo_subprocess)
+                            photo_thread.start()
                     except Exception as e:
                         print(f"Failed to start img_capture.py: {e}")
                         appState.stateChanged.emit("100")
@@ -188,7 +189,7 @@ class VendingMachineDisplay(QWidget):
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         else:
             try:
-                result = subprocess.run(["python3", "img_capture.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                result = subprocess.run(["python3", "print.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                         text=True, check=True)
                 print("Output:", result.stdout)
             except subprocess.CalledProcessError as e:
@@ -235,7 +236,7 @@ class VendingMachineDisplay(QWidget):
                 print_thread = threading.Thread(target=self.print_subprocess)
                 print_thread.start()
             except Exception as e:
-                print(f"Failed to start img_capture.py: {e}")
+                print(f"Failed to start print.py: {e}")
                 appState.stateChanged.emit("100")
         if state == "5":
             print(f"{'_' * 10}State changed to 5: Tahnk You!{'_' * 10}")
