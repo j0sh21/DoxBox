@@ -55,8 +55,7 @@ def move_image():
         source_picture_path = os.path.join(cwd_tmp, picture_name)
         destination_picture_path = os.path.join(cwd_tmp.replace("/images/pics/","/images/print/"))
         copy_file(source_picture_path, destination_picture_path)
-        image_path = os.path.join(destination_picture_path, picture_name)
-        print_image(printer_name, image_path)
+        print_image(printer_name, destination_picture_path)
         os.remove(destination_picture_path)
         print(f'Successfully removed {picture_name} from Disk.')
 
