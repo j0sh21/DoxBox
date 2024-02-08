@@ -94,7 +94,7 @@ class VendingMachineDisplay(QWidget):
                 self.updateGIF(self.appState.state)
 
     def playGIF(self):
-        self.movie.setFileName(self.gifPath)
+        self.movie.setFileName(self.gif_path)
         self.gifLabel.setMovie(self.movie)
         self.loopCount = 0  # Reset loop count each time a new GIF is played
         self.movie.setScaledSize(QSize(500, 500))
