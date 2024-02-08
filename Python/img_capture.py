@@ -83,15 +83,19 @@ def make_picture():
     clear_files_cmd = config.CLEAR_FILES_COMMAND
 
     try:
-        start_download = datetime.now()
+        start_trigger = datetime.now()
+        print(f"Trigger photo NOW!")
         run_gphoto2_command(trigger_photo_cmd)
-        end_download = datetime.now()
-        print(f"Photo taken and saved in {(end_download - start_download).total_seconds()} Seconds.")
+        end_trigger = datetime.now()
+        print(f"Photo taken and saved on Camera in {(end_trigger - start_trigger).total_seconds()} Seconds.")
         start_download = datetime.now()
         run_gphoto2_command(download_pics_cmd)
         end_download = datetime.now()
-        print(f"Copied file in {(end_download - start_download).total_seconds()} Seconds.")
+        print(f"Copied file from Camera to RaspberryPi in {(end_download - start_download).total_seconds()} Seconds.")
+        start_clear = datetime.now()
         run_gphoto2_command(clear_files_cmd)
+        end_clear = datetime.now()
+        print(f"Cleared file from Camera in {(end_clear - start_clear).total_seconds()} Seconds.")
         os.chdir(cwd)
         print(f"Changed Working Directory to: {os.getcwd()}")
     except Exception as e:
@@ -100,7 +104,6 @@ def make_picture():
 
 def rename_pics():
     shot_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
     for filename in os.listdir("."):
 
             if len(filename) < 13:
@@ -120,13 +123,20 @@ def rename_pics():
                         send_message_to_app("100")
 
 def main():
+
     clear_files_cmd = ["--folder", "/store_00020001/DCIM/100CANON", "-R", "--delete-all-files"]
+    print("Kill old ghphoto2 processes")
     kill_process()
+    print("Remove all files from the Camera")
     gp(clear_files_cmd)
+    print("Create output Folder if not already there")
     create_output_folder()
+    print("Make Picture")
     make_picture()
+    print("Rename the Picture")
     rename_pics()
 
-
 if __name__ == '__main__':
+    print("img_capture.py is now running")
     main()
+    print("img_capture.py is now finished successfully")
