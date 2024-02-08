@@ -188,16 +188,17 @@ class VendingMachineDisplay(QWidget):
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         else:
             try:
-                process = subprocess.run(["python3", ".print.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                stdout, stderr = process.communicate()
+                result = subprocess.run(["python3", "img_capture.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                        text=True, check=True)
+                print("Output:", result.stdout)
+            except subprocess.CalledProcessError as e:
+                # This block will run if the subprocess returns a non-zero exit status
+                error_message = e.stderr  # Capture the stderr from the error
 
-                if stdout:
-                    print("Output:", stdout.decode())
-                if stderr:
-                    print("Error:", stderr.decode())
-            except Exception as e:
-                print(f"Failed to start img_capture.py: {e}")
-                appState.stateChanged.emit("100")
+                if "No printer" in error_message:
+                    print("Error: No printer found. Please ensure the printer is connected properly.")
+                else:
+                    print("An unexpected error with the printer occurred:", error_message)
 
     def photo_subprocess(self):
         if config.DEBUG_MODE == 1:
