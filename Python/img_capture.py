@@ -5,6 +5,7 @@ from sh import gphoto2 as gp
 import signal
 import os
 import subprocess
+import sh
 #sudo apt-get install gphoto2
 
 cwd = ""
@@ -85,7 +86,21 @@ def make_picture():
     try:
         start_trigger = datetime.now()
         print(f"Trigger photo NOW!")
-        run_gphoto2_command(trigger_photo_cmd)
+        try:
+            run_gphoto2_command(trigger_photo_cmd)
+        except sh.ErrorReturnCode_1 as e:
+            # Now we can check the contents of the error message
+            error_message = str(e)
+
+            if "Fokus" in error_message:
+                # If the specific error message is found, print custom text
+                print("Error: Camera has no Focus. Please ensure placing the subject on the focus mark and try again.")
+                send_message_to_app("101")
+            else:
+                # If the error message does not match, print a generic error message or re-raise the exception
+                print("An unexpected error occurred:", error_message)
+                send_message_to_app("100")
+                # Or, to propagate the error, you might use: raise
         end_trigger = datetime.now()
         print(f"Photo taken and saved on Camera in {(end_trigger - start_trigger).total_seconds()} Seconds.")
         start_download = datetime.now()
@@ -128,7 +143,21 @@ def main():
     print("Kill old ghphoto2 processes")
     kill_process()
     print("Remove all files from the Camera")
-    gp(clear_files_cmd)
+    try:
+        gp(clear_files_cmd)
+    except sh.ErrorReturnCode_1 as e:
+        # Now we can check the contents of the error message
+        error_message = str(e)
+
+        if "Keine Kamera gefunden" in error_message:
+            # If the specific error message is found, print custom text
+            print("Error: No camera found. Please ensure the camera is connected properly.")
+            send_message_to_app("102")
+        else:
+            # If the error message does not match, print a generic error message or re-raise the exception
+            print("An unexpected error occurred:", error_message)
+            send_message_to_app("100")
+            # Or, to propagate the error, you might use: raise
     print("Create output Folder if not already there")
     create_output_folder()
     print("Make Picture")
