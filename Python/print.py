@@ -33,6 +33,7 @@ def copy_file(source_path, destination_path):
         shutil.copy(source_path, destination_path)
         print(f"Successfully copied {source_path} to {destination_path}")
     except FileNotFoundError:
+        print(f"CWD {os.getcwd()}")
         print(f"Error: The file {source_path} does not exist.")
     except PermissionError:
         print(f"Error: Permission denied while copying {source_path}.")
