@@ -66,7 +66,7 @@ class VendingMachineDisplay(QWidget):
                     self.updateGIF(self.appState.state)
                     print(f"Replaying Gif {self.loopCount} times finished.")
                 else:
-                    self.playGIF(self)
+                    self.playGIF()
                     print(f"Replaying Gif because total duration was < 3 seconds")
         else:
             if self.appState.state in("1","2","3"):
@@ -255,7 +255,7 @@ class VendingMachineDisplay(QWidget):
                     gifTopLeft = vfCenter - QPoint(250, 250)  # Adjust for the size of the gifLabel
                     self.gifLabel.move(gifTopLeft)
                     self.gifLabel.show()  # Make sure the gifLabel is visible
-                    self.playGIF(self)
+                    self.playGIF()
                 except Exception as e:
                     print(f"Error while try to start playing Gif: {str(e)}")
             else:
