@@ -58,7 +58,7 @@ class VendingMachineDisplay(QWidget):
             self.onGIFFinished()
 
     def onGIFFinished(self):
-        if self.total_duration < 3.0 and self.appState.state not in (2, 3):
+        if self.total_duration < 3.0 and self.appState.state not in ("2", "3"):
             if self.movie.currentFrameNumber() == self.movie.frameCount() - 1:  # Last frame
                 self.loopCount += 1
                 if self.loopCount >= self.desiredLoops:
@@ -188,8 +188,8 @@ class VendingMachineDisplay(QWidget):
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         else:
             try:
-                subprocess.run(["python3", ".print.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                stdout, stderr = subprocess.communicate()
+                process = subprocess.run(["python3", ".print.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                stdout, stderr = process.communicate()
 
                 if stdout:
                     print("Output:", stdout.decode())
@@ -204,11 +204,11 @@ class VendingMachineDisplay(QWidget):
             print("DEBUG MODE: Simulate Photo")
         else:
             try:
-                subprocess.Popen(["python3", "img_capture.py"],
+                process = subprocess.Popen(["python3", "img_capture.py"],
                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 print("img_capture.py started successfully.")
                 # Reading the output and errors for debugging
-                stdout, stderr = subprocess.communicate()
+                stdout, stderr = process.communicate()
 
                 if stdout:
                     print("Output:", stdout.decode())
