@@ -124,8 +124,6 @@ def rename_pics():
                     try:
                         os.rename(filename, (shot_time + ".JPG"))
                         print("Picture renamed!")
-                        os.chdir(cwd)
-                        print(f"Changed Working Directory to: {os.getcwd()}")
                         send_message_to_app("4")
                     except FileNotFoundError:
                         print("Error: The Picture does not exist.")
@@ -136,7 +134,8 @@ def rename_pics():
                     except Exception as e:
                         print(f"An unexpected error occurred: {str(e)}")
                         send_message_to_app("100")
-
+    os.chdir(cwd)
+    print(f"Changed Working Directory to: {os.getcwd()}")
 def main():
 
     clear_files_cmd = ["--folder", "/store_00020001/DCIM/100CANON", "-R", "--delete-all-files"]
