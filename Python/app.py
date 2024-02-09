@@ -61,12 +61,13 @@ class VendingMachineDisplay(QWidget):
         self.loopCount += 1
         if self.total_duration < 3.0 and self.appState.state not in ("2", "3"):
             if self.movie.currentFrameNumber() == self.movie.frameCount() - 1:  # Last frame
-                if self.total_duration < 0.5:
-                    self.desiredLoops *= 6
-                elif self.total_duration < 1.0:
-                    self.desiredLoops *= 3
-                elif self.total_duration < 2.0:
-                    self.desiredLoops *= 2
+                if self.loopCount == 1:
+                    if self.total_duration < 0.5:
+                        self.desiredLoops *= 6
+                    elif self.total_duration < 1.0:
+                        self.desiredLoops *= 3
+                    elif self.total_duration < 2.0:
+                        self.desiredLoops *= 2
                 if self.loopCount >= self.desiredLoops:
                     self.movie.stop()
                     if self.appState.state == "1":
