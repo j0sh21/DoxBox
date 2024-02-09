@@ -256,6 +256,7 @@ class VendingMachineDisplay(QWidget):
 
     def updateGIF(self, state):
         self.loopCount = 0  # Reset loop count each time a new GIF is played
+        self.desiredLoops = 0 # Reset desired Loops count each time a new GIF is played
         # Map states to subfolders
         subfolder_map = {
             "0": "0_welcome",
