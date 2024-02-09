@@ -32,7 +32,7 @@ class AppState(QObject):
 class VendingMachineDisplay(QWidget):
     def __init__(self, appState):
         super().__init__()
-        self.loopCount
+        self.loopCount = 0
         self.desiredLoops = 3
         self.appState = appState
         self.initUI()
