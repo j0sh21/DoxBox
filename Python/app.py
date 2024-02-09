@@ -61,13 +61,22 @@ class VendingMachineDisplay(QWidget):
         self.loopCount += 1
         if self.total_duration < 3.0 and self.appState.state not in ("2", "3"):
             if self.movie.currentFrameNumber() == self.movie.frameCount() - 1:  # Last frame
+                if self.total_duration < 0.5:
+                    self.desiredLoops *= 6
+                elif self.total_duration < 1.0:
+                    self.desiredLoops *= 3
+                elif self.total_duration < 2.0:
+                    self.desiredLoops *= 2
                 if self.loopCount >= self.desiredLoops:
                     self.movie.stop()
+                    if self.appState.state == "1":
+                        print(f"({self.desiredLoops}x) Payment GIFF finished, next State: 2 and Gif")
+                        self.appState.state = "2"
                     self.updateGIF(self.appState.state)
-                    print(f"Replaying Gif {self.loopCount} times finished.")
+                    print(f"({self.desiredLoops}x) Loops finished, next random Gif for State: {self.appState.state}")
                 else:
                     self.playGIF()
-                    print(f"Replaying Gif because total duration was < 3 seconds")
+                    print(f"Replaying Gif ({self.desiredLoops}x), total duration is < 3 seconds")
         else:
             if self.appState.state in("1","2","3"):
                 if self.appState.state == "1":
