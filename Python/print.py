@@ -1,8 +1,17 @@
 import datetime
 import shutil
+import socket
 import cups
 import os
 import config
+
+def send_message_to_app(message):
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+            client_socket.connect((config.HOST, config.PORT))
+            client_socket.sendall(message.encode())
+    except socket.error as e:
+        print(f"Error in sending message to app: {e}")
 
 def print_image(printer_name, image_path):
     print("Connect to the CUPS printing Server")

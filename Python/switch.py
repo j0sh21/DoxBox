@@ -6,11 +6,10 @@ import socket
 
 def send_message_to_app(message):
     try:
-        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client_socket.connect((config.HOST, config.PORT))
-        client_socket.sendall(message.encode())
-        client_socket.close()
-    except Exception as e:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+            client_socket.connect((config.HOST, config.PORT))
+            client_socket.sendall(message.encode())
+    except socket.error as e:
         print(f"Error in sending message to app: {e}")
 
 def main_loop():
