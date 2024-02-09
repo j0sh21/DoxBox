@@ -20,7 +20,7 @@ def main():
     app_thread = threading.Thread(target=run_app)
     app_thread.start()
 
-    if DEBUG == 1:
+    if DEBUG in(1,2):
         # Running debug_client.py as a subprocess when DEBUG is True
         print("Start DEBUG CLIENT")
         subprocess.run(["python3", r"./dev/debug_client.py"])
