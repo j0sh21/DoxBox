@@ -24,18 +24,10 @@ class RGBLEDController:
         print("Deactivating fade...")
         self.fade_active = 0  # Deactivate fade
 
-
-    def update_color(self, color, step):
-        color += step
-        if color > 255:
-            return 255
-        if color < 0:
-            return 0
-        return color
-
     def set_lights(self, pin, brightness):
         real_brightness = int(brightness * (self.brightness / 255.0))
         self.pi.set_PWM_dutycycle(pin, real_brightness)
+
     def update_brightness(self, r, g, b):
         r = int(r * (self.brightness / 255.0))
         g = int(g * (self.brightness / 255.0))
@@ -55,13 +47,20 @@ class RGBLEDController:
             self.set_lights(self.green_pin, g)
             self.set_lights(self.blue_pin, b)
 
-
     def update_leds(self):
         r, g, b = self.update_brightness(self.r, self.g, self.b)
         # Update the LED colors based on the current state
         self.set_lights(self.red_pin, r)
         self.set_lights(self.green_pin, g)
         self.set_lights(self.blue_pin, b)
+
+    def update_color(self, color, step):
+        color += step
+        if color > 255:
+            return 255
+        if color < 0:
+            return 0
+        return color
 
     def fade_led(self):
         while self.fade_active == 1:  # Check if fade loop should be active
@@ -97,7 +96,6 @@ class RGBLEDController:
         fade_thread = threading.Thread(target=self.fade_led)
         fade_thread.start()
         time.sleep(1)  # Sleep to prevent high CPU usage
-
 
 
 class ServerThread(Thread):
