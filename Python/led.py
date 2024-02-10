@@ -107,7 +107,7 @@ class RGBLEDController:
     def run(self):
         # Example initialization or setup code
         print("LED Controller is running...")
-        self.set_color(255, 255, 255)  # Set to a default color (white) or your choice
+        self.set_color(103, 58, 183)  # Set to a default color (red) or your choice
 
         # Start the fade process in a separate thread to keep the main loop responsive
         fade_thread = threading.Thread(target=self.fade_led)
