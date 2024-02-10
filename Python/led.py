@@ -150,7 +150,7 @@ class ServerThread(Thread):
                 fade = int(parts[1])
                 if fade == 1:
                     r, g, b = self.led_controller.get_color()
-                    self.led_controller.get_color(r, g, b)
+                    self.led_controller.set_color(r, g, b)
                     self.led_controller.activate_fade()
                     print("Start fading LED")
                 elif fade == 0:
