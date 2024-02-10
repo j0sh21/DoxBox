@@ -65,6 +65,7 @@ class RGBLEDController:
         return color
 
     def fade_led(self):
+        self.b = 0
         while self.fade_active == 1:  # Check if fade loop should be active
             # Fade the LED colors
             # Fade logic
