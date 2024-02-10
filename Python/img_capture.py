@@ -46,6 +46,9 @@ def create_output_folder():
         os.makedirs(save_pic_to)
     except FileExistsError:
         print(f"The folder '{save_pic_to}' already exists.")
+    except PermissionError:
+        print(f"Error: Permission denied to create folder {save_pic_to}.")
+        send_message_to_app("104")
     except Exception as e:
         print(f"An error occurred while creating the folder: {str(e)}")
         send_message_to_app("100")
@@ -56,10 +59,10 @@ def create_output_folder():
         print(f"Changed working directory to '{save_pic_to}'")
     except FileNotFoundError:
         print(f"Error: The specified directory '{save_pic_to}' does not exist.")
-        send_message_to_app("100")
+        send_message_to_app("103")
     except PermissionError:
         print(f"Error: Permission denied while changing the working directory.")
-        send_message_to_app("100")
+        send_message_to_app("104")
     except Exception as e:
         print(f"An unexpected error occurred: {str(e)}")
         send_message_to_app("100")
@@ -83,9 +86,6 @@ def run_gphoto2_command(command):
             # If the error message does not match, print a generic error message or re-raise the exception
             print("An unexpected error occurred:", error_message)
             send_message_to_app("100")
-    except subprocess.CalledProcessError as e:
-        print(f"Error running command '{command}': {str(e)}")
-        send_message_to_app("100")
 
 def make_picture():
     global cwd
@@ -116,10 +116,10 @@ def rename_pics():
                     send_message_to_app("4")
                 except FileNotFoundError:
                     print("Error: The Picture does not exist.")
-                    send_message_to_app("105")
+                    send_message_to_app("103")
                 except PermissionError:
                     print("Error: Permission denied while renaming files.")
-                    send_message_to_app("106")
+                    send_message_to_app("104")
                 except Exception as e:
                     print(f"An unexpected error occurred: {str(e)}")
                     send_message_to_app("100")

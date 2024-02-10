@@ -23,6 +23,7 @@ def print_image(printer_name, image_path):
     # Check if specified printer is available
     if printer_name not in printers:
         print(f"Printer {printer_name} not found. Available printers:")
+        send_message_to_app("110")
         for printer in printers:
             print(f"{printer}\n")
         return
@@ -31,8 +32,13 @@ def print_image(printer_name, image_path):
 
     if config.DEBUG_MODE == 0:
         # Print the image
-        print_job_id = conn.printFile(printer_name, image_path, "Photo Print", {})
-        print(f"Print job submitted to Printer. Job ID: {print_job_id}\nStart printing {image_path} on {printer_name}")
+        try:
+            print_job_id = conn.printFile(printer_name, image_path, "Photo Print", {})
+            print(
+                f"Print job submitted to Printer. Job ID: {print_job_id}\nStart printing {image_path} on {printer_name}")
+        except Exception as e:
+            print(f"Error while creating and sending print job.")
+            send_message_to_app("110")
     else:
         print(f"DEBUG MODE: Simulate Print file {image_path} on {printer_name}. \nDEBUG MODE: Skip 45 sec waiting time...")
 
@@ -44,10 +50,14 @@ def copy_file(source_path, destination_path):
     except FileNotFoundError:
         print(f"CWD {os.getcwd()}")
         print(f"Error: The file {source_path} does not exist.")
+        send_message_to_app("103")
     except PermissionError:
         print(f"Error: Permission denied while copying {source_path}.")
+        send_message_to_app("104")
     except Exception as e:
         print(f"An unexpected error occurred while copying {source_path}: {str(e)}")
+        send_message_to_app("100")
+
 
 def move_image():
     pic_dir = os.path.join(config.PICTURE_SAVE_DIRECTORY, datetime.datetime.now().strftime("%Y-%m-%d"))
