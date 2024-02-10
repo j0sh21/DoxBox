@@ -6,11 +6,10 @@ import socket
 
 def send_message_to_app(message):
     try:
-        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client_socket.connect((config.HOST, config.PORT))
-        client_socket.sendall(message.encode())
-        client_socket.close()
-    except Exception as e:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+            client_socket.connect((config.HOST, config.PORT))
+            client_socket.sendall(message.encode())
+    except socket.error as e:
         print(f"Error in sending message to app: {e}")
 
 def main_loop():
@@ -22,6 +21,7 @@ def main_loop():
     response = None
 
     while True:
+        print("Request LnBits API for new payments")
         response = requests.get(config.API_URL, headers={'X-API-Key': config.API_KEY})
         if (response.status_code == 200):
             rsJson = response.json()
@@ -34,7 +34,7 @@ def main_loop():
                 amount = rsJson[0]['amount'] / 1000  # Amount in SATS
 
                 if (amount == config.AMOUNT_THRESHOLD):
-                    print("Sats recieved!")
+                    print("Sats recieved, sending msg = 1 to app.py!")
                     send_message_to_app("1")
                     time.sleep(config.POST_PAYMENT_DELAY)
                 else:
@@ -45,5 +45,6 @@ def main_loop():
             exit(response.status_code)
 
 if __name__ == '__main__':
+    print("switch.py is now running.")
     main_thread = threading.Thread(target=main_loop)
     main_thread.start()
