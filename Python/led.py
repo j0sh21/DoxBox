@@ -35,8 +35,8 @@ class RGBLEDController:
         return r, g, b
 
     def set_color(self, r, g, b):
-        self.fade_active = False  # Pause the fade loop when a color is set directly
         if r or g or b:
+            self.fade_active = False  # Pause the fade loop when a color is set directly
             self.r, self.g, self.b = self.update_brightness(r, g, b)
             self.set_lights(self.red_pin, self.r)
             self.set_lights(self.green_pin, self.g)
