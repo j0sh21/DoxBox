@@ -15,6 +15,8 @@ class RGBLEDController:
         self.brightness, self.prev_brightness = 255, 255
         self.fade_active = 1  # Flag to control the fade loop
 
+    def get_color(self):
+        return self.r, self.g, self.b
     def activate_fade(self):
         print("Activating fade...")
         self.fade_active = 1  # Activate fade
@@ -147,7 +149,8 @@ class ServerThread(Thread):
             elif parts[0] == "fade" and len(parts) == 2:
                 fade = int(parts[1])
                 if fade == 1:
-                    self.led_controller.set_color(255, 0, 254)
+                    r, g, b = self.led_controller.get_color()
+                    self.led_controller.get_color(r, g, b)
                     self.led_controller.activate_fade()
                     print("Start fading LED")
                 elif fade == 0:
