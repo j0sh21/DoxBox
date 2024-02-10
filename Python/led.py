@@ -56,13 +56,25 @@ class RGBLEDController:
         self.set_lights(self.green_pin, g)
         self.set_lights(self.blue_pin, b)
 
-    def update_color(self, color, step):
-        color += step
-        if color > 255:
-            return 255
-        if color < 0:
-            return 0
-        return color
+
+    def blink_led(self, blink_count=5, on_time=0.5, off_time=0.5):
+        # Save the current LED state
+        original_r, original_g, original_b = self.r, self.g, self.b
+
+        for _ in range(blink_count):
+            # Turn off the LED
+            self.r, self.g, self.b = 0, 0, 0
+            self.update_leds()
+            time.sleep(off_time)  # LED is off for 'off_time' seconds
+
+            # Restore the original LED state
+            self.r, self.g, self.b = original_r, original_g, original_b
+            self.update_leds()
+            time.sleep(on_time)  # LED is on for 'on_time' seconds
+
+        # Ensure the LED is left in the original state
+        self.r, self.g, self.b = original_r, original_g, original_b
+        self.update_leds()
 
     def fade_led(self):
         while self.fade_active == 1:  # Check if fade loop should be active
@@ -171,6 +183,16 @@ class ServerThread(Thread):
                     print("End fading LED")
                 else:
                     print("Fading state must be 0 = off or 1 = on.")
+            elif parts[0] == "blink" and len(parts) == 2:
+                blink = int(parts[1])
+                if blink == 1:
+                    self.led_controller.blink_led()
+                    print("Start blinking LED")
+                elif blink == 0:
+                    self.led_controller.deactivate_fade()
+                    print("End blinking LED")
+                else:
+                    print("blinking state must be 0 = off or 1 = on.")
             else:
                 print(f"Unrecognized command: {command}")
         except ValueError as e:
