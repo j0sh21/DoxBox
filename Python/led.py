@@ -66,23 +66,38 @@ class RGBLEDController:
 
     def fade_led(self):
         while self.fade_active == 1:  # Check if fade loop should be active
-            # Fade the LED colors
-            # Fade logic
-            if self.r == 255 and self.b == 0 and self.g < 255:
-                self.g = self.update_color(self.g, self.steps)
-            elif self.g == 255 and self.b == 0 and self.r > 0:
-                self.r = self.update_color(self.r, -self.steps)
-            elif self.r == 0 and self.g == 255 and self.b < 255:
-                self.b = self.update_color(self.b, self.steps)
-            elif self.r == 0 and self.b == 255 and self.g > 0:
-                self.g = self.update_color(self.g, -self.steps)
-            elif self.g == 0 and self.b == 255 and self.r < 255:
-                self.r = self.update_color(self.r, self.steps)
-            elif self.r == 255 and self.g == 0 and self.b > 0:
-                self.b = self.update_color(self.b, -self.steps)
+            # Determine the next transition based on the current state
+            if max(self.r, self.g, self.b) < 255:  # Increase the highest color to max
+                if self.r >= self.g and self.r >= self.b:
+                    self.r = min(self.r + self.steps, 255)
+                elif self.g >= self.r and self.g >= self.b:
+                    self.g = min(self.g + self.steps, 255)
+                else:
+                    self.b = min(self.b + self.steps, 255)
+            elif min(self.r, self.g, self.b) > 0:  # Decrease the lowest color to 0
+                if self.r <= self.g and self.r <= self.b:
+                    self.r = max(self.r - self.steps, 0)
+                elif self.g <= self.r and self.g <= self.b:
+                    self.g = max(self.g - self.steps, 0)
+                else:
+                    self.b = max(self.b - self.steps, 0)
+            else:  # Shift the max color towards the next in the cycle
+                if self.r == 255 and self.b == 0:  # Red to yellow
+                    self.g = min(self.g + self.steps, 255)
+                elif self.g == 255 and self.b == 0:  # Yellow to green
+                    self.r = max(self.r - self.steps, 0)
+                elif self.g == 255 and self.r == 0:  # Green to cyan
+                    self.b = min(self.b + self.steps, 255)
+                elif self.b == 255 and self.r == 0:  # Cyan to blue
+                    self.g = max(self.g - self.steps, 0)
+                elif self.b == 255 and self.g == 0:  # Blue to magenta
+                    self.r = min(self.r + self.steps, 255)
+                elif self.r == 255 and self.g == 0:  # Magenta to red
+                    self.b = max(self.b - self.steps, 0)
+
             # Update the LEDs based on the current colors
             self.update_leds()
-            #print(f"Set color to {self.r}, {self.g}, {self.b}")
+            # Debugging: print(f"Set color to {self.r}, {self.g}, {self.b}")
             time.sleep(0.01)  # Small delay to prevent high CPU usage
 
     def start_fade_thread(self):
@@ -149,9 +164,6 @@ class ServerThread(Thread):
             elif parts[0] == "fade" and len(parts) == 2:
                 fade = int(parts[1])
                 if fade == 1:
-                    r, g, b = self.led_controller.get_color()
-                    b = 0
-                    self.led_controller.set_color(r, g, b)
                     self.led_controller.activate_fade()
                     print("Start fading LED")
                 elif fade == 0:
