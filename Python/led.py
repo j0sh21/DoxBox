@@ -78,34 +78,22 @@ class RGBLEDController:
 
     def fade_led(self):
         while self.fade_active == 1:  # Check if fade loop should be active
-            # Determine the next transition based on the current state
-            if max(self.r, self.g, self.b) < 255:  # Increase the highest color to max
-                if self.r >= self.g and self.r >= self.b:
-                    self.r = min(self.r + self.steps, 255)
-                elif self.g >= self.r and self.g >= self.b:
-                    self.g = min(self.g + self.steps, 255)
-                else:
-                    self.b = min(self.b + self.steps, 255)
-            elif min(self.r, self.g, self.b) > 0:  # Decrease the lowest color to 0
-                if self.r <= self.g and self.r <= self.b:
-                    self.r = max(self.r - self.steps, 0)
-                elif self.g <= self.r and self.g <= self.b:
-                    self.g = max(self.g - self.steps, 0)
-                else:
-                    self.b = max(self.b - self.steps, 0)
-            else:  # Shift the max color towards the next in the cycle
-                if self.r == 255 and self.b == 0:  # Red to yellow
-                    self.g = min(self.g + self.steps, 255)
-                elif self.g == 255 and self.b == 0:  # Yellow to green
-                    self.r = max(self.r - self.steps, 0)
-                elif self.g == 255 and self.r == 0:  # Green to cyan
-                    self.b = min(self.b + self.steps, 255)
-                elif self.b == 255 and self.r == 0:  # Cyan to blue
-                    self.g = max(self.g - self.steps, 0)
-                elif self.b == 255 and self.g == 0:  # Blue to magenta
-                    self.r = min(self.r + self.steps, 255)
-                elif self.r == 255 and self.g == 0:  # Magenta to red
-                    self.b = max(self.b - self.steps, 0)
+            max_color = max(self.r, self.g, self.b)
+            min_color = min(self.r, self.g, self.b)
+
+            # Adjust colors to smoothly transition between states
+            if self.r == max_color and self.g < max_color and self.b == min_color:
+                self.g = min(self.g + self.steps, 255)  # Red to yellow
+            elif self.g == max_color and self.r > min_color:
+                self.r = max(self.r - self.steps, 0)  # Yellow to green
+            elif self.g == max_color and self.b < max_color and self.r == min_color:
+                self.b = min(self.b + self.steps, 255)  # Green to cyan
+            elif self.b == max_color and self.g > min_color:
+                self.g = max(self.g - self.steps, 0)  # Cyan to blue
+            elif self.b == max_color and self.r < max_color and self.g == min_color:
+                self.r = min(self.r + self.steps, 255)  # Blue to magenta
+            elif self.r == max_color and self.b > min_color:
+                self.b = max(self.b - self.steps, 0)  # Magenta to red
 
             # Update the LEDs based on the current colors
             self.update_leds()
