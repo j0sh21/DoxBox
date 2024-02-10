@@ -71,7 +71,7 @@ def run_gphoto2_command(command):
     except sh.ErrorReturnCode_1 as e:
         # Now we can check the contents of the error message
         error_message = str(e)
-        if "Fokus" in error_message:
+        if "focus" in error_message:
             # If the specific error message is found, print custom text
             print("Error: Camera has no Focus. Please ensure placing the subject on the focus mark and try again.")
             send_message_to_app("101")
