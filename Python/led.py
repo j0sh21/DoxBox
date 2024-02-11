@@ -196,13 +196,20 @@ class ServerThread(Thread):
                     print("End fading LED")
                 else:
                     print("Fading state must be 0 = off or 1 = on.")
+            elif parts[0] == "blink" and len(parts) == 2:
+                blink = int(parts[1])
+                if blink >= 1:
+                    self.led_controller.breath_led(blink_count=blink)
+                    print("Start blinking LED")
+                else:
+                    print("blinking count must be one or more.")
             elif parts[0] == "breath" and len(parts) == 2:
                 breath = int(parts[1])
                 if breath >= 1:
                     self.led_controller.breath_led(breath_count=breath)
-                    print("Start blinking LED")
+                    print("Start breathing LED")
                 else:
-                    print("blinking count must be one or more.")
+                    print("breath count must be one or more.")
             else:
                 print(f"Unrecognized command: {command}")
         except ValueError as e:
