@@ -189,8 +189,8 @@ class ServerThread(Thread):
             elif parts[0] == "fade" and len(parts) == 2:
                 fade = int(parts[1])
                 if fade == 1:
-                    self.led_controller.activate_fade()
                     print("Start fading LED")
+                    self.led_controller.activate_fade()
                 elif fade == 0:
                     self.led_controller.deactivate_fade()
                     print("End fading LED")
@@ -199,15 +199,15 @@ class ServerThread(Thread):
             elif parts[0] == "blink" and len(parts) == 2:
                 blink = int(parts[1])
                 if blink >= 1:
-                    self.led_controller.blink_led(blink_count=blink)
                     print("Start blinking LED")
+                    self.led_controller.blink_led(blink_count=blink)
                 else:
                     print("blinking count must be one or more.")
             elif parts[0] == "breath" and len(parts) == 2:
                 breath = int(parts[1])
                 if breath >= 1:
-                    self.led_controller.breath_led(breath_count=breath)
                     print("Start breathing LED")
+                    self.led_controller.breath_led(breath_count=breath)
                 else:
                     print("breath count must be one or more.")
             else:
