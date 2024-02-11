@@ -116,83 +116,55 @@ class VendingMachineDisplay(QWidget):
         layout = QVBoxLayout()
         self.setLayout(layout)
 
-        # Header setup
-        #header = QLabel("Header")  # Or use a QWidget and customize it
-        #header.setFixedHeight(50)
-        # Set the background color of the header to dark purple
-        #header.setStyleSheet("background-color: #301934; color: white;")  # Added color: white for the text
-        #header.setAlignment(Qt.AlignCenter)
-        #layout.addWidget(header)
+        # Set up the webcam viewfinder
+        self.viewfinder = QCameraViewfinder(self)
+        self.viewfinder.setGeometry(0, 0, 1280, 720)  # Position und Größe des Viewfinders
+        layout.addWidget(self.viewfinder, 1)  # Der '1' bewirkt, dass der Viewfinder expandiert
+
+        # Initialize and start the camera
+        self.camera = QCamera(QCameraInfo.defaultCamera())
+        viewfinder_settings = QCameraViewfinderSettings()
+        viewfinder_settings.setResolution(1280, 720)  # Auflösung festlegen
+        self.camera.setViewfinderSettings(viewfinder_settings)
+        self.camera.setViewfinder(self.viewfinder)
+        self.camera.start()
+
+        # Initialize the QLabel for displaying GIFs with the viewfinder as its parent
+        self.gifLabel = QLabel(self.viewfinder)
+        self.gifLabel.setAlignment(Qt.AlignCenter)  # Zentriere den Inhalt
+        self.gifLabel.setGeometry(QRect(0, 0, 500, 500))  # Geometrie festlegen
+        self.gifLabel.hide()  # GIF-Label zunächst verstecken
+        self.gifLabel.raise_()  # Über anderen Widgets platzieren
 
         # Load Frame PNG
         pixmap = QPixmap(rf"{config.PATH_TO_FRAME}")
         # Create QLabel for Frame
         frame = QLabel(self)
         frame.setPixmap(pixmap)
-        frame.setAlignment(Qt.AlignCenter)  # Center Frame
-        # Ensure the QLabel supports transparency
-        frame.setAttribute(Qt.WA_TranslucentBackground)
+        frame.setAlignment(Qt.AlignCenter)  # Rahmen zentrieren
+        frame.setAttribute(Qt.WA_TranslucentBackground)  # Transparenz unterstützen
+        frame.setGeometry(0, 0, 1600, 720)  # Position und Größe des Bildrahmens festlegen
+        frame.raise_()  # Über anderen Widgets platzieren
 
-
-        # Sidebar setup
-        #sidebar = QWidget()
-        #sidebar.setFixedWidth(150)
-        #sidebar.setStyleSheet("background-color: #301934; color: white;")  # Added color: white for the text
-        #sidebarLayout = QVBoxLayout(sidebar)
-        #sidebarLayout.setContentsMargins(0, 0, 0, 0)  # Remove any margins to ensure the QR code is at the very top
-        #sidebarLayout.setSpacing(0)  # Remove spacing between widgets in the sidebar
-
-        # QR Code setup
-        #self.qrCodeLabel = QLabel(sidebar)
-        #pixmap = QPixmap(config.IMAGE_PATH)  # Use the image path from config.py
-        #self.qrCodeLabel.setPixmap(pixmap.scaled(config.IMAGE_WIDTH, config.IMAGE_HEIGHT,
-        #                                        Qt.KeepAspectRatio))  # Use image dimensions from config.py
-        #self.qrCodeLabel.setAlignment(Qt.AlignCenter)  # Center the QR code horizontally in the sidebar
-        # Add the QR code to the sidebar layout
-        #sidebarLayout.addWidget(self.qrCodeLabel)
-
-        # Set up the webcam viewfinder
-        self.viewfinder = QCameraViewfinder(self)
-
-        #contentLayout.addWidget(sidebar)
-        layout.addWidget(self.viewfinder, 1)  # The '1' makes the viewfinder expand
-
-        # Add the content layout to the main layout
-        #layout.addLayout(contentLayout)
-
-        # Initialize and start the camera
-        self.camera = QCamera(QCameraInfo.defaultCamera())
-
-        #build viewfinder instance
-        viewfinder_settings = QCameraViewfinderSettings()
-        viewfinder_settings.setResolution(1280, 720)  # Set Resolution
-
-        # Vewfinder Settings
-        self.camera.setViewfinderSettings(viewfinder_settings)
-        self.camera.setViewfinder(self.viewfinder)
-        self.camera.start()
-        # Initialize the QLabel for displaying GIFs with the viewfinder as its parent
-        self.gifLabel = QLabel(self.viewfinder)
-        self.gifLabel.setAlignment(Qt.AlignCenter)  # Center the content
-        self.gifLabel.setGeometry(QRect(0, 0, 500, 500))  # Set the geometry to 500x500 pixels
-        self.gifLabel.hide()  # Initially hide the gifLabel
-        self.gifLabel.raise_()
-        # Display text in the middle of the screen, always on top
+        # TextLabel-Position anpassen
         self.textLabel = QLabel(config.DEFAULT_TEXT, self)
         self.textLabel.setAlignment(Qt.AlignCenter)
-        self.textLabel.setStyleSheet(
-            "background-color: rgba(255, 255, 255, 128);")  # Optional: Semi-transparent background
-        self.textLabel.adjustSize()  # Adjust size based on text content
+        self.textLabel.setStyleSheet("background-color: rgba(255, 255, 255, 128);")
+        self.textLabel.adjustSize()
         self.repositionTextLabel()
         self.textLabel.raise_()
 
-        layout.addWidget(frame)
+        layout.addWidget(frame)  # Den Bildrahmen zum Layout hinzufügen
 
-        # Window configurations
-        if config.FULLSCREEN_MODE:  # Check if fullscreen mode is enabled in config.py
+        # Fensterkonfigurationen
+        self.configureWindow()
+
+    def configureWindow(self):
+        if config.FULLSCREEN_MODE:
             self.showFullScreen()
         else:
             self.setWindowTitle(config.WINDOW_TITLE)
+            self.setGeometry(100, 100, 1600, 720)  # Fenstergröße anpassen
             self.show()
 
     def repositionTextLabel(self):
