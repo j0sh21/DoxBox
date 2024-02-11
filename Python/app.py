@@ -112,60 +112,36 @@ class VendingMachineDisplay(QWidget):
         self.movie.start()
 
     def initUI(self):
-        # Set the layout
-        layout = QVBoxLayout()
-        self.setLayout(layout)
+        # Layout für das Hauptfenster
+        self.layout = QVBoxLayout(self)
 
-        # Set up the webcam viewfinder
-        self.viewfinder = QCameraViewfinder(self)
-        self.viewfinder.setGeometry(0, 0, 1280, 720)  # Position und Größe des Viewfinders
-        layout.addWidget(self.viewfinder, 1)  # Der '1' bewirkt, dass der Viewfinder expandiert
-
-        # Initialize and start the camera
+        # Initialisiere und starte die Kamera
         self.camera = QCamera(QCameraInfo.defaultCamera())
+
+        # Erstelle eine QCameraViewfinder-Instanz für den Kamerastream
+        self.viewfinder = QCameraViewfinder(self)
         viewfinder_settings = QCameraViewfinderSettings()
-        viewfinder_settings.setResolution(1280, 720)  # Auflösung festlegen
+        viewfinder_settings.setResolution(1280, 720)  # Setze Auflösung
         self.camera.setViewfinderSettings(viewfinder_settings)
         self.camera.setViewfinder(self.viewfinder)
         self.camera.start()
 
-        # Initialize the QLabel for displaying GIFs with the viewfinder as its parent
-        self.gifLabel = QLabel(self.viewfinder)
-        self.gifLabel.setAlignment(Qt.AlignCenter)  # Zentriere den Inhalt
-        self.gifLabel.setGeometry(QRect(0, 0, 500, 500))  # Geometrie festlegen
-        self.gifLabel.hide()  # GIF-Label zunächst verstecken
-        self.gifLabel.raise_()  # Über anderen Widgets platzieren
+        # Füge den Viewfinder zum Layout hinzu
+        self.layout.addWidget(self.viewfinder)
 
-        # Load Frame PNG
-        pixmap = QPixmap(rf"{config.PATH_TO_FRAME}")
-        # Create QLabel for Frame
-        frame = QLabel(self)
-        frame.setPixmap(pixmap)
-        frame.setAlignment(Qt.AlignCenter)  # Rahmen zentrieren
-        frame.setAttribute(Qt.WA_TranslucentBackground)  # Transparenz unterstützen
-        frame.setGeometry(0, 0, 1600, 720)  # Position und Größe des Bildrahmens festlegen
-        frame.raise_()  # Über anderen Widgets platzieren
+        # Erstelle ein QLabel für das Bild, das über dem Kamerastream angezeigt wird
+        self.imageLabel = QLabel(self)
+        pixmap = QPixmap(rf'{config.PATH_TO_FRAME}')
+        self.imageLabel.setPixmap(pixmap)
+        self.imageLabel.setScaledContents(True)
 
-        # TextLabel-Position anpassen
-        self.textLabel = QLabel(config.DEFAULT_TEXT, self)
-        self.textLabel.setAlignment(Qt.AlignCenter)
-        self.textLabel.setStyleSheet("background-color: rgba(255, 255, 255, 128);")
-        self.textLabel.adjustSize()
-        self.repositionTextLabel()
-        self.textLabel.raise_()
+        # Setze die Größe des Bildes
+        self.imageLabel.setGeometry(0, 0, 800, 600)  # Anpassen an deine Bedürfnisse
 
-        layout.addWidget(frame)  # Den Bildrahmen zum Layout hinzufügen
-
-        # Fensterkonfigurationen
-        self.configureWindow()
-
-    def configureWindow(self):
-        if config.FULLSCREEN_MODE:
-            self.showFullScreen()
-        else:
-            self.setWindowTitle(config.WINDOW_TITLE)
-            self.setGeometry(100, 100, 1600, 720)  # Fenstergröße anpassen
-            self.show()
+        # Setze die Fenstergröße und zeige es an
+        self.setGeometry(100, 100, 1280, 720)
+        self.setWindowTitle('Kamerastream mit Bild Overlay')
+        self.show()
 
     def repositionTextLabel(self):
         # Center the textLabel within the window
