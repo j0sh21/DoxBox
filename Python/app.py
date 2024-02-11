@@ -124,42 +124,40 @@ class VendingMachineDisplay(QWidget):
         header.setStyleSheet("background-color: #301934; color: white;")  # Added color: white for the text
         header.setAlignment(Qt.AlignCenter)
         #layout.addWidget(header)
-
-        # Content area with sidebar and viewfinder
-        contentLayout = QHBoxLayout()
+        # Load Frame PNG
         pixmap = QPixmap(rf"{config.PATH_TO_FRAME}")
         # Create QLabel for Frame
         frame = QLabel(self)
         frame.setPixmap(pixmap)
         frame.setAlignment(Qt.AlignCenter)  # Center Frame
-        contentLayout.addWidget(frame)
+        layout.addWidget(frame)
 
         # Sidebar setup
-        sidebar = QWidget()
-        sidebar.setFixedWidth(150)
-        sidebar.setStyleSheet("background-color: #301934; color: white;")  # Added color: white for the text
-        sidebarLayout = QVBoxLayout(sidebar)
-        sidebarLayout.setContentsMargins(0, 0, 0, 0)  # Remove any margins to ensure the QR code is at the very top
-        sidebarLayout.setSpacing(0)  # Remove spacing between widgets in the sidebar
+        #sidebar = QWidget()
+        #sidebar.setFixedWidth(150)
+        #sidebar.setStyleSheet("background-color: #301934; color: white;")  # Added color: white for the text
+        #sidebarLayout = QVBoxLayout(sidebar)
+        #sidebarLayout.setContentsMargins(0, 0, 0, 0)  # Remove any margins to ensure the QR code is at the very top
+        #sidebarLayout.setSpacing(0)  # Remove spacing between widgets in the sidebar
 
         # QR Code setup
-        self.qrCodeLabel = QLabel(sidebar)
-        pixmap = QPixmap(config.IMAGE_PATH)  # Use the image path from config.py
-        self.qrCodeLabel.setPixmap(pixmap.scaled(config.IMAGE_WIDTH, config.IMAGE_HEIGHT,
-                                                Qt.KeepAspectRatio))  # Use image dimensions from config.py
-        self.qrCodeLabel.setAlignment(Qt.AlignCenter)  # Center the QR code horizontally in the sidebar
+        #self.qrCodeLabel = QLabel(sidebar)
+        #pixmap = QPixmap(config.IMAGE_PATH)  # Use the image path from config.py
+        #self.qrCodeLabel.setPixmap(pixmap.scaled(config.IMAGE_WIDTH, config.IMAGE_HEIGHT,
+        #                                        Qt.KeepAspectRatio))  # Use image dimensions from config.py
+        #self.qrCodeLabel.setAlignment(Qt.AlignCenter)  # Center the QR code horizontally in the sidebar
         # Add the QR code to the sidebar layout
-        sidebarLayout.addWidget(self.qrCodeLabel)
+        #sidebarLayout.addWidget(self.qrCodeLabel)
 
         # Set up the webcam viewfinder
         self.viewfinder = QCameraViewfinder(self)
         layout.addWidget(self.viewfinder)
 
         #contentLayout.addWidget(sidebar)
-        contentLayout.addWidget(self.viewfinder, 1)  # The '1' makes the viewfinder expand
+        layout.addWidget(self.viewfinder, 1)  # The '1' makes the viewfinder expand
 
         # Add the content layout to the main layout
-        layout.addLayout(contentLayout)
+        #layout.addLayout(contentLayout)
 
         # Initialize and start the camera
         self.camera = QCamera(QCameraInfo.defaultCamera())
