@@ -132,7 +132,7 @@ class VendingMachineDisplay(QWidget):
         frame.setAlignment(Qt.AlignCenter)  # Center Frame
         # Ensure the QLabel supports transparency
         frame.setAttribute(Qt.WA_TranslucentBackground)
-        layout.addWidget(frame)
+
 
         # Sidebar setup
         #sidebar = QWidget()
@@ -185,6 +185,8 @@ class VendingMachineDisplay(QWidget):
         self.textLabel.adjustSize()  # Adjust size based on text content
         self.repositionTextLabel()
         self.textLabel.raise_()
+
+        layout.addWidget(frame)
 
         # Window configurations
         if config.FULLSCREEN_MODE:  # Check if fullscreen mode is enabled in config.py
