@@ -3,10 +3,10 @@ from threading import Thread
 import socket
 import pigpio
 import time
-
+import config
 
 class RGBLEDController:
-    def __init__(self, red_pin, green_pin, blue_pin, steps=1, brightness_steps=25):
+    def __init__(self, red_pin, green_pin, blue_pin, steps=config.fade_steps, brightness_steps=config.brightness_steps):
         self.red_pin, self.green_pin, self.blue_pin = red_pin, green_pin, blue_pin
         self.r, self.g, self.b = 255.0, 0, 0
         self.pi = pigpio.pi()
@@ -57,7 +57,7 @@ class RGBLEDController:
         self.set_lights(self.blue_pin, b)
 
 
-    def blink_led(self, blink_count=5, on_time=0.5, off_time=0.5):
+    def blink_led(self, blink_count=5, on_time = config.on_time, off_time = config.off_time):
         # Save the current LED state
         original_r, original_g, original_b = self.r, self.g, self.b
 
@@ -107,7 +107,7 @@ class RGBLEDController:
     def run(self):
         # Example initialization or setup code
         print("LED Controller is running...")
-        self.set_color(103, 58, 183)  # Set to a default color (red) or your choice
+        self.set_color(103, 58, 183)  # Set to a default color (lnbits color)
 
         # Start the fade process in a separate thread to keep the main loop responsive
         fade_thread = threading.Thread(target=self.fade_led)
@@ -186,7 +186,7 @@ class ServerThread(Thread):
             print(f"Unexpected error: {e}")
 
 def main():
-    controller = RGBLEDController(red_pin=17, green_pin=22, blue_pin=24)
+    controller = RGBLEDController(config.red_pin, config.green_pin, config.blue_pin)
     server = ServerThread(host='0.0.0.0', port=12345, led_controller=controller)
 
     server.start()

@@ -61,7 +61,6 @@ def copy_file(source_path, destination_path):
 
 def move_image():
     pic_dir = os.path.join(config.PICTURE_SAVE_DIRECTORY, datetime.datetime.now().strftime("%Y-%m-%d"))
-    print_dir = config.PRINT_DIR
     printer_name = config.PRINTER_NAME
     cwd = os.getcwd()
     os.chdir(pic_dir)
@@ -72,7 +71,9 @@ def move_image():
         picture_name = filename
         # Construct the full source and destination paths
         source_picture_path = os.path.join(cwd_tmp, picture_name)
-        destination_picture_path = os.path.join(cwd_tmp.replace("/images/pics/","/images/print/"))
+        # swap print and pic dir in the source picture path and remove ".." before if it is there in config eg: ../images/print/ -> /images/print/ to build destination path for picture
+        destination_picture_path = os.path.join(cwd_tmp.replace(f"{config.PICTURE_SAVE_DIRECTORY.replace('..','')}",f"{config.PRINT_DIR.replace('..','')}"))
+        # copy picture from source path to the desination path
         copy_file(source_picture_path, destination_picture_path)
         print_image(printer_name, destination_picture_path)
         os.remove(destination_picture_path)

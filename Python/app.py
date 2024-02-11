@@ -115,6 +115,13 @@ class VendingMachineDisplay(QWidget):
         # Set the layout
         layout = QVBoxLayout()
         self.setLayout(layout)
+        pixmap = QPixmap(rf"{config.PATH_TO_FRAME}")  # Pfad zu Ihrem PNG-Bild
+
+        # Create QLabel for Frame
+        frame = QLabel(self)
+        frame.setPixmap(pixmap)
+        frame.setAlignment(Qt.AlignCenter)  # Center Frame
+        layout.addWidget(frame)
 
         # Header setup
         header = QLabel("Header")  # Or use a QWidget and customize it

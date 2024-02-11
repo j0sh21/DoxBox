@@ -50,6 +50,7 @@ IMAGE_PATH = get_config_value('Display', 'IMAGE_PATH')
 IMAGE_WIDTH = config.getint('Display', 'IMAGE_WIDTH')  # Assuming IMAGE_WIDTH will always be present and correctly formatted
 IMAGE_HEIGHT = config.getint('Display', 'IMAGE_HEIGHT')  # Assuming IMAGE_HEIGHT will always be present and correctly formatted
 DEFAULT_TEXT = get_config_value('Display', 'DEFAULT_TEXT')
+PATH_TO_FRAME= get_config_value('Display', 'PATH_TO_FRAME')
 
 # Server Configuration
 SERVER_HOST = get_config_value('Server', 'SERVER_HOST')
@@ -58,6 +59,19 @@ MAX_CONNECTIONS = config.getint('Server', 'MAX_CONNECTIONS')  # Assuming MAX_CON
 
 PRINTER_NAME = get_config_value('Printer', 'NAME')
 PRINT_DIR = get_config_value('Printer', 'DIR')
+
+#GPIO PINS
+red_pin = get_config_value('GPIO', 'red_pin')
+green_pin = get_config_value('GPIO', 'green_pin')
+blue_pin = get_config_value('GPIO', 'blue_pin')
+
+on_time =get_config_value('GPIO', 'on_time')
+off_time = get_config_value('GPIO', 'off_time')
+
+fade_steps = get_config_value('GPIO', 'fade_steps')
+
+brightness_steps = get_config_value('GPIO', 'brightness_steps')
+
 
 DEBUG_MODE = int(get_config_value('DEV', 'DEBUG'))
 

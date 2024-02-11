@@ -78,10 +78,15 @@ def run_gphoto2_command(command):
             # If the specific error message is found, print custom text
             print("Error: Camera has no Focus. Please ensure placing the subject on the focus mark and try again.")
             send_message_to_app("101")
+        elif "failed to release" in error_message:
+            print("Error: Capture failed to release")
+            send_message_to_app("101")
         elif "Keine Kamera gefunden" in error_message:
             # If the specific error message is found, print custom text
             print("Error: No camera found. Please ensure the camera is connected properly.")
             send_message_to_app("102")
+        elif "Zugriff verweigert" in error_message:
+            send_message_to_app("104")
         else:
             # If the error message does not match, print a generic error message or re-raise the exception
             print("An unexpected error occurred:", error_message)
