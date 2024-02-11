@@ -4,6 +4,7 @@ import socket
 import pigpio
 import time
 import config
+import math
 
 class RGBLEDController:
     def __init__(self, red_pin, green_pin, blue_pin, steps=config.fade_steps, brightness_steps=config.brightness_steps):
@@ -17,6 +18,7 @@ class RGBLEDController:
 
     def get_color(self):
         return self.r, self.g, self.b
+    
     def activate_fade(self):
         print("Activating fade...")
         self.fade_active = 1  # Activate fade
@@ -76,6 +78,29 @@ class RGBLEDController:
         self.r, self.g, self.b = original_r, original_g, original_b
         self.update_leds()
 
+    def breath_led(self, breath_count=5):
+        original_r, original_g, original_b = self.r, self.g, self.b
+        steps = 100  # Number of steps in one breath cycle
+        for cycle in range(breath_count):
+            for step in range(steps):
+                # Calculate scaling factor using a sinusoidal pattern for smooth transition
+                scale = (math.sin(step / steps * math.pi))
+
+                # Apply the scaling factor to each color component
+                scaled_red = int(self.r * scale)
+                scaled_green = int(self.g * scale)
+                scaled_blue = int(self.b * scale)
+
+                # Update LED colors with the scaled values
+                self.set_lights(self.red_pin, scaled_red)
+                self.set_lights(self.green_pin, scaled_green)
+                self.set_lights(self.blue_pin, scaled_blue)
+
+                time.sleep(0.01)  # Adjust for desired speed of the breathing effect
+                # Ensure the LED is left in the original state
+        self.r, self.g, self.b = original_r, original_g, original_b
+        self.update_leds()
+    
     def fade_led(self):
         while self.fade_active == 1:  # Check if fade loop should be active
             max_color = max(self.r, self.g, self.b)
@@ -171,10 +196,10 @@ class ServerThread(Thread):
                     print("End fading LED")
                 else:
                     print("Fading state must be 0 = off or 1 = on.")
-            elif parts[0] == "blink" and len(parts) == 2:
-                blink = int(parts[1])
-                if blink >= 1:
-                    self.led_controller.blink_led(blink_count=blink)
+            elif parts[0] == "breath" and len(parts) == 2:
+                breath = int(parts[1])
+                if breath >= 1:
+                    self.led_controller.breath_led(breath_count=breath)
                     print("Start blinking LED")
                 else:
                     print("blinking count must be one or more.")
