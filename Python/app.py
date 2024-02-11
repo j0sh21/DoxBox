@@ -115,13 +115,7 @@ class VendingMachineDisplay(QWidget):
         # Set the layout
         layout = QVBoxLayout()
         self.setLayout(layout)
-        pixmap = QPixmap(rf"{config.PATH_TO_FRAME}")  # Pfad zu Ihrem PNG-Bild
 
-        # Create QLabel for Frame
-        frame = QLabel(self)
-        frame.setPixmap(pixmap)
-        frame.setAlignment(Qt.AlignCenter)  # Center Frame
-        layout.addWidget(frame)
 
         # Header setup
         header = QLabel("Header")  # Or use a QWidget and customize it
@@ -129,10 +123,16 @@ class VendingMachineDisplay(QWidget):
         # Set the background color of the header to dark purple
         header.setStyleSheet("background-color: #301934; color: white;")  # Added color: white for the text
         header.setAlignment(Qt.AlignCenter)
-        layout.addWidget(header)
+        #layout.addWidget(header)
 
         # Content area with sidebar and viewfinder
         contentLayout = QHBoxLayout()
+        pixmap = QPixmap(rf"{config.PATH_TO_FRAME}")
+        # Create QLabel for Frame
+        frame = QLabel(self)
+        frame.setPixmap(pixmap)
+        frame.setAlignment(Qt.AlignCenter)  # Center Frame
+        contentLayout.addWidget(frame)
 
         # Sidebar setup
         sidebar = QWidget()
@@ -155,7 +155,7 @@ class VendingMachineDisplay(QWidget):
         self.viewfinder = QCameraViewfinder(self)
         layout.addWidget(self.viewfinder)
 
-        contentLayout.addWidget(sidebar)
+        #contentLayout.addWidget(sidebar)
         contentLayout.addWidget(self.viewfinder, 1)  # The '1' makes the viewfinder expand
 
         # Add the content layout to the main layout
