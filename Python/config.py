@@ -66,12 +66,12 @@ green_pin = config.getint('GPIO', 'green_pin')
 blue_pin = config.getint('GPIO', 'blue_pin')
 
 # LED effects
-on_time = get_config_value('GPIO', 'on_time')
-off_time = get_config_value('GPIO', 'off_time')
-fade_steps = get_config_value('GPIO', 'fade_steps')
-brightness_steps = get_config_value('GPIO', 'brightness_steps')
+on_time = config.getfloat('GPIO', 'on_time')
+off_time = config.getfloat('GPIO', 'off_time')
+fade_steps = config.getfloat('GPIO', 'fade_steps')
+brightness_steps = config.getfloat('GPIO', 'brightness_steps')
 
 #DEBUG MODE
-DEBUG_MODE = int(get_config_value('DEV', 'DEBUG'))
+DEBUG_MODE = config.getint('DEV', 'DEBUG')
 
 print("Config successfully loaded!")
