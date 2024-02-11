@@ -80,7 +80,7 @@ class RGBLEDController:
 
     def breath_led(self, breath_count=5):
         original_r, original_g, original_b = self.r, self.g, self.b
-        steps = 100  # Number of steps in one breath cycle
+        steps = config.BREATH_STEPS  # Number of steps in one breath cycle
         for cycle in range(breath_count):
             for step in range(steps):
                 # Calculate scaling factor using a sinusoidal pattern for smooth transition
@@ -96,7 +96,7 @@ class RGBLEDController:
                 self.set_lights(self.green_pin, scaled_green)
                 self.set_lights(self.blue_pin, scaled_blue)
 
-                time.sleep(0.01)  # Adjust for desired speed of the breathing effect
+                time.sleep(config.BREATH_SPEED)  # Adjust for desired speed of the breathing effect
                 # Ensure the LED is left in the original state
         self.r, self.g, self.b = original_r, original_g, original_b
         self.update_leds()

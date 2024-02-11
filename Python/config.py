@@ -71,6 +71,9 @@ off_time = config.getfloat('GPIO', 'off_time')
 fade_steps = config.getfloat('GPIO', 'fade_steps')
 brightness_steps = config.getfloat('GPIO', 'brightness_steps')
 
+BREATH_SPEED = config.getfloat('GPIO', 'BREATH_SPEED')
+BREATH_STEPS = config.getfloat('GPIO', 'BREATH_STEPS')
+
 #DEBUG MODE
 DEBUG_MODE = config.getint('DEV', 'DEBUG')
 
