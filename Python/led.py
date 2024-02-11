@@ -199,7 +199,7 @@ class ServerThread(Thread):
             elif parts[0] == "blink" and len(parts) == 2:
                 blink = int(parts[1])
                 if blink >= 1:
-                    self.led_controller.breath_led(blink_count=blink)
+                    self.led_controller.blink_led(blink_count=blink)
                     print("Start blinking LED")
                 else:
                     print("blinking count must be one or more.")
