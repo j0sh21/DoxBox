@@ -116,20 +116,22 @@ class VendingMachineDisplay(QWidget):
         layout = QVBoxLayout()
         self.setLayout(layout)
 
-
         # Header setup
-        header = QLabel("Header")  # Or use a QWidget and customize it
-        header.setFixedHeight(50)
+        #header = QLabel("Header")  # Or use a QWidget and customize it
+        #header.setFixedHeight(50)
         # Set the background color of the header to dark purple
-        header.setStyleSheet("background-color: #301934; color: white;")  # Added color: white for the text
-        header.setAlignment(Qt.AlignCenter)
+        #header.setStyleSheet("background-color: #301934; color: white;")  # Added color: white for the text
+        #header.setAlignment(Qt.AlignCenter)
         #layout.addWidget(header)
+
         # Load Frame PNG
         pixmap = QPixmap(rf"{config.PATH_TO_FRAME}")
         # Create QLabel for Frame
         frame = QLabel(self)
         frame.setPixmap(pixmap)
         frame.setAlignment(Qt.AlignCenter)  # Center Frame
+        # Ensure the QLabel supports transparency
+        frame.setAttribute(Qt.WA_TranslucentBackground)
         layout.addWidget(frame)
 
         # Sidebar setup
@@ -151,7 +153,6 @@ class VendingMachineDisplay(QWidget):
 
         # Set up the webcam viewfinder
         self.viewfinder = QCameraViewfinder(self)
-        layout.addWidget(self.viewfinder)
 
         #contentLayout.addWidget(sidebar)
         layout.addWidget(self.viewfinder, 1)  # The '1' makes the viewfinder expand
@@ -170,13 +171,12 @@ class VendingMachineDisplay(QWidget):
         self.camera.setViewfinderSettings(viewfinder_settings)
         self.camera.setViewfinder(self.viewfinder)
         self.camera.start()
-
         # Initialize the QLabel for displaying GIFs with the viewfinder as its parent
         self.gifLabel = QLabel(self.viewfinder)
         self.gifLabel.setAlignment(Qt.AlignCenter)  # Center the content
         self.gifLabel.setGeometry(QRect(0, 0, 500, 500))  # Set the geometry to 500x500 pixels
         self.gifLabel.hide()  # Initially hide the gifLabel
-
+        self.gifLabel.raise_()
         # Display text in the middle of the screen, always on top
         self.textLabel = QLabel(config.DEFAULT_TEXT, self)
         self.textLabel.setAlignment(Qt.AlignCenter)
