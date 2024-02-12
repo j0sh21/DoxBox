@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout
 from PyQt5.QtMultimedia import QCamera, QCameraInfo, QCameraViewfinderSettings
 from PyQt5.QtMultimediaWidgets import QCameraViewfinder
 from PyQt5.QtGui import QPixmap, QMovie
@@ -111,37 +111,63 @@ class VendingMachineDisplay(QWidget):
         self.movie.setScaledSize(QSize(500, 500))
         self.movie.start()
 
+
     def initUI(self):
-        # Layout für das Hauptfenster
+        # Set the layout
         self.layout = QVBoxLayout(self)
-
-        # Initialisiere und starte die Kamera
-        self.camera = QCamera(QCameraInfo.defaultCamera())
-
-        # Erstelle eine QCameraViewfinder-Instanz für den Kamerastream
+        self.setLayout(self.layout)
+               
+        # Background setup
+        self.backgroundLabel = QLabel(self)
+        pixmap = QPixmap(rf"{config.PATH_TO_FRAME}")
+        self.backgroundLabel.setPixmap(pixmap)
+        self.backgroundLabel.setScaledContents(True)
+        self.backgroundLabel.setAlignment(Qt.AlignCenter)
+        self.backgroundLabel.setAttribute(Qt.WA_TranslucentBackground)
+        self.backgroundLabel.setGeometry(0, 0, 1600, 720)
+        self.backgroundLabel.raise_()  # Bringe das Hintergrundbild nach vorne
+        
+        # Webcam Viewfinder setup
         self.viewfinder = QCameraViewfinder(self)
+        viewfinderX = int((1600 - 1280) / 2)
+        viewfinderY = int((720 - 720) / 2)
+        self.setStyleSheet("""
+            QCameraViewfinder {
+                border-radius: 90px;
+                background-color: transparent;
+            }
+        """)
+        self.viewfinder.setGeometry(80, 70, int(1280*.79), int(720*.79))  # Korrektur der Größe
+
+
+        # Initialize and start the camera
+        self.camera = QCamera(QCameraInfo.defaultCamera())
         viewfinder_settings = QCameraViewfinderSettings()
-        viewfinder_settings.setResolution(1280, 720)  # Setze Auflösung
+        viewfinder_settings.setResolution(1280, 720)
         self.camera.setViewfinderSettings(viewfinder_settings)
         self.camera.setViewfinder(self.viewfinder)
         self.camera.start()
+        
+        # GIF Label setup within viewfinder
+        self.gifLabel = QLabel(self.viewfinder)
+        self.gifLabel.setAlignment(Qt.AlignCenter)
+        gifLabelX = int((1280 - 500) / 2)  # Center the gif label within the viewfinder
+        gifLabelY = int((720 - 500) / 2) 
+        self.gifLabel.setGeometry(gifLabelX, gifLabelY, 500, 500)
+        self.gifLabel.hide()
 
-        # Füge den Viewfinder zum Layout hinzu
-        self.layout.addWidget(self.viewfinder)
+        # Setze Transparenz und Fenstereigenschaften auf das Hauptfenster (TODO:Funktioniert nicht wie gewünscht, wir nutzen den scharzen frame als "rahmen".)
+        self.setAttribute(Qt.WA_TranslucentBackground)  # Fensterhintergrund transparent machen
+        self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)
 
-        # Erstelle ein QLabel für das Bild, das über dem Kamerastream angezeigt wird
-        self.imageLabel = QLabel(self)
-        pixmap = QPixmap(rf'{config.PATH_TO_FRAME}')
-        self.imageLabel.setPixmap(pixmap)
-        self.imageLabel.setScaledContents(True)
+        if config.FULLSCREEN_MODE:
+            self.showFullScreen()
+        else:
+            self.setWindowTitle(config.WINDOW_TITLE)
+            self.show()
 
-        # Setze die Größe des Bildes
-        self.imageLabel.setGeometry(0, 0, 800, 600)  # Anpassen an deine Bedürfnisse
 
-        # Setze die Fenstergröße und zeige es an
-        self.setGeometry(100, 100, 1280, 720)
-        self.setWindowTitle('Kamerastream mit Bild Overlay')
-        self.show()
+
 
     def repositionTextLabel(self):
         # Center the textLabel within the window
