@@ -221,7 +221,7 @@ class VendingMachineDisplay(QWidget):
         # state handling
         if state == "0":
             print(f"{'_' * 10}State changed to 0: Welcome Screen{'_' * 10}")
-            self.send_msg_to_LED(HOST, PORT, "color 103, 58, 183")  # Set to lnbits color
+            self.send_msg_to_LED(HOST, PORT, "color 103 58 183")  # Set to lnbits color
             self.send_msg_to_LED(HOST, PORT, "blink 1")
             self.send_msg_to_LED(HOST, PORT, "fade 1")
         if state == "1":
