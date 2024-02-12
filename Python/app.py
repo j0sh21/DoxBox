@@ -43,6 +43,15 @@ class VendingMachineDisplay(QWidget):
         self.total_duration = 0
         self.gif_path = ""
 
+    def send_msg_to_LED(self , host, port, command):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+            # Connect to the server
+            client_socket.connect((host, port))
+            print(f"Connected to server at {host}:{port}")
+            # Send the command to the server
+            print(f"Sending command to {host}:{command.encode('utf-8')}")
+            client_socket.sendall(command.encode('utf-8'))
+
     def calculateDuration(self, frame_number):
         if frame_number == 0:  # Check if this is the first frame
             # Calculate the total duration of the GIF
@@ -167,13 +176,6 @@ class VendingMachineDisplay(QWidget):
             self.show()
 
 
-
-
-    def repositionTextLabel(self):
-        # Center the textLabel within the window
-        rect = self.textLabel.rect()
-        self.textLabel.move((self.width() - rect.width()) // 2, (self.height() - rect.height()) // 2)
-
     def print_subprocess(self):
         if config.DEBUG_MODE == 1:
             print("DEBUG MODE: Simulate print")
@@ -213,17 +215,26 @@ class VendingMachineDisplay(QWidget):
                 appState.stateChanged.emit("100")
 
     def onStateChanged(self, state):
+        HOST, PORT = '127.0.0.1', 12345  # Change host and port if needed
         # state handling
         if state == "0":
             print(f"{'_' * 10}State changed to 0: Welcome Screen{'_' * 10}")
+            self.send_msg_to_LED(HOST, PORT, "blink 1")
+            self.send_msg_to_LED(HOST, PORT, "fade 1")
         if state == "1":
             print(f"{'_' * 10}State changed to 1: Payment recived{'_' * 10}")
+            self.send_msg_to_LED(HOST, PORT, "color 0 255 0")
+            self.send_msg_to_LED(HOST, PORT, "breath 3")
         if state == "2":
             print(f"{'_' * 10}State changed to 2: Start Countdown{'_' * 10}")
+            self.send_msg_to_LED(HOST, PORT, "fade 0")
+            self.send_msg_to_LED(HOST, PORT, "blink 10")
         if state == "3":
             print(f"{'_' * 10}State changed to 3: Smile Now{'_' * 10}")
+            self.send_msg_to_LED(HOST, PORT, "color 255 255 255")
         if state == "4":
             print(f"{'_' * 10}State changed to 4: Start printing{'_' * 10}")
+            self.send_msg_to_LED(HOST, PORT, "breath 10")
             try:
                 print_thread = threading.Thread(target=self.print_subprocess)
                 print_thread.start()
@@ -232,6 +243,10 @@ class VendingMachineDisplay(QWidget):
                 appState.stateChanged.emit("100")
         if state == "5":
             print(f"{'_' * 10}State changed to 5: Tahnk You!{'_' * 10}")
+            self.send_msg_to_LED(HOST, PORT, "color 0 255 0")
+            self.send_msg_to_LED(HOST, PORT, "fade 1")
+        if state == "100":
+            self.send_msg_to_LED(HOST, PORT, "color 255 0 0")
 
         self.movie.stop()
         self.updateGIF(state)
@@ -278,15 +293,6 @@ class VendingMachineDisplay(QWidget):
                 print("No GIF files found in the specified folder.")
         except FileNotFoundError:
             print(f"The folder {gif_folder_path} does not exist.")
-
-def send_message_to_app(message):
-    try:
-        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client_socket.connect((config.HOST, config.PORT))
-        client_socket.sendall(message.encode())
-        client_socket.close()
-    except Exception as e:
-        print(f"Error in sending message to app: {e}")
 
 def handle_client_connection(client_socket, appState):
     try:
