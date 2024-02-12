@@ -44,7 +44,7 @@ def main():
         # Running switch.py as a subprocess when DEBUG is False
         subprocess.run(["python3", "switch.py"])
 
-    led_thread = threading.Thread(target=start_led())
+    led_thread = threading.Thread(target=start_led)
     led_thread.start()
 
 

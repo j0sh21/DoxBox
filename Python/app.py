@@ -67,6 +67,7 @@ class VendingMachineDisplay(QWidget):
             self.onGIFFinished()
 
     def onGIFFinished(self):
+        HOST, PORT = '127.0.0.1', 12345  # Change host and port if needed
         self.loopCount += 1
         if self.total_duration < 3.0 and self.appState.state not in ("2", "3"):
             if self.movie.currentFrameNumber() == self.movie.frameCount() - 1:  # Last frame
@@ -100,6 +101,7 @@ class VendingMachineDisplay(QWidget):
                     print("Smile GIFF finished, capture Photo very soon")
                     try:
                         if self.loopCount == 1: #Only after 1st Loop
+                            self.send_msg_to_LED(HOST, PORT, "color 255 255 255")
                             photo_thread = threading.Thread(target=self.photo_subprocess)
                             photo_thread.start()
                     except Exception as e:
@@ -219,6 +221,7 @@ class VendingMachineDisplay(QWidget):
         # state handling
         if state == "0":
             print(f"{'_' * 10}State changed to 0: Welcome Screen{'_' * 10}")
+            self.send_msg_to_LED(HOST, PORT, "color 103, 58, 183")  # Set to lnbits color
             self.send_msg_to_LED(HOST, PORT, "blink 1")
             self.send_msg_to_LED(HOST, PORT, "fade 1")
         if state == "1":
@@ -227,11 +230,9 @@ class VendingMachineDisplay(QWidget):
             self.send_msg_to_LED(HOST, PORT, "breath 3")
         if state == "2":
             print(f"{'_' * 10}State changed to 2: Start Countdown{'_' * 10}")
-            self.send_msg_to_LED(HOST, PORT, "fade 0")
             self.send_msg_to_LED(HOST, PORT, "blink 10")
         if state == "3":
             print(f"{'_' * 10}State changed to 3: Smile Now{'_' * 10}")
-            self.send_msg_to_LED(HOST, PORT, "color 255 255 255")
         if state == "4":
             print(f"{'_' * 10}State changed to 4: Start printing{'_' * 10}")
             self.send_msg_to_LED(HOST, PORT, "breath 10")
