@@ -11,22 +11,59 @@ class RGBLEDController:
         self.red_pin, self.green_pin, self.blue_pin = red_pin, green_pin, blue_pin
         self.r, self.g, self.b = 255.0, 0, 0
         self.pi = pigpio.pi()
-        self.steps = steps
-        self.brightness_steps = brightness_steps
+        self.steps, self.brightness_steps = steps, brightness_steps
         self.brightness, self.prev_brightness = 255, 255
-        self.fade_active = 1  # Flag to control the fade loop
+        self.fade_active, self.blink_active, self.breath_active = False, False, False  # Flag to control the loops
+        self.blink_count, self.breath_count = 0, 0
+        self.loop_type = "False"
 
-    def get_color(self):
-        return self.r, self.g, self.b
-    
-    def activate_fade(self):
-        print("Activating fade...")
-        self.fade_active = 1  # Activate fade
-        self.start_fade_thread()
+    def set_blink_count(self, blink):
+        self.deactivate_loop()
+        self.loop_type = "blink"
+        self.blink_count = blink
+        self.activate_loop()
 
-    def deactivate_fade(self):
-        print("Deactivating fade...")
-        self.fade_active = 0  # Deactivate fade
+    def set_breath_count(self, breath):
+        self.deactivate_loop()
+        self.loop_type = "breath"
+        self.breath_count = breath
+        self.activate_loop()
+
+    def set_fade(self):
+        self.deactivate_loop()
+        self.loop_type = "fade"
+        self.activate_loop()
+
+    def activate_loop(self):
+        if self.loop_type == "fade":
+            self.fade_active = 1
+            print("Activating fade...")
+            fade_thread = threading.Thread(target=self.fade_led)
+            fade_thread.start()
+        elif self.loop_type == "blink":
+            self.blink_active = 1
+            print("Activating fade...")
+            blink_thread = threading.Thread(target=self.blink_led)
+            blink_thread.start()
+            print("Activating blink...")
+        elif self.loop_type == "breath":
+            self.breath_active = 1
+            print("Activating breath...")
+            breath_thread = threading.Thread(target=self.breath_led)
+            breath_thread.start()
+
+    def deactivate_loop(self):
+        if self.loop_type == "fade":
+            print("Deactivating fade...")
+            self.fade_active = False  # Deactivate fade
+        elif self.loop_type == "blink":
+            print("Deactivating blink...")
+            self.blink_active = False  # Deactivate fade
+        elif self.loop_type == "breath":
+            print("Deactivating breath...")
+            self.breath_active = False  # Deactivate fade
+        else:
+            print("No loop to stop")
 
     def set_lights(self, pin, brightness):
         real_brightness = int(brightness * (self.brightness / 255.0))
@@ -40,7 +77,7 @@ class RGBLEDController:
 
     def set_color(self, r, g, b):
         if r or g or b:
-            self.fade_active = False  # Pause the fade loop when a color is set directly
+            self.deactivate_loop()  # Pause the loop when a color is set directly
             self.r, self.g, self.b = self.update_brightness(r, g, b)
             self.set_lights(self.red_pin, self.r)
             self.set_lights(self.green_pin, self.g)
@@ -59,49 +96,89 @@ class RGBLEDController:
         self.set_lights(self.blue_pin, b)
 
 
-    def blink_led(self, blink_count=5, on_time = config.on_time, off_time = config.off_time):
-        # Save the current LED state
-        original_r, original_g, original_b = self.r, self.g, self.b
+    def blink_led(self, on_time = config.on_time, off_time = config.off_time):
+        while self.blink_active == 1:
+            # Save the current LED state
+            original_r, original_g, original_b = self.r, self.g, self.b
 
-        for _ in range(blink_count):
-            # Turn off the LED
-            self.r, self.g, self.b = 0, 0, 0
-            self.update_leds()
-            time.sleep(off_time)  # LED is off for 'off_time' seconds
+            if self.blink_count > 1:
+                for _ in range(self.blink_count):
+                    # Turn off the LED
+                    self.r, self.g, self.b = 0, 0, 0
+                    self.update_leds()
+                    time.sleep(off_time)  # LED is off for 'off_time' seconds
 
-            # Restore the original LED state
+                    # Restore the original LED state
+                    self.r, self.g, self.b = original_r, original_g, original_b
+                    self.update_leds()
+                    time.sleep(on_time)  # LED is on for 'on_time' seconds
+                # break the loop if number of desired blinks was given
+                break
+            # blink forever if no number of desired blinks is given
+            else:
+                # Turn off the LED
+                self.r, self.g, self.b = 0, 0, 0
+                self.update_leds()
+                time.sleep(off_time)  # LED is off for 'off_time' seconds
+
+                # Restore the original LED state
+                self.r, self.g, self.b = original_r, original_g, original_b
+                self.update_leds()
+                time.sleep(on_time)  # LED is on for 'on_time' seconds
+
+            # Ensure the LED is left in the original state
             self.r, self.g, self.b = original_r, original_g, original_b
             self.update_leds()
-            time.sleep(on_time)  # LED is on for 'on_time' seconds
+            time.sleep(0.01)  # Small delay to prevent high CPU usage
 
-        # Ensure the LED is left in the original state
-        self.r, self.g, self.b = original_r, original_g, original_b
-        self.update_leds()
+    def breath_led(self):
+        while self.breath_active == 1:
+            original_r, original_g, original_b = self.r, self.g, self.b
+            steps = config.BREATH_STEPS  # Number of steps in one breath cycle
 
-    def breath_led(self, breath_count=5):
-        original_r, original_g, original_b = self.r, self.g, self.b
-        steps = config.BREATH_STEPS  # Number of steps in one breath cycle
-        for cycle in range(breath_count):
-            for step in range(steps):
-                # Calculate scaling factor using a sinusoidal pattern for smooth transition
-                scale = (math.sin(step / steps * math.pi))
+            if self.breath_count > 1:
+                for cycle in range(self.breath_count):
+                    for step in range(steps):
+                        # Calculate scaling factor using a sinusoidal pattern for smooth transition
+                        scale = (math.sin(step / steps * math.pi))
 
-                # Apply the scaling factor to each color component
-                scaled_red = int(self.r * scale)
-                scaled_green = int(self.g * scale)
-                scaled_blue = int(self.b * scale)
+                        # Apply the scaling factor to each color component
+                        scaled_red, scaled_green, scaled_blue  = int(self.r * scale), int(self.g * scale), int(self.b * scale)
 
-                # Update LED colors with the scaled values
-                self.set_lights(self.red_pin, scaled_red)
-                self.set_lights(self.green_pin, scaled_green)
-                self.set_lights(self.blue_pin, scaled_blue)
+                        # Update LED colors with the scaled values
+                        self.set_lights(self.red_pin, scaled_red)
+                        self.set_lights(self.green_pin, scaled_green)
+                        self.set_lights(self.blue_pin, scaled_blue)
 
-                time.sleep(config.BREATH_SPEED)  # Adjust for desired speed of the breathing effect
+                        time.sleep(config.BREATH_SPEED)  # Adjust for desired speed of the breathing effect
+                    # Ensure the LED is left in the original state
+                    self.r, self.g, self.b = original_r, original_g, original_b
+                    self.update_leds()
+                    time.sleep(0.01)  # Small delay to prevent high CPU usage
+                # break the loop if number of desired breaths was given
+                break
+            # breath forever if no number of desired breaths is given
+            else:
+                for step in range(steps):
+                    # Calculate scaling factor using a sinusoidal pattern for smooth transition
+                    scale = (math.sin(step / steps * math.pi))
+
+                    # Apply the scaling factor to each color component
+                    scaled_red, scaled_green, scaled_blue  = int(self.r * scale), int(self.g * scale), int(self.b * scale)
+
+                    # Update LED colors with the scaled values
+                    self.set_lights(self.red_pin, scaled_red)
+                    self.set_lights(self.green_pin, scaled_green)
+                    self.set_lights(self.blue_pin, scaled_blue)
+
+                    time.sleep(config.BREATH_SPEED)  # Adjust for desired speed of the breathing effect
                 # Ensure the LED is left in the original state
-        self.r, self.g, self.b = original_r, original_g, original_b
-        self.update_leds()
-    
+                self.r, self.g, self.b = original_r, original_g, original_b
+                self.update_leds()
+                time.sleep(0.01)  # Small delay to prevent high CPU usage
+
     def fade_led(self):
+        # fade until loop is broken
         while self.fade_active == 1:  # Check if fade loop should be active
             max_color = max(self.r, self.g, self.b)
             min_color = min(self.r, self.g, self.b)
@@ -125,18 +202,12 @@ class RGBLEDController:
             # Debugging: print(f"Set color to {self.r}, {self.g}, {self.b}")
             time.sleep(0.01)  # Small delay to prevent high CPU usage
 
-    def start_fade_thread(self):
-        fade_thread = threading.Thread(target=self.fade_led)
-        fade_thread.start()
 
     def run(self):
         # Example initialization or setup code
         print("LED Controller is running...")
         self.set_color(103, 58, 183)  # Set to a default color (lnbits color)
-
         # Start the fade process in a separate thread to keep the main loop responsive
-        fade_thread = threading.Thread(target=self.fade_led)
-        fade_thread.start()
         time.sleep(1)  # Sleep to prevent high CPU usage
 
 
@@ -189,25 +260,25 @@ class ServerThread(Thread):
             elif parts[0] == "fade" and len(parts) == 2:
                 fade = int(parts[1])
                 if fade == 1:
-                    print("Start fading LED")
-                    self.led_controller.activate_fade()
+                    self.led_controller.set_fade()
                 elif fade == 0:
-                    self.led_controller.deactivate_fade()
-                    print("End fading LED")
+                    self.led_controller.deactivate_loop()
                 else:
                     print("Fading state must be 0 = off or 1 = on.")
             elif parts[0] == "blink" and len(parts) == 2:
                 blink = int(parts[1])
                 if blink >= 1:
-                    print("Start blinking LED")
-                    self.led_controller.blink_led(blink_count=blink)
+                    self.led_controller.set_blink_count(blink)
+                elif blink == 0:
+                    self.led_controller.deactivate_loop()
                 else:
                     print("blinking count must be one or more.")
             elif parts[0] == "breath" and len(parts) == 2:
                 breath = int(parts[1])
                 if breath >= 1:
-                    print("Start breathing LED")
-                    self.led_controller.breath_led(breath_count=breath)
+                    self.led_controller.set_breath_count(breath)
+                elif breath == 0:
+                    self.led_controller.deactivate_loop()
                 else:
                     print("breath count must be one or more.")
             else:
@@ -220,16 +291,14 @@ class ServerThread(Thread):
 def main():
     controller = RGBLEDController(config.red_pin, config.green_pin, config.blue_pin)
     server = ServerThread(host='0.0.0.0', port=12345, led_controller=controller)
-
     server.start()
     controller.run()
-    server.led_controller.activate_fade()
 
     try:
         while True:
             time.sleep(1)  # Main loop doing other tasks
     except KeyboardInterrupt:
-        server.deactivate_fade()
+        server.deactivate_loop()
         print("LED Controller application stopped.")
 
 if __name__ == "__main__":
