@@ -29,6 +29,9 @@ def main():
     app_thread = threading.Thread(target=run_app)
     app_thread.start()
 
+    led_thread = threading.Thread(target=start_led)
+    led_thread.start()
+
     if DEBUG in(1,2):
         # Running debug_client.py as a subprocess when DEBUG is True
         print("Start DEBUG CLIENT")
@@ -43,9 +46,6 @@ def main():
         print("Start BTC-SWITCH CLIENT")
         # Running switch.py as a subprocess when DEBUG is False
         subprocess.run(["python3", "switch.py"])
-
-    led_thread = threading.Thread(target=start_led)
-    led_thread.start()
 
 
 if __name__ == "__main__":
