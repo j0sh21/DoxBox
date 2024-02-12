@@ -8,8 +8,16 @@ def run_app():
     subprocess.run(["python3", "app.py"])
 
 def start_led():
+
+    try:
+        subprocess.run(['sudo', 'pigpiod'])
+        print("pigpiod gestartet.")
+    except Exception as e:
+        print("Fehler beim Starten von pigpiod:", e)
+
     print("Start LED SERVER")
     subprocess.run(["python3", "led.py"])
+
 
 def run_process_mock():
     print("Start process_mock CLIENT")
