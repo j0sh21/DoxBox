@@ -1,14 +1,12 @@
 import socket
 
-def run_client(host, port):
+def send_msg_to_LED(host, port, command):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
         # Connect to the server
         client_socket.connect((host, port))
         print(f"Connected to server at {host}:{port}")
 
         while True:
-            # Prompt the user for a command
-            command = input("Enter command (or 'exit' to quit): ")
             if command.lower() == 'exit':
                 break
 
@@ -17,5 +15,5 @@ def run_client(host, port):
 
 if __name__ == "__main__":
     HOST, PORT = '127.0.0.1', 12345  # Change host and port if needed
-    run_client(HOST, PORT)
+    send_msg_to_LED(HOST, PORT)
 

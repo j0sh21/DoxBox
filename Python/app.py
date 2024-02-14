@@ -246,7 +246,7 @@ class VendingMachineDisplay(QWidget):
             print(f"{'_' * 10}State changed to 5: Tahnk You!{'_' * 10}")
             self.send_msg_to_LED(HOST, PORT, "color 0 255 0")
             self.send_msg_to_LED(HOST, PORT, "fade 1")
-        if state == "100":
+        if state in("100", "101", "102", "103", "104", "110", "112", "113", "114", "115", "119"):
             self.send_msg_to_LED(HOST, PORT, "color 255 0 0")
 
         self.movie.stop()
