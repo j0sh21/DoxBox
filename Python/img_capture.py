@@ -118,16 +118,19 @@ def rename_pics():
                 try:
                     os.rename(filename, (shot_time + ".JPG"))
                     print("Picture renamed!")
-                    send_message_to_app("4")
+                    return True
                 except FileNotFoundError:
                     print("Error: The Picture does not exist.")
                     send_message_to_app("103")
+                    return False
                 except PermissionError:
                     print("Error: Permission denied while renaming files.")
                     send_message_to_app("104")
+                    return False
                 except Exception as e:
                     print(f"An unexpected error occurred: {str(e)}")
                     send_message_to_app("100")
+                    return False
     os.chdir(cwd)
     print(f"Changed Working Directory to: {os.getcwd()}")
 
@@ -155,7 +158,8 @@ def main():
     print("Make Picture")
     make_picture()
     print("Rename the Picture")
-    rename_pics()
+    if rename_pics():
+        send_message_to_app("4")
 
 if __name__ == '__main__':
     cwd = ""
