@@ -16,6 +16,16 @@ class RGBLEDController:
         self.fade_active, self.blink_active, self.breath_active = False, False, False  # Flag to control the loops
         self.blink_count, self.breath_count = 0, 0
         self.loop_type = "False"
+        self.breath_speed = config.BREATH_SPEED
+        self.breath_lower_brightness = 40
+        self.breath_upper_brightness = 179
+
+    def set_breath_speed(self, speed):
+        self.breath_speed = float(speed)
+    
+    def set_breath_lights(self, lower_brightness, upper_brightness):
+        self.breath_lower_brightness = lower_brightness
+        self.breath_upper_brightness = upper_brightness
 
     def set_blink_count(self, blink):
         self.deactivate_loop()
@@ -141,7 +151,6 @@ class RGBLEDController:
                     for step in range(steps):
                         # Calculate scaling factor using a sinusoidal pattern for smooth transition
                         scale = (math.sin(step / steps * math.pi))
-
                         # Apply the scaling factor to each color component
                         scaled_red, scaled_green, scaled_blue  = int(self.r * scale), int(self.g * scale), int(self.b * scale)
 
@@ -150,11 +159,11 @@ class RGBLEDController:
                         self.set_lights(self.green_pin, scaled_green)
                         self.set_lights(self.blue_pin, scaled_blue)
 
-                        time.sleep(config.BREATH_SPEED)  # Adjust for desired speed of the breathing effect
+                        time.sleep(self.breath_speed)  # Adjust for desired speed of the breathing effect
                     # Ensure the LED is left in the original state
-                    self.r, self.g, self.b = original_r, original_g, original_b
-                    self.update_leds()
-                    time.sleep(0.01)  # Small delay to prevent high CPU usage
+                self.r, self.g, self.b = original_r, original_g, original_b
+                self.update_leds()
+                time.sleep(0.01)  # Small delay to prevent high CPU usage
                 # break the loop if number of desired breaths was given
                 break
             # breath forever if no number of desired breaths is given
@@ -171,7 +180,7 @@ class RGBLEDController:
                     self.set_lights(self.green_pin, scaled_green)
                     self.set_lights(self.blue_pin, scaled_blue)
 
-                    time.sleep(config.BREATH_SPEED)  # Adjust for desired speed of the breathing effect
+                    time.sleep(self.breath_speed)  # Adjust for desired speed of the breathing effect
                 # Ensure the LED is left in the original state
                 self.r, self.g, self.b = original_r, original_g, original_b
                 self.update_leds()
@@ -206,7 +215,7 @@ class RGBLEDController:
     def run(self):
         # Example initialization or setup code
         print("LED Controller is running...")
-        self.set_color(103, 58, 183)  # Set to a default color (lnbits color)
+        self.set_color(226, 0, 116)  # Set to a default color (lnbits color)
         # Start the fade process in a separate thread to keep the main loop responsive
         time.sleep(1)  # Sleep to prevent high CPU usage
 
@@ -281,6 +290,12 @@ class ServerThread(Thread):
                     self.led_controller.deactivate_loop()
                 else:
                     print("breath count must be one or more.")
+            if parts[0] == "breathspeed" and len(parts) == 2:
+                speed = int(parts[1])
+                if speed > 0:
+                    self.led_controller.set_breath_speed(speed)
+                else:
+                    print("breath speed must be bigger than 0.")
             else:
                 print(f"Unrecognized command: {command}")
         except ValueError as e:

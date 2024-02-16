@@ -221,21 +221,26 @@ class VendingMachineDisplay(QWidget):
         # state handling
         if state == "0":
             print(f"{'_' * 10}State changed to 0: Welcome Screen{'_' * 10}")
-            self.send_msg_to_LED(HOST, PORT, "color 103 58 183")  # Set to lnbits color
-            self.send_msg_to_LED(HOST, PORT, "blink 1")
-            self.send_msg_to_LED(HOST, PORT, "fade 1")
+            self.send_msg_to_LED(HOST, PORT, "color 226 0 116")  # Set to lnbits color
+            self.send_msg_to_LED(HOST, PORT, "breath_speed 0.09")
+            self.send_msg_to_LED(HOST, PORT, "breath 1")
         if state == "1":
             print(f"{'_' * 10}State changed to 1: Payment recived{'_' * 10}")
-            self.send_msg_to_LED(HOST, PORT, "color 0 255 0")
-            self.send_msg_to_LED(HOST, PORT, "breath 3")
+            #change breath speed to 0.02
+            self.send_msg_to_LED(HOST, PORT, "breath_speed 0.02")
+            self.send_msg_to_LED(HOST, PORT, "breath 1")
         if state == "2":
             print(f"{'_' * 10}State changed to 2: Start Countdown{'_' * 10}")
-            self.send_msg_to_LED(HOST, PORT, "blink 10")
+            self.send_msg_to_LED(HOST, PORT, "breath 0")
+            self.send_msg_to_LED(HOST, PORT, "blink 1")
         if state == "3":
             print(f"{'_' * 10}State changed to 3: Smile Now{'_' * 10}")
+            self.send_msg_to_LED(HOST, PORR, "color 255 255 255")
         if state == "4":
             print(f"{'_' * 10}State changed to 4: Start printing{'_' * 10}")
-            self.send_msg_to_LED(HOST, PORT, "breath 10")
+            self.send_msg_to_LED(HOST, PORT, "color 226 0 116")
+            self.send_msg_to_LED(HOST, PORT, "breath_speed 0.09")
+            self.send_msg_to_LED(HOST, PORT, "breath 1")
             try:
                 print_thread = threading.Thread(target=self.print_subprocess)
                 print_thread.start()
@@ -244,10 +249,12 @@ class VendingMachineDisplay(QWidget):
                 appState.stateChanged.emit("100")
         if state == "5":
             print(f"{'_' * 10}State changed to 5: Tahnk You!{'_' * 10}")
-            self.send_msg_to_LED(HOST, PORT, "color 0 255 0")
+            
+            self.send_msg_to_LED(HOST, PORT, "color 0  255")
             self.send_msg_to_LED(HOST, PORT, "fade 1")
         if state in("100", "101", "102", "103", "104", "110", "112", "113", "114", "115", "119"):
             self.send_msg_to_LED(HOST, PORT, "color 255 0 0")
+            self.send_msg_to_LED(HOST, PORT, "blink 1")
 
         self.movie.stop()
         self.updateGIF(state)
