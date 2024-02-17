@@ -52,17 +52,17 @@ class VendingMachineDisplay(QWidget):
             print(f"Sending command to {host}:{command.encode('utf-8')}")
             client_socket.sendall(command.encode('utf-8'))
 
-    def calculateDuration(self, frame_number):
-        if frame_number == 0:  # Check if this is the first frame
-            # Calculate the total duration of the GIF
-            frame_count = self.movie.frameCount()
-            frame_rate = self.movie.nextFrameDelay()  # Delay between frames in milliseconds
-            self.total_duration = frame_count * frame_rate / 1000  # Total duration in seconds
-            print(f"Start playing gif with {str(self.total_duration)} total duration")
+    def calculateDuration(self):
+        # Calculate the total duration of the GIF
+        frame_count = self.movie.frameCount()
+        frame_rate = self.movie.nextFrameDelay()  # Delay between frames in milliseconds
+        self.total_duration = frame_count * frame_rate / 1000  # Total duration in seconds
+        print(f"Start playing gif with {str(self.total_duration)} seconds total duration")
 
-    def onFrameChanged(self, frameNumber):
-        self.calculateDuration(self.movie.currentFrameNumber())
-        if frameNumber == self.movie.frameCount() - 1:  # Check if it's the last frame
+    def onFrameChanged(self):
+        if self.movie.currentFrameNumber() == 0: # Check if this is the first frame
+            self.calculateDuration()
+        elif self.movie.currentFrameNumber() == self.movie.frameCount() - 1:  # Check if it's the last frame
             self.movie.stop()
             self.onGIFFinished()
 
@@ -76,12 +76,14 @@ class VendingMachineDisplay(QWidget):
                         self.desiredLoops *= 6
                     elif self.total_duration < 1.0:
                         self.desiredLoops *= 3
-                    elif self.total_duration < 2.0:
+                    elif self.total_duration < 4.0:
                         self.desiredLoops *= 2
                 if self.loopCount >= self.desiredLoops:
                     self.movie.stop()
                     if self.appState.state == "1":
                         print(f"({self.desiredLoops}x) Payment GIFF finished, next State: 2 and Gif")
+                        self.desiredLoops = 3
+                        self.loopCount = 0
                         self.appState.state = "2"
                     print(f"({self.desiredLoops}x) Loops finished, next random Gif for State: {self.appState.state}")
                     self.updateGIF(self.appState.state)
@@ -150,7 +152,6 @@ class VendingMachineDisplay(QWidget):
         """)
         self.viewfinder.setGeometry(80, 70, int(1280*.79), int(720*.79))  # Korrektur der Größe
 
-
         # Initialize and start the camera
         self.camera = QCamera(QCameraInfo.defaultCamera())
         viewfinder_settings = QCameraViewfinderSettings()
@@ -176,7 +177,6 @@ class VendingMachineDisplay(QWidget):
         else:
             self.setWindowTitle(config.WINDOW_TITLE)
             self.show()
-
 
     def print_subprocess(self):
         if config.DEBUG_MODE == 1:
@@ -222,12 +222,13 @@ class VendingMachineDisplay(QWidget):
         if state == "0":
             print(f"{'_' * 10}State changed to 0: Welcome Screen{'_' * 10}")
             self.send_msg_to_LED(HOST, PORT, "color 226 0 116")  # Set to lnbits color
-            self.send_msg_to_LED(HOST, PORT, "breath_speed 0.09")
+            self.send_msg_to_LED(HOST, PORT, "breathspeed 0.09")
             self.send_msg_to_LED(HOST, PORT, "breath 1")
         if state == "1":
             print(f"{'_' * 10}State changed to 1: Payment recived{'_' * 10}")
+            self.send_msg_to_LED(HOST, PORT, "breath 0")
             #change breath speed to 0.02
-            self.send_msg_to_LED(HOST, PORT, "breath_speed 0.02")
+            self.send_msg_to_LED(HOST, PORT, "breathspeed 0.02")
             self.send_msg_to_LED(HOST, PORT, "breath 1")
         if state == "2":
             print(f"{'_' * 10}State changed to 2: Start Countdown{'_' * 10}")
@@ -235,11 +236,11 @@ class VendingMachineDisplay(QWidget):
             self.send_msg_to_LED(HOST, PORT, "blink 1")
         if state == "3":
             print(f"{'_' * 10}State changed to 3: Smile Now{'_' * 10}")
-            self.send_msg_to_LED(HOST, PORR, "color 255 255 255")
+            self.send_msg_to_LED(HOST, PORT, "color 255 255 255")
         if state == "4":
             print(f"{'_' * 10}State changed to 4: Start printing{'_' * 10}")
             self.send_msg_to_LED(HOST, PORT, "color 226 0 116")
-            self.send_msg_to_LED(HOST, PORT, "breath_speed 0.09")
+            self.send_msg_to_LED(HOST, PORT, "breathspeed 0.09")
             self.send_msg_to_LED(HOST, PORT, "breath 1")
             try:
                 print_thread = threading.Thread(target=self.print_subprocess)

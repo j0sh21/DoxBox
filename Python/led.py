@@ -290,7 +290,7 @@ class ServerThread(Thread):
                     self.led_controller.deactivate_loop()
                 else:
                     print("breath count must be one or more.")
-            if parts[0] == "breathspeed" and len(parts) == 2:
+            elif parts[0] == "breathspeed" and len(parts) == 2:
                 speed = int(parts[1])
                 if speed > 0:
                     self.led_controller.set_breath_speed(speed)
