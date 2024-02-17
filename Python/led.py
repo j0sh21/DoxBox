@@ -107,10 +107,9 @@ class RGBLEDController:
 
 
     def blink_led(self, on_time = config.on_time, off_time = config.off_time):
+        original_r, original_g, original_b = self.r, self.g, self.b
         while self.blink_active == 1:
             # Save the current LED state
-            original_r, original_g, original_b = self.r, self.g, self.b
-
             if self.blink_count > 1:
                 for _ in range(self.blink_count):
                     # Turn off the LED
@@ -123,6 +122,10 @@ class RGBLEDController:
                     self.update_leds()
                     time.sleep(on_time)  # LED is on for 'on_time' seconds
                 # break the loop if number of desired blinks was given
+                # Ensure the LED is left in the original state
+                self.r, self.g, self.b = original_r, original_g, original_b
+                self.update_leds()
+                time.sleep(0.01)  # Small delay to prevent high CPU usage
                 break
             # blink forever if no number of desired blinks is given
             else:
@@ -135,15 +138,16 @@ class RGBLEDController:
                 self.r, self.g, self.b = original_r, original_g, original_b
                 self.update_leds()
                 time.sleep(on_time)  # LED is on for 'on_time' seconds
-
+        else:
             # Ensure the LED is left in the original state
             self.r, self.g, self.b = original_r, original_g, original_b
             self.update_leds()
             time.sleep(0.01)  # Small delay to prevent high CPU usage
 
     def breath_led(self):
+        original_r, original_g, original_b = self.r, self.g, self.b
         while self.breath_active == 1:
-            original_r, original_g, original_b = self.r, self.g, self.b
+
             steps = config.BREATH_STEPS  # Number of steps in one breath cycle
 
             if self.breath_count > 1:
@@ -153,14 +157,13 @@ class RGBLEDController:
                         scale = (math.sin(step / steps * math.pi))
                         # Apply the scaling factor to each color component
                         scaled_red, scaled_green, scaled_blue  = int(self.r * scale), int(self.g * scale), int(self.b * scale)
-
                         # Update LED colors with the scaled values
                         self.set_lights(self.red_pin, scaled_red)
                         self.set_lights(self.green_pin, scaled_green)
                         self.set_lights(self.blue_pin, scaled_blue)
-
                         time.sleep(self.breath_speed)  # Adjust for desired speed of the breathing effect
-                    # Ensure the LED is left in the original state
+
+                # Ensure the LED is left in the original state
                 self.r, self.g, self.b = original_r, original_g, original_b
                 self.update_leds()
                 time.sleep(0.01)  # Small delay to prevent high CPU usage
@@ -179,12 +182,12 @@ class RGBLEDController:
                     self.set_lights(self.red_pin, scaled_red)
                     self.set_lights(self.green_pin, scaled_green)
                     self.set_lights(self.blue_pin, scaled_blue)
-
                     time.sleep(self.breath_speed)  # Adjust for desired speed of the breathing effect
-                # Ensure the LED is left in the original state
-                self.r, self.g, self.b = original_r, original_g, original_b
-                self.update_leds()
-                time.sleep(0.01)  # Small delay to prevent high CPU usage
+        else:
+            # Ensure the LED is left in the original state
+            self.r, self.g, self.b = original_r, original_g, original_b
+            self.update_leds()
+            time.sleep(0.01)  # Small delay to prevent high CPU usage
 
     def fade_led(self):
         # fade until loop is broken
