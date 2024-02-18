@@ -71,9 +71,9 @@ class VendingMachineDisplay(QWidget):
                 if self.loopCount >= self.desiredLoops:
                     self.movie.stop()
                     if self.appState.state == "1":
-                        print(f"({self.desiredLoops}x) Payment GIFF finished, next State: 2 and Gif")
+                        print(f"({self.desiredLoops}x) Payment GIFF finished, next state: 2 and Gif")
                         self.appState.state = "2"
-                    print(f"({self.desiredLoops}x) Loops finished, next random Gif for State: {self.appState.state}")
+                    print(f"({self.desiredLoops}x) Loops finished, next random Gif for state: {self.appState.state}")
                     self.updateGIF(self.appState.state)
                 else:
                     print(f"Replaying Gif ({self.desiredLoops}x), total duration is < 3 seconds")
@@ -82,13 +82,13 @@ class VendingMachineDisplay(QWidget):
         else:
             if self.appState.state in("1","2","3"):
                 if self.appState.state == "1":
-                    print("Payment GIFF finished, next State: 2 and Gif")
+                    print("Payment GIFF finished, next state: 2 and Gif")
                     self.appState.state = "2"
                 elif self.appState.state == "2":
-                    print("Countdown GIFF finished, next State: 3 and Gif")
+                    print("Countdown GIFF finished, next state: 3 and Gif")
                     self.appState.state = "3"
                 else:
-                    print("Smile GIFF finished, capture Photo very soon")
+                    print("Smile GIFF finished, capture photo very soon")
                     try:
                         if self.loopCount == 1: #Only after 1st Loop
                             photo_thread = threading.Thread(target=self.photo_subprocess)
@@ -100,7 +100,7 @@ class VendingMachineDisplay(QWidget):
                 print(f"Gif for state {self.appState.state} finished play next gif for state {self.appState.state} until external state change")
                 self.updateGIF(self.appState.state)
             elif self.appState.state == "5":
-                print("Thank You GIFF finished, initial State 0 and start welcome Gif")
+                print("Thank You - GIFF finished, initial state 0, start welcome Gif")
                 self.appState.state = "0"
             else:
                 self.updateGIF(self.appState.state)
@@ -210,7 +210,7 @@ class VendingMachineDisplay(QWidget):
                 if "No printer" in error_message:
                     print("Error: No printer found. Please ensure the printer is connected properly.")
                 else:
-                    print("An unexpected error with the printer occurred:", error_message)
+                    print("An unexpected error occurred with the printer:", error_message)
 
     def photo_subprocess(self):
         if config.DEBUG_MODE == 1:
@@ -234,13 +234,13 @@ class VendingMachineDisplay(QWidget):
     def onStateChanged(self, state):
         # state handling
         if state == "0":
-            print(f"{'_' * 10}State changed to 0: Welcome Screen{'_' * 10}")
+            print(f"{'_' * 10}State changed to 0: Welcome screen{'_' * 10}")
         if state == "1":
             print(f"{'_' * 10}State changed to 1: Payment recived{'_' * 10}")
         if state == "2":
-            print(f"{'_' * 10}State changed to 2: Start Countdown{'_' * 10}")
+            print(f"{'_' * 10}State changed to 2: Start countdown{'_' * 10}")
         if state == "3":
-            print(f"{'_' * 10}State changed to 3: Smile Now{'_' * 10}")
+            print(f"{'_' * 10}State changed to 3: Smile now{'_' * 10}")
         if state == "4":
             print(f"{'_' * 10}State changed to 4: Start printing{'_' * 10}")
             try:
@@ -250,7 +250,7 @@ class VendingMachineDisplay(QWidget):
                 print(f"Failed to start print.py: {e}")
                 appState.stateChanged.emit("100")
         if state == "5":
-            print(f"{'_' * 10}State changed to 5: Tahnk You!{'_' * 10}")
+            print(f"{'_' * 10}State changed to 5: Thank You!{'_' * 10}")
 
         self.movie.stop()
         self.updateGIF(state)
@@ -330,15 +330,15 @@ def start_server(appState):
 
 if __name__ == '__main__':
     print("app.py is now running")
-    print("building app...")
+    print("Building app...")
     app = QApplication(sys.argv)
-    print("building app completed!")
-    print("building state object...")
+    print("Building app completed!")
+    print("Building state object...")
     appState = AppState()
-    print("building state object completed!")
-    print("building Display...")
+    print("Building state object completed!")
+    print("Building Display...")
     ex = VendingMachineDisplay(appState)
-    print("building Display completed!")
+    print("Building Display completed!")
 
     # Start the server in a separate thread
     print("Start server...")
