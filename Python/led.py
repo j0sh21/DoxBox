@@ -62,6 +62,7 @@ class RGBLEDController:
     def set_fade(self):
         self.deactivate_loop()
         self.loop_type = "fade"
+        self.activate_loop()
 
     #Activate or deactivate loop by external input
     def activate_loop(self):
