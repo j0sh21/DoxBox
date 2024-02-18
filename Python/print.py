@@ -14,7 +14,7 @@ def send_message_to_app(message):
         print(f"Error in sending message to app: {e}")
 
 def print_image(printer_name, image_path):
-    print("Connect to the CUPS printing Server")
+    print("Connect to the CUPS printing server")
     # Connect to CUPS
     conn = cups.Connection()
     # Get a list of all printers
@@ -27,14 +27,14 @@ def print_image(printer_name, image_path):
             print(f"{printer}\n")
         return
 
-    print(f"Sucessfully Connected to the print Server {printer_name}")
+    print(f"Sucessfully connected to the print server {printer_name}")
 
     if config.DEBUG_MODE == 0:
         # Print the image
         print_job_id = conn.printFile(printer_name, image_path, "Photo Print", {})
-        print(f"Print job submitted to Printer. Job ID: {print_job_id}\nStart printing {image_path} on {printer_name}")
+        print(f"Print job submitted to printer. Job ID: {print_job_id}\nStart printing {image_path} on {printer_name}")
     else:
-        print(f"DEBUG MODE: Simulate Print file {image_path} on {printer_name}. \nDEBUG MODE: Skip 45 sec waiting time...")
+        print(f"DEBUG MODE: Simulate print file {image_path} on {printer_name}. \nDEBUG MODE: Skip 45 sec waiting time...")
 
 def copy_file(source_path, destination_path):
     try:
@@ -66,14 +66,14 @@ def move_image():
         copy_file(source_picture_path, destination_picture_path)
         print_image(printer_name, destination_picture_path)
         os.remove(destination_picture_path)
-        print(f'Successfully removed {picture_name} from Disk.')
+        print(f'Successfully removed {picture_name} from disk.')
 
     os.chdir(cwd)
     print(f"Change directory back to {cwd}")
 
 if __name__ == '__main__':
-    print("print.py is now running.")
-    print(f"preparing print Job")
+    print("Print.py is now running.")
+    print(f"Preparing print job")
     move_image()
     print(f"Printing now up to 45 seconds ...")
     print("print.py is now finished successfully")
