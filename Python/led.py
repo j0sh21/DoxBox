@@ -110,15 +110,14 @@ class RGBLEDController:
     def set_color(self, r, g, b):
         if r or g or b:
             self.deactivate_loop()  # Pause the loop when a color is set directly
-            while self.breath_count+self.blink_count>0:
+            while self.breath_count+self.blink_count+self.fade_active > 0:
                 abc = 1
                 #wait until loop finished
             else:
-                if self.breath_count and self.blink_count == 0 and self.fade_active == 0:
-                    self.r, self.g, self.b = self.update_brightness(r, g, b)
-                    self.set_lights(self.red_pin, self.r)
-                    self.set_lights(self.green_pin, self.g)
-                    self.set_lights(self.blue_pin, self.b)
+                self.r, self.g, self.b = self.update_brightness(r, g, b)
+                self.set_lights(self.red_pin, self.r)
+                self.set_lights(self.green_pin, self.g)
+                self.set_lights(self.blue_pin, self.b)
         else:
             r, g, b = self.update_brightness(self.r, self.g, self.b)
             self.set_lights(self.red_pin, r)
