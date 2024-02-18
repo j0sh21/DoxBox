@@ -1,6 +1,9 @@
-# Project Overview
+# Doxbox - a bitcoin ⚡️ lightning photobox 
 
-This project is designed to leverage the capabilities of a Raspberry Pi or any other Debian based host system to interact with a DSLR camera for high-quality image capture while  managing and interacting with a specific application workflow, which includes image capture, printing, and dynamic user interface interaction. The application runs on Python and integrates with various external systems and libraries, such as CUPS for printing and gphoto2 for camera control, to deliver its functionality.
+<p align="center">
+<img src="https://github.com/j0sh21/DoxBox/assets/63317640/7eda15cf-c3a2-4236-9e24-a084b4512d96" width="200">
+</p>
+
 
 ## Key Components
 
@@ -13,13 +16,23 @@ This project is designed to leverage the capabilities of a Raspberry Pi or any o
 
 ## Hardware Requirements
 
-- **Host System**: The core platform for running the application (e.g. Raspberry Pi, mini pc), providing the necessary compute resources and connectivity for peripherals.
-- **DSLR Camera**: Used for capturing high-quality images. Ensure compatibility with gphoto2 for integration.
-- **Webcam**: A webcam must be attached and configured for image capture functionalities.
-- **Display**: A display is required for showing the GUI, including photo previews and animations.
-- **Printer**: A photo printer set up and configured on the Host System for printing images, compatible with CUPS.
+- **Raspberry Pi 4** running [debian firmware](https://www.raspberrypi.com/software/operating-systems/)
+- **DSLR Camera**: Canon EOS 450D with at least 1GB SD-Card. If you use another one ensure compatibility with gphoto2 
+- **Display**: Waveshare 10.4" QLED Quantum Dot Capacitive Display (1600 x 720) 
+- **Printer**: Xiaomi-Instant-Photo-Printer-1S, compatible with CUPS, 6" fotopaper
+- **LED**: 4 pole RGB line, breadboard, cables, 4 Mosfets
+- **wood**: 3 x 80x80cm plywood, possibly a lasercutter 
+- **magnets**: 20 corner magnets (each 2pc), 40 x 4mm screws, 120 x 4mm nuts
+- **spray colour**: 1 can grounding colour, 4 cans actual colour
+
+  <img src="https://github.com/j0sh21/DoxBox/assets/63317640/384280e0-cc6e-4bd0-9953-c318b5e12f15" height="200">
+
+  <img src="https://github.com/j0sh21/DoxBox/assets/63317640/e446af16-d840-4cbc-87f9-3d5f67b3a15d" height="200">
+
+
 
 ## Setup Instructions
+
 
 1. **Clone the Repository**: Start by cloning this repository to your local machine.
 
