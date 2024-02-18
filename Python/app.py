@@ -113,7 +113,7 @@ class VendingMachineDisplay(QWidget):
                 print(f"Gif for state {self.appState.state} finished play next gif for state {self.appState.state} until external state change")
                 self.updateGIF(self.appState.state)
             elif self.appState.state == "5":
-                print("Thank You GIFF finished, initial state 0 and start welcome Gif")
+                print("Thank You - GIFF finished, initial state 0, start welcome Gif")
                 self.appState.state = "0"
             else:
                 self.updateGIF(self.appState.state)
@@ -195,7 +195,7 @@ class VendingMachineDisplay(QWidget):
                 if "No printer" in error_message:
                     print("Error: No printer found. Please ensure the printer is connected properly.")
                 else:
-                    print("An unexpected error with the printer occurred:", error_message)
+                    print("An unexpected error occurred with the printer:", error_message)
 
     def photo_subprocess(self):
         if config.DEBUG_MODE == 1:
@@ -236,12 +236,14 @@ class VendingMachineDisplay(QWidget):
             self.send_msg_to_LED(HOST, PORT, "breath 1")
         if state == "2":
             print(f"{'_' * 10}State changed to 2: Start countdown{'_' * 10}")
+
             self.send_msg_to_LED(HOST, PORT, "breath 0")
             self.send_msg_to_LED(HOST, PORT, "blinkspeed 0.5 0.5")
             self.send_msg_to_LED(HOST, PORT, "blink 1")
         if state == "3":
             print(f"{'_' * 10}State changed to 3: Smile now{'_' * 10}")
             self.send_msg_to_LED(HOST, PORT, "fade 1")
+
         if state == "4":
             print(f"{'_' * 10}State changed to 4: Start printing{'_' * 10}")
             self.send_msg_to_LED(HOST, PORT, "color 226 0 116")
@@ -261,7 +263,7 @@ class VendingMachineDisplay(QWidget):
         if state in("100", "101", "102", "103", "104", "110", "112", "113", "114", "115", "119"):
             self.send_msg_to_LED(HOST, PORT, "color 255 0 0")
             self.send_msg_to_LED(HOST, PORT, "blink 1")
-
+        
         self.movie.stop()
         self.updateGIF(state)
 
