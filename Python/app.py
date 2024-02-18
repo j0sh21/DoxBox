@@ -81,11 +81,11 @@ class VendingMachineDisplay(QWidget):
                 if self.loopCount >= self.desiredLoops:
                     self.movie.stop()
                     if self.appState.state == "1":
-                        print(f"({self.desiredLoops}x) Payment GIFF finished, next State: 2 and Gif")
+                        print(f"({self.desiredLoops}x) Payment GIFF finished, next state: 2 and Gif")
                         self.desiredLoops = 3
                         self.loopCount = 0
                         self.appState.state = "2"
-                    print(f"({self.desiredLoops}x) Loops finished, next random Gif for State: {self.appState.state}")
+                    print(f"({self.desiredLoops}x) Loops finished, next random Gif for state: {self.appState.state}")
                     self.updateGIF(self.appState.state)
                 else:
                     print(f"Replaying Gif ({self.desiredLoops}x), total duration is < 3 seconds")
@@ -94,13 +94,13 @@ class VendingMachineDisplay(QWidget):
         else:
             if self.appState.state in("1","2","3"):
                 if self.appState.state == "1":
-                    print("Payment GIFF finished, next State: 2 and Gif")
+                    print("Payment GIFF finished, next state: 2 and Gif")
                     self.appState.state = "2"
                 elif self.appState.state == "2":
-                    print("Countdown GIFF finished, next State: 3 and Gif")
+                    print("Countdown GIFF finished, next state: 3 and Gif")
                     self.appState.state = "3"
                 else:
-                    print("Smile GIFF finished, capture Photo very soon")
+                    print("Smile GIFF finished, capture photo very soon")
                     try:
                         if self.loopCount == 1: #Only after 1st Loop
                             self.send_msg_to_LED(HOST, PORT, "fade 0")
@@ -113,7 +113,7 @@ class VendingMachineDisplay(QWidget):
                 print(f"Gif for state {self.appState.state} finished play next gif for state {self.appState.state} until external state change")
                 self.updateGIF(self.appState.state)
             elif self.appState.state == "5":
-                print("Thank You GIFF finished, initial State 0 and start welcome Gif")
+                print("Thank You GIFF finished, initial state 0 and start welcome Gif")
                 self.appState.state = "0"
             else:
                 self.updateGIF(self.appState.state)
@@ -223,7 +223,7 @@ class VendingMachineDisplay(QWidget):
             self.send_msg_to_LED(HOST, PORT, "breath 0")
             self.send_msg_to_LED(HOST, PORT, "blink 0")
             self.send_msg_to_LED(HOST, PORT, "fade 0")
-            print(f"{'_' * 10}State changed to 0: Welcome Screen{'_' * 10}")
+            print(f"{'_' * 10}State changed to 0: Welcome screen{'_' * 10}")
             self.send_msg_to_LED(HOST, PORT, "color 226 0 116")  # Set to lnbits color
             self.send_msg_to_LED(HOST, PORT, "breathbrightness 0.1 0.7")
             self.send_msg_to_LED(HOST, PORT, "breathspeed 0.09")
@@ -235,12 +235,12 @@ class VendingMachineDisplay(QWidget):
             self.send_msg_to_LED(HOST, PORT, "breathspeed 0.02")
             self.send_msg_to_LED(HOST, PORT, "breath 1")
         if state == "2":
-            print(f"{'_' * 10}State changed to 2: Start Countdown{'_' * 10}")
+            print(f"{'_' * 10}State changed to 2: Start countdown{'_' * 10}")
             self.send_msg_to_LED(HOST, PORT, "breath 0")
             self.send_msg_to_LED(HOST, PORT, "blinkspeed 0.5 0.5")
             self.send_msg_to_LED(HOST, PORT, "blink 1")
         if state == "3":
-            print(f"{'_' * 10}State changed to 3: Smile Now{'_' * 10}")
+            print(f"{'_' * 10}State changed to 3: Smile now{'_' * 10}")
             self.send_msg_to_LED(HOST, PORT, "fade 1")
         if state == "4":
             print(f"{'_' * 10}State changed to 4: Start printing{'_' * 10}")
@@ -255,7 +255,7 @@ class VendingMachineDisplay(QWidget):
                 print(f"Failed to start print.py: {e}")
                 appState.stateChanged.emit("100")
         if state == "5":
-            print(f"{'_' * 10}State changed to 5: Tahnk You!{'_' * 10}")
+            print(f"{'_' * 10}State changed to 5: Thank You!{'_' * 10}")
             self.send_msg_to_LED(HOST, PORT, "breath 0")
             self.send_msg_to_LED(HOST, PORT, "fade 1")
         if state in("100", "101", "102", "103", "104", "110", "112", "113", "114", "115", "119"):
@@ -331,15 +331,15 @@ def start_server(appState):
 
 if __name__ == '__main__':
     print("app.py is now running")
-    print("building app...")
+    print("Building app...")
     app = QApplication(sys.argv)
-    print("building app completed!")
-    print("building state object...")
+    print("Building app completed!")
+    print("Building state object...")
     appState = AppState()
-    print("building state object completed!")
-    print("building Display...")
+    print("Building state object completed!")
+    print("Building Display...")
     ex = VendingMachineDisplay(appState)
-    print("building Display completed!")
+    print("Building Display completed!")
 
     # Start the server in a separate thread
     print("Start server...")

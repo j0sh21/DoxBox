@@ -15,7 +15,7 @@ def send_message_to_app(message):
         print(f"Error in sending message to app: {e}")
 
 def print_image(printer_name, image_path):
-    print("Connect to the CUPS printing Server")
+    print("Connect to the CUPS printing server")
     conn = cups.Connection()
     printers = conn.getPrinters()
 

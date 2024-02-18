@@ -21,7 +21,7 @@ def main_loop():
     response = None
 
     while True:
-        print("Request LnBits API for new payments")
+        print("Request LNbits API for new payments")
         response = requests.get(config.API_URL, headers={'X-API-Key': config.API_KEY})
         if (response.status_code == 200):
             rsJson = response.json()
