@@ -17,26 +17,32 @@ class RGBLEDController:
         self.blink_count, self.breath_count = 0, 0
         self.loop_type = "False"
         self.breath_speed = config.BREATH_SPEED
-        self.breath_lower_brightness = 40
-        self.breath_upper_brightness = 179
+        self.breath_upper_brightness = 1.0  # 100%
+        self.breath_lower_brightness = 0.0  # 0%
+        self.blink_ontime = config.on_time
+        self.blink_offtime = config.off_time
 
     def set_breath_speed(self, speed):
         self.breath_speed = float(speed)
-    
+
+    def set_blink_times(self, on_time, off_time):
+        self.blink_ontime = float(on_time)
+        self.blink_offtime = float(off_time)
+
     def set_breath_lights(self, lower_brightness, upper_brightness):
-        self.breath_lower_brightness = lower_brightness
-        self.breath_upper_brightness = upper_brightness
+        self.breath_lower_brightness = float(lower_brightness)
+        self.breath_upper_brightness = float(upper_brightness)
 
     def set_blink_count(self, blink):
         self.deactivate_loop()
         self.loop_type = "blink"
-        self.blink_count = blink
+        self.blink_count = int(blink)
         self.activate_loop()
 
     def set_breath_count(self, breath):
         self.deactivate_loop()
         self.loop_type = "breath"
-        self.breath_count = breath
+        self.breath_count = int(breath)
         self.activate_loop()
 
     def set_fade(self):
@@ -105,89 +111,67 @@ class RGBLEDController:
         self.set_lights(self.green_pin, g)
         self.set_lights(self.blue_pin, b)
 
-
-    def blink_led(self, on_time = config.on_time, off_time = config.off_time):
+    def blink_led(self):
         original_r, original_g, original_b = self.r, self.g, self.b
+
         while self.blink_active == 1:
-            # Save the current LED state
-            if self.blink_count > 1:
-                for _ in range(self.blink_count):
-                    # Turn off the LED
-                    self.r, self.g, self.b = 0, 0, 0
-                    self.update_leds()
-                    time.sleep(off_time)  # LED is off for 'off_time' seconds
+            # Turn off the LED
+            self.r, self.g, self.b = 0, 0, 0
+            self.update_leds()
+            time.sleep(self.blink_offtime)  # LED is off for 'off_time' seconds
 
-                    # Restore the original LED state
-                    self.r, self.g, self.b = original_r, original_g, original_b
-                    self.update_leds()
-                    time.sleep(on_time)  # LED is on for 'on_time' seconds
-                # break the loop if number of desired blinks was given
-                # Ensure the LED is left in the original state
-                self.r, self.g, self.b = original_r, original_g, original_b
-                self.update_leds()
-                time.sleep(0.01)  # Small delay to prevent high CPU usage
-                break
-            # blink forever if no number of desired blinks is given
-            else:
-                # Turn off the LED
-                self.r, self.g, self.b = 0, 0, 0
-                self.update_leds()
-                time.sleep(off_time)  # LED is off for 'off_time' seconds
-
-                # Restore the original LED state
-                self.r, self.g, self.b = original_r, original_g, original_b
-                self.update_leds()
-                time.sleep(on_time)  # LED is on for 'on_time' seconds
-        else:
-            # Ensure the LED is left in the original state
+            # Restore the original LED state
             self.r, self.g, self.b = original_r, original_g, original_b
             self.update_leds()
-            time.sleep(0.01)  # Small delay to prevent high CPU usage
+            time.sleep(self.blink_ontime)  # LED is on for 'on_time' seconds
+
+            if self.blink_count > 1:
+                self.blink_count -= 1
+            # If a specific number of blinks is set, break after completing them
+            if self.blink_count == 1:
+                self.blink_count -= 1
+                # This part is reached when self.blink_active is no longer 1
+                self.r, self.g, self.b = original_r, original_g, original_b
+                self.update_leds()
+                break
+
+        # Ensure the LED is left in the original state, in case the loop exited early
+        self.r, self.g, self.b = original_r, original_g, original_b
+        self.update_leds()
+        time.sleep(0.01)  # Small delay to prevent high CPU usage
 
     def breath_led(self):
         original_r, original_g, original_b = self.r, self.g, self.b
         while self.breath_active == 1:
 
             steps = config.BREATH_STEPS  # Number of steps in one breath cycle
+            min_scale = self.breath_lower_brightness
+            max_scale = self.breath_upper_brightness
+
+            for step in range(steps):
+                scale = (math.sin(step / steps * math.pi) * (max_scale - min_scale)) + min_scale
+                scaled_red = int(original_r * scale)
+                scaled_green = int(original_g * scale)
+                scaled_blue = int(original_b * scale)
+                self.set_lights(self.red_pin, scaled_red)
+                self.set_lights(self.green_pin, scaled_green)
+                self.set_lights(self.blue_pin, scaled_blue)
+                time.sleep(self.breath_speed)
 
             if self.breath_count > 1:
-                for cycle in range(self.breath_count):
-                    for step in range(steps):
-                        # Calculate scaling factor using a sinusoidal pattern for smooth transition
-                        scale = (math.sin(step / steps * math.pi))
-                        # Apply the scaling factor to each color component
-                        scaled_red, scaled_green, scaled_blue  = int(self.r * scale), int(self.g * scale), int(self.b * scale)
-                        # Update LED colors with the scaled values
-                        self.set_lights(self.red_pin, scaled_red)
-                        self.set_lights(self.green_pin, scaled_green)
-                        self.set_lights(self.blue_pin, scaled_blue)
-                        time.sleep(self.breath_speed)  # Adjust for desired speed of the breathing effect
-
-                # Ensure the LED is left in the original state
-                self.r, self.g, self.b = original_r, original_g, original_b
-                self.update_leds()
-                time.sleep(0.01)  # Small delay to prevent high CPU usage
-                # break the loop if number of desired breaths was given
-                break
-            # breath forever if no number of desired breaths is given
+                self.breath_count -= 1
             else:
-                for step in range(steps):
-                    # Calculate scaling factor using a sinusoidal pattern for smooth transition
-                    scale = (math.sin(step / steps * math.pi))
+                if self.breath_count == 1:
+                    self.breath_count -= 1
+                    self.r, self.g, self.b = original_r, original_g, original_b
+                    self.update_leds()
+                    time.sleep(0.01)
+                    break  # Exit after one cycle if breath_count is set to 1
 
-                    # Apply the scaling factor to each color component
-                    scaled_red, scaled_green, scaled_blue  = int(self.r * scale), int(self.g * scale), int(self.b * scale)
-
-                    # Update LED colors with the scaled values
-                    self.set_lights(self.red_pin, scaled_red)
-                    self.set_lights(self.green_pin, scaled_green)
-                    self.set_lights(self.blue_pin, scaled_blue)
-                    time.sleep(self.breath_speed)  # Adjust for desired speed of the breathing effect
-        else:
-            # Ensure the LED is left in the original state
-            self.r, self.g, self.b = original_r, original_g, original_b
-            self.update_leds()
-            time.sleep(0.01)  # Small delay to prevent high CPU usage
+        # This part is reached when self.breath_active is no longer 1
+        self.r, self.g, self.b = original_r, original_g, original_b
+        self.update_leds()
+        time.sleep(0.01)
 
     def fade_led(self):
         # fade until loop is broken
@@ -285,6 +269,12 @@ class ServerThread(Thread):
                     self.led_controller.deactivate_loop()
                 else:
                     print("blinking count must be one or more.")
+            elif parts[0] == "blinkspeed" and len(parts) == 3:
+                on, off = map(int, parts[1:])
+                if on > 0 and off > 0:
+                    self.led_controller.set_blink_times(on, off)
+                else:
+                    print("on and off time must both be bigger than 0 seconds.")
             elif parts[0] == "breath" and len(parts) == 2:
                 breath = int(parts[1])
                 if breath >= 1:
@@ -299,6 +289,13 @@ class ServerThread(Thread):
                     self.led_controller.set_breath_speed(speed)
                 else:
                     print("breath speed must be bigger than 0.")
+            elif parts[0] == "breathbrightness" and len(parts) == 3:
+                lower, upper = map(int, parts[1:])
+                if lower+upper > 0 and lower < 1 and upper < 1 and lower < upper:
+                    self.led_controller.set_breath_lights(lower, upper)
+                else:
+                    print("upper and / or lower brighntess must be >= 0 and <= 1.")
+
             else:
                 print(f"Unrecognized command: {command}")
         except ValueError as e:
