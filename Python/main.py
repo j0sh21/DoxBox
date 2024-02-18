@@ -36,12 +36,10 @@ def main():
         # Running debug_client.py as a subprocess when DEBUG is True
         print("Start DEBUG CLIENT")
         subprocess.run(["python3", r"./dev/debug_client.py"])
-
     if DEBUG == 2:
         app_thread2 = threading.Thread(target=run_process_mock())
         app_thread2.start()
         print("Start debug process without payment and printing")
-
     else:
         print("Start BTC-SWITCH CLIENT")
         # Running switch.py as a subprocess when DEBUG is False
