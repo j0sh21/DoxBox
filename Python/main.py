@@ -28,7 +28,7 @@ def main():
     if DEBUG == 2:
         app_thread2 = threading.Thread(target=run_app2())
         app_thread2.start()
-        print("Start Debug process without payment and printing")
+        print("Start debug process without payment and printing")
 
 
     else:
