@@ -18,4 +18,3 @@ def run_client(host, port):
 if __name__ == "__main__":
     HOST, PORT = '127.0.0.1', 12345  # Change host and port if needed
     run_client(HOST, PORT)
-

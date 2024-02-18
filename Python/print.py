@@ -4,6 +4,7 @@ import socket
 import cups
 import os
 import config
+import time
 
 def send_message_to_app(message):
     try:
@@ -15,64 +16,67 @@ def send_message_to_app(message):
 
 def print_image(printer_name, image_path):
     print("Connect to the CUPS printing server")
-    # Connect to CUPS
     conn = cups.Connection()
-    # Get a list of all printers
     printers = conn.getPrinters()
 
-    # Check if specified printer is available
     if printer_name not in printers:
         print(f"Printer {printer_name} not found. Available printers:")
+        send_message_to_app("112")
         for printer in printers:
             print(f"{printer}\n")
         return
-
-    print(f"Sucessfully connected to the print server {printer_name}")
+      
+    print(f"Successfully Connected to the print Server {printer_name}")
 
     if config.DEBUG_MODE == 0:
-        # Print the image
-        print_job_id = conn.printFile(printer_name, image_path, "Photo Print", {})
-        print(f"Print job submitted to printer. Job ID: {print_job_id}\nStart printing {image_path} on {printer_name}")
+        if not os.path.exists(image_path):
+            print(f"Error: File {image_path} not found.")
+            send_message_to_app("113")
+            return
+        try:
+            print_job_id = conn.printFile(printer_name, image_path, "Photo Print", {})
+            print(f"Print job submitted. Job ID: {print_job_id} - {image_path} on {printer_name}")
+        except Exception as e:
+            print(f"Error in print job: {e}")
+            send_message_to_app("119")
     else:
         print(f"DEBUG MODE: Simulate print file {image_path} on {printer_name}. \nDEBUG MODE: Skip 45 sec waiting time...")
 
 def copy_file(source_path, destination_path):
+    if not os.path.exists(source_path):
+        print(f"Error: The file {source_path} does not exist.")
+        send_message_to_app("113")
+        return False
     try:
-        # Copy the source file to the destination path
         shutil.move(source_path, destination_path)
         print(f"Successfully copied {source_path} to {destination_path}")
-    except FileNotFoundError:
-        print(f"CWD {os.getcwd()}")
-        print(f"Error: The file {source_path} does not exist.")
+        return True
     except PermissionError:
-        print(f"Error: Permission denied while copying {source_path}.")
+        print(f"Error: Permission denied for {source_path}.")
+        send_message_to_app("114")
     except Exception as e:
-        print(f"An unexpected error occurred while copying {source_path}: {str(e)}")
+        print(f"Error copying {source_path}: {e}")
+        send_message_to_app("115")
+    return False
 
 def move_image():
-    pic_dir = os.path.join(config.PICTURE_SAVE_DIRECTORY, datetime.datetime.now().strftime("%Y-%m-%d"))
-    print_dir = config.PRINT_DIR
+    pic_dir = os.path.abspath(os.path.join(config.PICTURE_SAVE_DIRECTORY, datetime.datetime.now().strftime("%Y-%m-%d")))
     printer_name = config.PRINTER_NAME
-    cwd = os.getcwd()
-    os.chdir(pic_dir)
-    cwd_tmp = os.getcwd()
-    print(f"Change directory to {pic_dir}")
 
-    for filename in os.listdir():
-        picture_name = filename
-        # Construct the full source and destination paths
-        source_picture_path = os.path.join(cwd_tmp, picture_name)
-        destination_picture_path = os.path.join(cwd_tmp.replace("/images/pics/","/images/print/"))
-        copy_file(source_picture_path, destination_picture_path)
-        print_image(printer_name, destination_picture_path)
-        os.remove(destination_picture_path)
-        print(f'Successfully removed {picture_name} from disk.')
+    for filename in os.listdir(pic_dir):
+        source_path = os.path.join(pic_dir, filename)
+        destination_path = os.path.join(config.PRINT_DIR, filename)
 
-    os.chdir(cwd)
-    print(f"Change directory back to {cwd}")
+
+        if copy_file(source_path, destination_path):
+            print_image(printer_name, destination_path)
+            os.remove(destination_path)
+            print(f'Removed {filename} after creating and sending print Job.')
+            send_message_to_app("204")
 
 if __name__ == '__main__':
-    print("Print.py is now running.")
+    time.sleep(8)
+    print("print.py is now running.")
     print(f"Preparing print job")
     move_image()
     print(f"Printing now up to 45 seconds ...")

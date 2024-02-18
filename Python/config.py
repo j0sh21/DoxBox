@@ -50,6 +50,7 @@ IMAGE_PATH = get_config_value('Display', 'IMAGE_PATH')
 IMAGE_WIDTH = config.getint('Display', 'IMAGE_WIDTH')  # Assuming IMAGE_WIDTH will always be present and correctly formatted
 IMAGE_HEIGHT = config.getint('Display', 'IMAGE_HEIGHT')  # Assuming IMAGE_HEIGHT will always be present and correctly formatted
 DEFAULT_TEXT = get_config_value('Display', 'DEFAULT_TEXT')
+PATH_TO_FRAME= get_config_value('Display', 'PATH_TO_FRAME')
 
 # Server Configuration
 SERVER_HOST = get_config_value('Server', 'SERVER_HOST')
@@ -59,6 +60,21 @@ MAX_CONNECTIONS = config.getint('Server', 'MAX_CONNECTIONS')  # Assuming MAX_CON
 PRINTER_NAME = get_config_value('Printer', 'NAME')
 PRINT_DIR = get_config_value('Printer', 'DIR')
 
-DEBUG_MODE = int(get_config_value('DEV', 'DEBUG'))
+# GPIO PINS for LED
+red_pin = config.getint('GPIO', 'red_pin')
+green_pin = config.getint('GPIO', 'green_pin')
+blue_pin = config.getint('GPIO', 'blue_pin')
+
+# LED effects
+on_time = config.getfloat('GPIO', 'on_time')
+off_time = config.getfloat('GPIO', 'off_time')
+fade_steps = config.getfloat('GPIO', 'fade_steps')
+brightness_steps = config.getfloat('GPIO', 'brightness_steps')
+
+BREATH_SPEED = config.getfloat('GPIO', 'BREATH_SPEED')
+BREATH_STEPS = config.getint('GPIO', 'BREATH_STEPS')
+
+#DEBUG MODE
+DEBUG_MODE = config.getint('DEV', 'DEBUG')
 
 print("Config successfully loaded!")

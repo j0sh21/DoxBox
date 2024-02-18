@@ -43,21 +43,31 @@ class VendingMachineDisplay(QWidget):
         self.total_duration = 0
         self.gif_path = ""
 
-    def calculateDuration(self, frame_number):
-        if frame_number == 0:  # Check if this is the first frame
-            # Calculate the total duration of the GIF
-            frame_count = self.movie.frameCount()
-            frame_rate = self.movie.nextFrameDelay()  # Delay between frames in milliseconds
-            self.total_duration = frame_count * frame_rate / 1000  # Total duration in seconds
-            print(f"Start playing gif with {str(self.total_duration)} total duration")
+    def send_msg_to_LED(self , host, port, command):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+            # Connect to the server
+            client_socket.connect((host, port))
+            print(f"Connected to server at {host}:{port}")
+            # Send the command to the server
+            print(f"Sending command to {host}:{command.encode('utf-8')}")
+            client_socket.sendall(command.encode('utf-8'))
 
-    def onFrameChanged(self, frameNumber):
-        self.calculateDuration(self.movie.currentFrameNumber())
-        if frameNumber == self.movie.frameCount() - 1:  # Check if it's the last frame
+    def calculateDuration(self):
+        # Calculate the total duration of the GIF
+        frame_count = self.movie.frameCount()
+        frame_rate = self.movie.nextFrameDelay()  # Delay between frames in milliseconds
+        self.total_duration = frame_count * frame_rate / 1000  # Total duration in seconds
+        print(f"Start playing gif with {str(self.total_duration)} seconds total duration")
+
+    def onFrameChanged(self):
+        if self.movie.currentFrameNumber() == 0: # Check if this is the first frame
+            self.calculateDuration()
+        elif self.movie.currentFrameNumber() == self.movie.frameCount() - 1:  # Check if it's the last frame
             self.movie.stop()
             self.onGIFFinished()
 
     def onGIFFinished(self):
+        HOST, PORT = '127.0.0.1', 12345  # Change host and port if needed
         self.loopCount += 1
         if self.total_duration < 3.0 and self.appState.state not in ("2", "3"):
             if self.movie.currentFrameNumber() == self.movie.frameCount() - 1:  # Last frame
@@ -66,12 +76,14 @@ class VendingMachineDisplay(QWidget):
                         self.desiredLoops *= 6
                     elif self.total_duration < 1.0:
                         self.desiredLoops *= 3
-                    elif self.total_duration < 2.0:
+                    elif self.total_duration < 4.0:
                         self.desiredLoops *= 2
                 if self.loopCount >= self.desiredLoops:
                     self.movie.stop()
                     if self.appState.state == "1":
                         print(f"({self.desiredLoops}x) Payment GIFF finished, next state: 2 and Gif")
+                        self.desiredLoops = 3
+                        self.loopCount = 0
                         self.appState.state = "2"
                     print(f"({self.desiredLoops}x) Loops finished, next random Gif for state: {self.appState.state}")
                     self.updateGIF(self.appState.state)
@@ -91,6 +103,7 @@ class VendingMachineDisplay(QWidget):
                     print("Smile GIFF finished, capture photo very soon")
                     try:
                         if self.loopCount == 1: #Only after 1st Loop
+                            self.send_msg_to_LED(HOST, PORT, "fade 0")
                             photo_thread = threading.Thread(target=self.photo_subprocess)
                             photo_thread.start()
                     except Exception as e:
@@ -111,87 +124,59 @@ class VendingMachineDisplay(QWidget):
         self.movie.setScaledSize(QSize(500, 500))
         self.movie.start()
 
+
     def initUI(self):
         # Set the layout
-        layout = QVBoxLayout()
-        self.setLayout(layout)
-
-        # Header setup
-        header = QLabel("Header")  # Or use a QWidget and customize it
-        header.setFixedHeight(50)
-        # Set the background color of the header to dark purple
-        header.setStyleSheet("background-color: #301934; color: white;")  # Added color: white for the text
-        header.setAlignment(Qt.AlignCenter)
-        layout.addWidget(header)
-
-        # Content area with sidebar and viewfinder
-        contentLayout = QHBoxLayout()
-
-        # Sidebar setup
-        sidebar = QWidget()
-        sidebar.setFixedWidth(150)
-        sidebar.setStyleSheet("background-color: #301934; color: white;")  # Added color: white for the text
-        sidebarLayout = QVBoxLayout(sidebar)
-        sidebarLayout.setContentsMargins(0, 0, 0, 0)  # Remove any margins to ensure the QR code is at the very top
-        sidebarLayout.setSpacing(0)  # Remove spacing between widgets in the sidebar
-
-        # QR Code setup
-        self.qrCodeLabel = QLabel(sidebar)
-        pixmap = QPixmap(config.IMAGE_PATH)  # Use the image path from config.py
-        self.qrCodeLabel.setPixmap(pixmap.scaled(config.IMAGE_WIDTH, config.IMAGE_HEIGHT,
-                                                Qt.KeepAspectRatio))  # Use image dimensions from config.py
-        self.qrCodeLabel.setAlignment(Qt.AlignCenter)  # Center the QR code horizontally in the sidebar
-        # Add the QR code to the sidebar layout
-        sidebarLayout.addWidget(self.qrCodeLabel)
-
-        # Set up the webcam viewfinder
+        self.layout = QVBoxLayout(self)
+        self.setLayout(self.layout)
+               
+        # Background setup
+        self.backgroundLabel = QLabel(self)
+        pixmap = QPixmap(rf"{config.PATH_TO_FRAME}")
+        self.backgroundLabel.setPixmap(pixmap)
+        self.backgroundLabel.setScaledContents(True)
+        self.backgroundLabel.setAlignment(Qt.AlignCenter)
+        self.backgroundLabel.setAttribute(Qt.WA_TranslucentBackground)
+        self.backgroundLabel.setGeometry(0, 0, 1600, 720)
+        self.backgroundLabel.raise_()  # Bringe das Hintergrundbild nach vorne
+        
+        # Webcam Viewfinder setup
         self.viewfinder = QCameraViewfinder(self)
-        layout.addWidget(self.viewfinder)
-
-        contentLayout.addWidget(sidebar)
-        contentLayout.addWidget(self.viewfinder, 1)  # The '1' makes the viewfinder expand
-
-        # Add the content layout to the main layout
-        layout.addLayout(contentLayout)
+        viewfinderX = int((1600 - 1280) / 2)
+        viewfinderY = int((720 - 720) / 2)
+        self.setStyleSheet("""
+            QCameraViewfinder {
+                border-radius: 90px;
+                background-color: transparent;
+            }
+        """)
+        self.viewfinder.setGeometry(80, 70, int(1280*.79), int(720*.79))  # Korrektur der Größe
 
         # Initialize and start the camera
         self.camera = QCamera(QCameraInfo.defaultCamera())
-
-        #build viewfinder instance
         viewfinder_settings = QCameraViewfinderSettings()
-        viewfinder_settings.setResolution(1280, 720)  # Set Resolution
-
-        # Vewfinder Settings
+        viewfinder_settings.setResolution(1280, 720)
         self.camera.setViewfinderSettings(viewfinder_settings)
         self.camera.setViewfinder(self.viewfinder)
         self.camera.start()
-
-        # Initialize the QLabel for displaying GIFs with the viewfinder as its parent
+        
+        # GIF Label setup within viewfinder
         self.gifLabel = QLabel(self.viewfinder)
-        self.gifLabel.setAlignment(Qt.AlignCenter)  # Center the content
-        self.gifLabel.setGeometry(QRect(0, 0, 500, 500))  # Set the geometry to 500x500 pixels
-        self.gifLabel.hide()  # Initially hide the gifLabel
+        self.gifLabel.setAlignment(Qt.AlignCenter)
+        gifLabelX = int((1280 - 500) / 2)  # Center the gif label within the viewfinder
+        gifLabelY = int((720 - 500) / 2) 
+        self.gifLabel.setGeometry(gifLabelX, gifLabelY, 500, 500)
+        self.gifLabel.hide()
 
-        # Display text in the middle of the screen, always on top
-        self.textLabel = QLabel(config.DEFAULT_TEXT, self)
-        self.textLabel.setAlignment(Qt.AlignCenter)
-        self.textLabel.setStyleSheet(
-            "background-color: rgba(255, 255, 255, 128);")  # Optional: Semi-transparent background
-        self.textLabel.adjustSize()  # Adjust size based on text content
-        self.repositionTextLabel()
-        self.textLabel.raise_()
+        # Setze Transparenz und Fenstereigenschaften auf das Hauptfenster (TODO:Funktioniert nicht wie gewünscht, wir nutzen den scharzen frame als "rahmen".)
+        self.setAttribute(Qt.WA_TranslucentBackground)  # Fensterhintergrund transparent machen
+        self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)
 
-        # Window configurations
-        if config.FULLSCREEN_MODE:  # Check if fullscreen mode is enabled in config.py
+        if config.FULLSCREEN_MODE:
             self.showFullScreen()
         else:
             self.setWindowTitle(config.WINDOW_TITLE)
             self.show()
-
-    def repositionTextLabel(self):
-        # Center the textLabel within the window
-        rect = self.textLabel.rect()
-        self.textLabel.move((self.width() - rect.width()) // 2, (self.height() - rect.height()) // 2)
 
     def print_subprocess(self):
         if config.DEBUG_MODE == 1:
@@ -232,17 +217,39 @@ class VendingMachineDisplay(QWidget):
                 appState.stateChanged.emit("100")
 
     def onStateChanged(self, state):
+        HOST, PORT = '127.0.0.1', 12345  # Change host and port if needed
         # state handling
         if state == "0":
+            self.send_msg_to_LED(HOST, PORT, "breath 0")
+            self.send_msg_to_LED(HOST, PORT, "blink 0")
+            self.send_msg_to_LED(HOST, PORT, "fade 0")
             print(f"{'_' * 10}State changed to 0: Welcome screen{'_' * 10}")
+            self.send_msg_to_LED(HOST, PORT, "color 226 0 116")  # Set to lnbits color
+            self.send_msg_to_LED(HOST, PORT, "breathbrightness 0.1 0.7")
+            self.send_msg_to_LED(HOST, PORT, "breathspeed 0.09")
+            self.send_msg_to_LED(HOST, PORT, "breath 1")
         if state == "1":
             print(f"{'_' * 10}State changed to 1: Payment recived{'_' * 10}")
+            self.send_msg_to_LED(HOST, PORT, "breath 0")
+            self.send_msg_to_LED(HOST, PORT, "breathbrightness 0.2 0.8")
+            self.send_msg_to_LED(HOST, PORT, "breathspeed 0.02")
+            self.send_msg_to_LED(HOST, PORT, "breath 1")
         if state == "2":
             print(f"{'_' * 10}State changed to 2: Start countdown{'_' * 10}")
+
+            self.send_msg_to_LED(HOST, PORT, "breath 0")
+            self.send_msg_to_LED(HOST, PORT, "blinkspeed 0.5 0.5")
+            self.send_msg_to_LED(HOST, PORT, "blink 1")
         if state == "3":
             print(f"{'_' * 10}State changed to 3: Smile now{'_' * 10}")
+            self.send_msg_to_LED(HOST, PORT, "fade 1")
+
         if state == "4":
             print(f"{'_' * 10}State changed to 4: Start printing{'_' * 10}")
+            self.send_msg_to_LED(HOST, PORT, "color 226 0 116")
+            self.send_msg_to_LED(HOST, PORT, "breathbrightness 0.35 0.8")
+            self.send_msg_to_LED(HOST, PORT, "breathspeed 0.12")
+            self.send_msg_to_LED(HOST, PORT, "breath 1")
             try:
                 print_thread = threading.Thread(target=self.print_subprocess)
                 print_thread.start()
@@ -251,7 +258,12 @@ class VendingMachineDisplay(QWidget):
                 appState.stateChanged.emit("100")
         if state == "5":
             print(f"{'_' * 10}State changed to 5: Thank You!{'_' * 10}")
-
+            self.send_msg_to_LED(HOST, PORT, "breath 0")
+            self.send_msg_to_LED(HOST, PORT, "fade 1")
+        if state in("100", "101", "102", "103", "104", "110", "112", "113", "114", "115", "119"):
+            self.send_msg_to_LED(HOST, PORT, "color 255 0 0")
+            self.send_msg_to_LED(HOST, PORT, "blink 1")
+        
         self.movie.stop()
         self.updateGIF(state)
 
@@ -297,15 +309,6 @@ class VendingMachineDisplay(QWidget):
                 print("No GIF files found in the specified folder.")
         except FileNotFoundError:
             print(f"The folder {gif_folder_path} does not exist.")
-
-def send_message_to_app(message):
-    try:
-        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client_socket.connect((config.HOST, config.PORT))
-        client_socket.sendall(message.encode())
-        client_socket.close()
-    except Exception as e:
-        print(f"Error in sending message to app: {e}")
 
 def handle_client_connection(client_socket, appState):
     try:
