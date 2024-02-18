@@ -8,19 +8,21 @@ import math
 
 class RGBLEDController:
     def __init__(self, red_pin, green_pin, blue_pin, steps=config.fade_steps, brightness_steps=config.brightness_steps):
-        self.red_pin, self.green_pin, self.blue_pin = red_pin, green_pin, blue_pin
-        self.r, self.g, self.b = 255.0, 0, 0
-        self.pi = pigpio.pi()
-        self.steps, self.brightness_steps = steps, brightness_steps
-        self.brightness, self.prev_brightness = 255, 255
+        self.red_pin, self.green_pin, self.blue_pin = red_pin, green_pin, blue_pin # GPIO Pins
+        self.r, self.g, self.b = 255.0, 0, 0 # color variables
+        self.pi = pigpio.pi() #use gpio on raspberry pi
+        self.steps, self.brightness_steps = steps, brightness_steps # fade effect speed (steps) and number of steps.
+        self.brightness, self.prev_brightness = 255, 255 # brightness variables
         self.fade_active, self.blink_active, self.breath_active = False, False, False  # Flag to control the loops
-        self.blink_count, self.breath_count = 0, 0
-        self.loop_type = "False"
-        self.breath_speed = config.BREATH_SPEED
-        self.breath_upper_brightness = 1.0  # 100%
-        self.breath_lower_brightness = 0.0  # 0%
-        self.blink_ontime = config.on_time
-        self.blink_offtime = config.off_time
+        self.blink_count, self.breath_count = 0, 0 # initialize count if blink or breath effect should be played x times
+        self.loop_type = "False" # variable to control fade, blink or breath loop
+        self.breath_speed = config.BREATH_SPEED # speed for breath effect
+        self.breath_upper_brightness, self.breath_lower_brightness = 1.0, 0.0   # breath from 100% to 0%
+        self.blink_ontime, self.blink_offtime  = config.on_time, config.off_time #Blink on and off time
+
+    #Functions for changing speed and other LED effect related settings by external input while loop is running.
+    def set_fade_speed(self, speed):
+        self.steps = float(speed)
 
     def set_breath_speed(self, speed):
         self.breath_speed = float(speed)
@@ -33,6 +35,7 @@ class RGBLEDController:
         self.breath_lower_brightness = float(lower_brightness)
         self.breath_upper_brightness = float(upper_brightness)
 
+    #Set a specific count for blink or breath LED effect by external input before starting loop
     def set_blink_count(self, blink):
         if blink > 1:
             self.deactivate_loop()
@@ -55,11 +58,12 @@ class RGBLEDController:
             self.loop_type = "breath"
             self.activate_loop()
 
+
     def set_fade(self):
         self.deactivate_loop()
         self.loop_type = "fade"
-        self.activate_loop()
 
+    #Activate or deactivate loop by external input
     def activate_loop(self):
         if self.loop_type == "fade":
             self.fade_active = 1
@@ -91,6 +95,7 @@ class RGBLEDController:
         else:
             print("No loop to stop")
 
+    #dimm the lights
     def set_lights(self, pin, brightness):
         real_brightness = int(brightness * (self.brightness / 255.0))
         self.pi.set_PWM_dutycycle(pin, real_brightness)
@@ -104,10 +109,15 @@ class RGBLEDController:
     def set_color(self, r, g, b):
         if r or g or b:
             self.deactivate_loop()  # Pause the loop when a color is set directly
-            self.r, self.g, self.b = self.update_brightness(r, g, b)
-            self.set_lights(self.red_pin, self.r)
-            self.set_lights(self.green_pin, self.g)
-            self.set_lights(self.blue_pin, self.b)
+            while self.breath_count+self.blink_count>0:
+                abc = 1
+                #wait until loop finished
+            else:
+                if self.breath_count and self.blink_count == 0 and self.fade_active == 0:
+                    self.r, self.g, self.b = self.update_brightness(r, g, b)
+                    self.set_lights(self.red_pin, self.r)
+                    self.set_lights(self.green_pin, self.g)
+                    self.set_lights(self.blue_pin, self.b)
         else:
             r, g, b = self.update_brightness(self.r, self.g, self.b)
             self.set_lights(self.red_pin, r)
@@ -208,19 +218,16 @@ class RGBLEDController:
             # Debugging: print(f"Set color to {self.r}, {self.g}, {self.b}")
             time.sleep(0.01)  # Small delay to prevent high CPU usage
 
-
     def run(self):
-        # Example initialization or setup code
+        #initialization
         print("LED Controller is running...")
         self.set_color(226, 0, 116)  # Set to a default color (lnbits color)
-        # Start the fade process in a separate thread to keep the main loop responsive
-        time.sleep(1)  # Sleep to prevent high CPU usage
+        time.sleep(0.1)  # Sleep to prevent high CPU usage
 
 
 class ServerThread(Thread):
     def __init__(self, host, port, led_controller):
         super().__init__()
-
         self.host = host
         self.port = port
         self.led_controller = led_controller
@@ -299,6 +306,12 @@ class ServerThread(Thread):
                     self.led_controller.set_breath_speed(speed)
                 else:
                     print("breath speed must be bigger than 0.")
+            elif parts[0] == "fadespeed" and len(parts) == 2:
+                speed = float(parts[1])
+                if speed > 0:
+                    self.led_controller.set_fade_speed(speed)
+                else:
+                    print("fade speed must be bigger than 0.")
             elif parts[0] == "breathbrightness" and len(parts) == 3:
                 lower, upper = map(float, parts[1:])
                 if lower+upper > 0 and lower < 1 and upper < 1 and lower < upper:
