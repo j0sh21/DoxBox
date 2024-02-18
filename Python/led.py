@@ -34,16 +34,26 @@ class RGBLEDController:
         self.breath_upper_brightness = float(upper_brightness)
 
     def set_blink_count(self, blink):
-        self.deactivate_loop()
-        self.loop_type = "blink"
-        self.blink_count = int(blink)
-        self.activate_loop()
+        if blink > 1:
+            self.deactivate_loop()
+            self.loop_type = "blink"
+            self.blink_count = int(blink)
+            self.activate_loop()
+        else:
+            self.deactivate_loop()
+            self.loop_type = "blink"
+            self.activate_loop()
 
     def set_breath_count(self, breath):
-        self.deactivate_loop()
-        self.loop_type = "breath"
-        self.breath_count = int(breath)
-        self.activate_loop()
+        if breath > 1:
+            self.deactivate_loop()
+            self.loop_type = "breath"
+            self.breath_count = int(breath)
+            self.activate_loop()
+        else:
+            self.deactivate_loop()
+            self.loop_type = "breath"
+            self.activate_loop()
 
     def set_fade(self):
         self.deactivate_loop()
@@ -270,7 +280,7 @@ class ServerThread(Thread):
                 else:
                     print("blinking count must be one or more.")
             elif parts[0] == "blinkspeed" and len(parts) == 3:
-                on, off = map(int, parts[1:])
+                on, off = map(float, parts[1:])
                 if on > 0 and off > 0:
                     self.led_controller.set_blink_times(on, off)
                 else:
@@ -284,13 +294,13 @@ class ServerThread(Thread):
                 else:
                     print("breath count must be one or more.")
             elif parts[0] == "breathspeed" and len(parts) == 2:
-                speed = int(parts[1])
+                speed = float(parts[1])
                 if speed > 0:
                     self.led_controller.set_breath_speed(speed)
                 else:
                     print("breath speed must be bigger than 0.")
             elif parts[0] == "breathbrightness" and len(parts) == 3:
-                lower, upper = map(int, parts[1:])
+                lower, upper = map(float, parts[1:])
                 if lower+upper > 0 and lower < 1 and upper < 1 and lower < upper:
                     self.led_controller.set_breath_lights(lower, upper)
                 else:
