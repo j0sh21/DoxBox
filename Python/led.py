@@ -24,6 +24,7 @@ class RGBLEDController:
         self.current_animation = None
         self.animation_lock = threading.Lock()
         self.animation_active = threading.Event()
+        self.stop_requested = False
 
     #Functions for changing speed and other LED effect related settings by external input while loop is running.
     def set_fade_speed(self, speed):
@@ -45,27 +46,23 @@ class RGBLEDController:
         if blink > 1:
             self.deactivate_loop()
             loop_type = "blink"
-            self.set_loop(loop_type)
             self.blink_count = int(blink)
-            self.activate_loop()
+            self.set_loop(loop_type)
         else:
             self.deactivate_loop()
             loop_type = "blink"
             self.set_loop(loop_type)
-            self.activate_loop()
 
     def set_breath_count(self, breath):
         if breath > 1:
             self.deactivate_loop()
             loop_type = "breath"
-            self.set_loop(loop_type)
             self.breath_count = int(breath)
-            self.activate_loop()
+            self.set_loop(loop_type)
         else:
             self.deactivate_loop()
             loop_type = "breath"
             self.set_loop(loop_type)
-            self.activate_loop()
 
     def set_loop(self, animation_type):
         if not self.animation_queue.full():
@@ -74,6 +71,11 @@ class RGBLEDController:
                 self.activate_loop()
         else:
             print("Animation queue is full. Please wait or interrupt current animation.")
+
+    def set_fade(self):
+        self.deactivate_loop()
+        loop_type = "fade"
+        self.set_loop(loop_type)
 
     # Activate or deactivate loop by external input
 
@@ -99,29 +101,21 @@ class RGBLEDController:
 
                 self.current_animation.start()
 
+    def deactivate_loop(self):
+        with self.animation_lock:
+            if self.current_animation and self.current_animation.is_alive():
+                self.stop_requested = True  # Signal the thread to stop
+                self.current_animation.join()  # Wait for the thread to terminate
+                print(f"Stopped {self.loop_type} loop")
+                self.stop_requested = False  # Reset the stop signal for future use
+            self.interrupt_current_animation()  # Reset the state of animation variables
+
     def interrupt_current_animation(self):
         self.blink_active = False
         self.breath_active = False
         self.fade_active = False
-
-    def set_fade(self):
-        self.deactivate_loop()
-        loop_type = "fade"
-        self.set_loop(loop_type)
-        self.activate_loop()
-
-    def deactivate_loop(self):
-        if self.loop_type == "fade":
-            print("Deactivating fade...")
-            self.fade_active = False  # Deactivate fade
-        elif self.loop_type == "blink":
-            print("Deactivating blink...")
-            self.blink_active = False  # Deactivate fade
-        elif self.loop_type == "breath":
-            print("Deactivating breath...")
-            self.breath_active = False  # Deactivate fade
-        else:
-            print("No loop to stop")
+        self.loop_type = None  # or any default value that indicates no active loop
+        self.current_animation = None
 
     #dimm the lights
     def set_lights(self, pin, brightness):
@@ -163,7 +157,7 @@ class RGBLEDController:
         self.animation_active.clear()
         original_r, original_g, original_b = self.r, self.g, self.b
 
-        while self.blink_active == 1:
+        while not self.stop_requested:
             # Turn off the LED
             self.r, self.g, self.b = 0, 0, 0
             self.update_leds()
@@ -195,7 +189,7 @@ class RGBLEDController:
     def breath_led(self):
         self.animation_active.clear()
         original_r, original_g, original_b = self.r, self.g, self.b
-        while self.breath_active == 1:
+        while not self.stop_requested:
 
             steps = config.BREATH_STEPS  # Number of steps in one breath cycle
             min_scale = self.breath_lower_brightness
@@ -231,7 +225,7 @@ class RGBLEDController:
     def fade_led(self):
         self.animation_active.clear()
         # fade until loop is broken
-        while self.fade_active == 1:  # Check if fade loop should be active
+        while not self.stop_requested:  # Check if fade loop should be active
             max_color = max(self.r, self.g, self.b)
             min_color = min(self.r, self.g, self.b)
 
@@ -357,7 +351,7 @@ class ServerThread(Thread):
                 else:
                     print("upper and / or lower brighntess must be >= 0 and <= 1.")
             elif parts[0] == "interrupt" and len(parts) == 1:
-                self.led_controller.interrupt_current_animation()
+                self.led_controller.deactivate_loop()
             else:
                 print(f"Unrecognized command: {command}")
         except ValueError as e:
