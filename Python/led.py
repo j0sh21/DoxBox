@@ -176,9 +176,10 @@ class RGBLEDController:
                 self.update_leds()
                 time.sleep(self.blink_offtime)  # LED is off for 'off_time' seconds
 
+                # Restore the original LED state
+                self.r, self.g, self.b = original_r, original_g, original_b
                 self.update_leds()
                 time.sleep(self.blink_ontime)  # LED is on for 'on_time' seconds
-                self.blink_count -= 1
 
                 # This part is reached when blinkt count is 0
                 self.r, self.g, self.b = original_r, original_g, original_b
