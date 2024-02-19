@@ -100,14 +100,7 @@ class RGBLEDController:
                 self.current_animation.start()
 
     def interrupt_current_animation(self):
-        with self.animation_lock:
-            # Safe thread stopping mechanism should be implemented within the animation methods
-            while not self.animation_queue.empty():
-                self.animation_queue.get()
-            if self.current_animation and self.current_animation.is_alive():
-                self.animation_active.set()  # Signal to the animation methods to stop
-                #self.current_animation.join()  # Wait for the animation to stop
-                self.animation_active.clear()
+        self.animation_active.clear()
 
     def set_fade(self):
         self.deactivate_loop()
