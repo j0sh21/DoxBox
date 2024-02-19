@@ -168,18 +168,16 @@ class RGBLEDController:
             self.update_leds()
             time.sleep(self.blink_ontime)  # LED is on for 'on_time' seconds
 
-            if self.blink_count > 1:
+            if self.blink_count >= 1:
                 self.blink_count -= 1
-            # If a specific number of blinks is set, break after completing them
-            if self.blink_count == 1:
-                self.blink_count -= 1
-            if self.blink_count == 0:
-                # This part is reached when self.blink_active is no longer 1
-                self.r, self.g, self.b = original_r, original_g, original_b
-                self.update_leds()
-                time.sleep(0.01)  # Small delay to prevent high CPU usage
-                self.animation_active.set()
-                break
+            else:
+                if self.blink_count == 0:
+                    # This part is reached when self.blink_active is no longer 1
+                    self.r, self.g, self.b = original_r, original_g, original_b
+                    self.update_leds()
+                    time.sleep(0.01)  # Small delay to prevent high CPU usage
+                    self.animation_active.set()
+                    break
 
         # Ensure the LED is left in the original state, in case the loop exited early
         self.r, self.g, self.b = original_r, original_g, original_b
@@ -206,16 +204,15 @@ class RGBLEDController:
                 self.set_lights(self.blue_pin, scaled_blue)
                 time.sleep(self.breath_speed)
 
-            if self.breath_count > 1:
+            if self.breath_count >= 1:
                 self.breath_count -= 1
-            if self.breath_count == 1:
-                self.breath_count -= 1
-            if self.breath_count == 0:
-                self.r, self.g, self.b = original_r, original_g, original_b
-                self.update_leds()
-                time.sleep(0.01)
-                self.animation_active.set()
-                break  # Exit after one cycle if breath_count is set to 1
+            else:
+                if self.breath_count == 0:
+                    self.r, self.g, self.b = original_r, original_g, original_b
+                    self.update_leds()
+                    time.sleep(0.01)
+                    self.animation_active.set()
+                    break  # Exit after one cycle if breath_count is set to 1
 
         # This part is reached when self.breath_active is no longer 1
         self.r, self.g, self.b = original_r, original_g, original_b
