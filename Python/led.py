@@ -71,7 +71,7 @@ class RGBLEDController:
         if not self.animation_queue.full():
             self.animation_queue.put(animation_type)
             if self.current_animation is None or not self.current_animation.is_alive():
-                self.start_next_animation()
+                self.activate_loop()
         else:
             print("Animation queue is full. Please wait or interrupt current animation.")
 
@@ -108,7 +108,7 @@ class RGBLEDController:
                 self.animation_active.set()  # Signal to the animation methods to stop
                 self.current_animation.join()  # Wait for the animation to stop
                 self.animation_active.clear()
-            self.start_next_animation()
+            self.activate_loop()
 
     def set_fade(self):
         self.deactivate_loop()
