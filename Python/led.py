@@ -100,7 +100,9 @@ class RGBLEDController:
                 self.current_animation.start()
 
     def interrupt_current_animation(self):
-        self.animation_active.clear()
+        self.blink_active = False
+        self.breath_active = False
+        self.fade_active = False
 
     def set_fade(self):
         self.deactivate_loop()
