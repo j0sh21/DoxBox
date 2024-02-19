@@ -106,7 +106,7 @@ class RGBLEDController:
                 self.animation_queue.get()
             if self.current_animation and self.current_animation.is_alive():
                 self.animation_active.set()  # Signal to the animation methods to stop
-                self.current_animation.join()  # Wait for the animation to stop
+                #self.current_animation.join()  # Wait for the animation to stop
                 self.animation_active.clear()
             self.activate_loop()
 
