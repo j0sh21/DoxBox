@@ -45,8 +45,8 @@ class RGBLEDController:
     def set_blink_count(self, blink):
         if blink > 1:
             self.deactivate_loop()
-            loop_type = "blink"
-            self.blink_count = int(blink)
+            loop_type = "blinkcount"
+            self.blink_count = int(blink)+1
             self.set_loop(loop_type)
         else:
             self.deactivate_loop()
@@ -56,8 +56,8 @@ class RGBLEDController:
     def set_breath_count(self, breath):
         if breath > 1:
             self.deactivate_loop()
-            loop_type = "breath"
-            self.breath_count = int(breath)
+            loop_type = "breathcount"
+            self.breath_count = int(breath)+1
             self.set_loop(loop_type)
         else:
             self.deactivate_loop()
@@ -83,7 +83,7 @@ class RGBLEDController:
         with self.animation_lock:
             if not self.animation_queue.empty() and (self.current_animation is None or not self.current_animation.is_alive()):
                 animation_type = self.animation_queue.get()
-                if animation_type == "breath":
+                if animation_type in("breath", "breathcount"):
                     print("Activating breath...")
                     self.breath_active = 1
                     self.loop_type = animation_type
@@ -93,7 +93,7 @@ class RGBLEDController:
                     self.fade_active = 1
                     self.loop_type = animation_type
                     self.current_animation = threading.Thread(target=self.fade_led)
-                elif animation_type == "blink":
+                elif animation_type in("blink", "blinkcount"):
                     print("Activating blink...")
                     self.blink_active = 1
                     self.loop_type = animation_type
@@ -167,8 +167,9 @@ class RGBLEDController:
             self.r, self.g, self.b = original_r, original_g, original_b
             self.update_leds()
             time.sleep(self.blink_ontime)  # LED is on for 'on_time' seconds
+
             self.blink_count -= 1
-            if self.blink_count < 2:
+            if self.blink_count < 2 and self.loop_type == "blinkcount":
 
                 # Turn off the LED
                 self.r, self.g, self.b = 0, 0, 0
@@ -212,7 +213,7 @@ class RGBLEDController:
                 time.sleep(self.breath_speed)
 
             self.breath_count -= 1
-            if self.breath_count < 2:
+            if self.breath_count < 2 and self.loop_type== "breathcount":
 
                 for step in range(steps):
                     scale = (math.sin(step / steps * math.pi) * (max_scale - min_scale)) + min_scale
