@@ -169,7 +169,7 @@ class RGBLEDController:
             time.sleep(self.blink_ontime)  # LED is on for 'on_time' seconds
 
             self.blink_count -= 1
-            if self.blink_count < 2 and self.loop_type == "blinkcount":
+            if self.blink_count < 3 and self.loop_type == "blinkcount":
 
                 # Turn off the LED
                 self.r, self.g, self.b = 0, 0, 0
@@ -182,8 +182,6 @@ class RGBLEDController:
                 time.sleep(self.blink_ontime)  # LED is on for 'on_time' seconds
 
                 # This part is reached when blinkt count is 0
-                self.r, self.g, self.b = original_r, original_g, original_b
-                self.update_leds()
                 time.sleep(0.01)  # Small delay to prevent high CPU usage
                 self.animation_active.set()
                 break
@@ -214,7 +212,7 @@ class RGBLEDController:
                 time.sleep(self.breath_speed)
 
             self.breath_count -= 1
-            if self.breath_count < 2 and self.loop_type== "breathcount":
+            if self.breath_count < 4 and self.loop_type== "breathcount":
 
                 for step in range(steps):
                     scale = (math.sin(step / steps * math.pi) * (max_scale - min_scale)) + min_scale
