@@ -108,7 +108,6 @@ class RGBLEDController:
                 self.animation_active.set()  # Signal to the animation methods to stop
                 #self.current_animation.join()  # Wait for the animation to stop
                 self.animation_active.clear()
-            self.activate_loop()
 
     def set_fade(self):
         self.deactivate_loop()
