@@ -167,17 +167,25 @@ class RGBLEDController:
             self.r, self.g, self.b = original_r, original_g, original_b
             self.update_leds()
             time.sleep(self.blink_ontime)  # LED is on for 'on_time' seconds
+            self.blink_count -= 1
+            if self.blink_count < 1:
 
-            if self.blink_count >= 1:
+                # Turn off the LED
+                self.r, self.g, self.b = 0, 0, 0
+                self.update_leds()
+                time.sleep(self.blink_offtime)  # LED is off for 'off_time' seconds
+
+                # Restore the original LED state
+                self.r, self.g, self.b = original_r, original_g, original_b
+                self.update_leds()
+                time.sleep(self.blink_ontime)  # LED is on for 'on_time' seconds
                 self.blink_count -= 1
-            else:
-                if self.blink_count == 0:
-                    # This part is reached when self.blink_active is no longer 1
-                    self.r, self.g, self.b = original_r, original_g, original_b
-                    self.update_leds()
-                    time.sleep(0.01)  # Small delay to prevent high CPU usage
-                    self.animation_active.set()
-                    break
+                # This part is reached when blinkt count is 0
+                self.r, self.g, self.b = original_r, original_g, original_b
+                self.update_leds()
+                time.sleep(0.01)  # Small delay to prevent high CPU usage
+                self.animation_active.set()
+                break
 
         # Ensure the LED is left in the original state, in case the loop exited early
         self.r, self.g, self.b = original_r, original_g, original_b
@@ -204,15 +212,27 @@ class RGBLEDController:
                 self.set_lights(self.blue_pin, scaled_blue)
                 time.sleep(self.breath_speed)
 
-            if self.breath_count >= 1:
+            self.breath_count -= 1
+            if self.breath_count < 1:
+                steps = config.BREATH_STEPS  # Number of steps in one breath cycle
+                min_scale = self.breath_lower_brightness
+                max_scale = self.breath_upper_brightness
+
+                for step in range(steps):
+                    scale = (math.sin(step / steps * math.pi) * (max_scale - min_scale)) + min_scale
+                    scaled_red = int(original_r * scale)
+                    scaled_green = int(original_g * scale)
+                    scaled_blue = int(original_b * scale)
+                    self.set_lights(self.red_pin, scaled_red)
+                    self.set_lights(self.green_pin, scaled_green)
+                    self.set_lights(self.blue_pin, scaled_blue)
+                    time.sleep(self.breath_speed)
                 self.breath_count -= 1
-            else:
-                if self.breath_count == 0:
-                    self.r, self.g, self.b = original_r, original_g, original_b
-                    self.update_leds()
-                    time.sleep(0.01)
-                    self.animation_active.set()
-                    break  # Exit after one cycle if breath_count is set to 1
+                self.r, self.g, self.b = original_r, original_g, original_b
+                self.update_leds()
+                time.sleep(0.01)
+                self.animation_active.set()
+                break  # Exit after one cycle if breath_count is set to 1
 
         # This part is reached when self.breath_active is no longer 1
         self.r, self.g, self.b = original_r, original_g, original_b
