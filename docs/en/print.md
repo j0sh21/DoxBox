@@ -2,29 +2,50 @@
 
 ## Overview
 
-The `print.py` script is an in-progress module designed for printing images through printers configured on the CUPS (Common UNIX Printing System) server. It leverages the `cups` Python module to interface with CUPS, providing functionalities to select printers and manage print jobs, specifically tailored for image printing.
+The `DoxBoxPrintManager` (`print.py`) is an essential component of the DoxBox system, designed to seamlessly handle the printing of images immediately after they are captured. This Python script integrates with CUPS (Common UNIX Printing System) to manage print jobs and ensures that each image is printed successfully while providing real-time feedback on the job status. To ensure confidentiality and data security, the image is immediately deleted after being sent to the printer.
+
+## Features
+
+- **Direct Integration with CUPS**: Leverages the CUPS server to submit and manage print jobs, ensuring broad compatibility with various printers.
+- **Real-Time Print Job Monitoring**: Tracks the status of each print job in real time, providing updates on completion, errors, or cancellations.
+- **Error Handling and Reporting**: Comprehensive error handling mechanisms report issues back to the application, ensuring smooth operation.
+- **Modular Design**: The script is structured into clear, concise functions, making it easy to understand, maintain, and extend.
+- **Configurable**: Utilizes an external configuration module (`config.py`) for easy adjustments without altering the core script.
+- **Debug Mode**: Includes a debug mode for testing and troubleshooting without sending actual print jobs to the printer.
+
+## Components
+
+- `send_message_to_app(message)`: Sends status messages or error codes to the main Photobox application for logging or user notification.
+- `check_print_job_status(conn, job_id)`: Monitors the status of submitted print jobs, ensuring they complete successfully or handling errors as needed.
+- `print_image(printer_name, image_path)`: Submits an image file to the specified printer and initiates the monitoring process.
+- `copy_file(source_path, destination_path)`: Handles the secure transfer of image files from the capture location to the print queue.
+- `move_image()`: Orchestrates the process of preparing images for printing, including file transfer and deletion post-printing.
+
+## How It Works
+
+1. **Image Capture**: Once an image is captured by the Photobox, it is stored in a predetermined directory.
+2. **File Preparation**: The `move_image` function scans the directory for new images, preparing them for printing.
+3. **Printing**: Images are sent to the `print_image` function, where they are submitted as print jobs to the configured printer.
+4. **Monitoring**: Each print job's status is monitored in real-time by `check_print_job_status`, providing feedback on the job's progress and handling any issues that arise.
+5. **Completion**: Upon successful printing, the image file is deleted, and the system is ready for the next capture.
+
+## Configuration
+
+The script relies on a separate `config.py` file for configuration settings, such as the CUPS server details, printer name, and directories for image storage and printing. This allows for easy adjustments to different environments or printers.
+
+## Debugging and Logging
+
+Debug mode can be activated for testing purposes, simulating the printing process without sending jobs to the printer. Console logging provides real-time feedback on the script's operation, and integrating a more sophisticated logging system is recommended for production use.
 
 ## Dependencies
 
-- **External Modules**: `cups` (requires the CUPS system and its Python bindings to be installed and configured on the host system).
-
-## Key Functionality
-
-### Print Image
-
-The core functionality of the script is encapsulated in the `print_image` function, which performs the following steps:
-
-1. Establishes a connection to the CUPS server.
-2. Retrieves and lists available printers, offering a basic check to ensure the specified printer is accessible.
-3. Submits an image file for printing on the specified printer, generating a print job ID for reference.
-
-### Error Handling
-
-The function includes minimal error handling to notify the user if the specified printer is not found, listing all available printers as part of the error message to aid in troubleshooting.
+- CUPS
+- Python-CUPS (for interacting with the CUPS server from Python)
+- Standard Python libraries: `datetime`, `shutil`, `socket`, `os`, `time`
 
 ## Example Usage
 
-The script contains an example usage section that demonstrates how to call the `print_image` function with hardcoded values for the printer name and image path. This example serves as a basic guide for integrating the printing functionality into broader application workflows.
+Example usage that demonstrates how to call the `print_image` function with hardcoded values for the printer name and image path. This example serves as a basic guide for integrating the printing functionality into broader application workflows.
 
 ```python
 printer_name = "Your_Printer_Name_Here"
@@ -35,19 +56,12 @@ image_path = os.path.join(image_directory, image_file)
 print_image(printer_name, image_path)
 ```
 
-## Considerations for Further Development
+## Getting Started
 
-Given the script's in-progress status, several areas could be considered for further development:
-
-- **Enhanced Error Handling:** Implement more robust error handling and feedback mechanisms to manage common printing issues, such as printer connectivity, file format compatibility, and print job status monitoring.
-- **Configuration and Flexibility:** Extend the function to include more print job options, such as print quality, paper size, and orientation, allowing for greater customization based on user needs or specific application requirements.
-- **Integration with Application Workflows:** Consider how the script will integrate with other application components, especially in contexts requiring batch printing, print job scheduling, or user interaction for printer selection.
-
-## Installation and Configuration
-
-Ensure that the **CUPS system** is installed and properly configured on your host system, including the installation of necessary printer drivers. The cups Python module should also be installed (**pip install pycups**).
-
-
+1. Ensure CUPS is installed and configured on your system.
+2. Install Python-CUPS using pip: `pip install pycups`.
+3. Adjust the `config.py` file to match your environment.
+4. Run the script after an image is captured to initiate the printing process.
 
 ### Installing Required Dependencies on eg. Raspberry Pi:
 
