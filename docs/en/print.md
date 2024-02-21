@@ -15,7 +15,7 @@ The `DoxBoxPrintManager` (`print.py`) is an essential component of the DoxBox sy
 
 ## Components
 
-- `send_message_to_app(message)`: Sends status messages or error codes to the main Photobox application for logging or user notification.
+- `send_message_to_app(message)`: Sends status messages or error codes to the main DoxBox application `app.py` for logging or user notification.
 - `check_print_job_status(conn, job_id)`: Monitors the status of submitted print jobs, ensuring they complete successfully or handling errors as needed.
 - `print_image(printer_name, image_path)`: Submits an image file to the specified printer and initiates the monitoring process.
 - `copy_file(source_path, destination_path)`: Handles the secure transfer of image files from the capture location to the print queue.
@@ -23,7 +23,7 @@ The `DoxBoxPrintManager` (`print.py`) is an essential component of the DoxBox sy
 
 ## How It Works
 
-1. **Image Capture**: Once an image is captured by the Photobox, it is stored in a predetermined directory.
+1. **Image Capture**: Once an image is captured by the DoxBox, it is stored in a predetermined directory.
 2. **File Preparation**: The `move_image` function scans the directory for new images, preparing them for printing.
 3. **Printing**: Images are sent to the `print_image` function, where they are submitted as print jobs to the configured printer.
 4. **Monitoring**: Each print job's status is monitored in real-time by `check_print_job_status`, providing feedback on the job's progress and handling any issues that arise.
@@ -35,7 +35,7 @@ The script relies on a separate `config.py` file for configuration settings, suc
 
 ## Debugging and Logging
 
-Debug mode can be activated for testing purposes, simulating the printing process without sending jobs to the printer. Console logging provides real-time feedback on the script's operation, and integrating a more sophisticated logging system is recommended for production use.
+Debug mode can be activated for testing purposes, simulating the printing process without sending jobs to the printer. Console logging provides real-time feedback on the script's operation.
 
 ## Dependencies
 
@@ -93,5 +93,3 @@ Upgrade pip, setuptools, and wheel (If Needed): In some cases, you may need to e
     pip3 install --upgrade pip setuptools wheel
 
 After upgrading these packages, attempt to install pycups again.
-
-If you encounter any issues during the installation process or if you have error messages, please provide them for further assistance.

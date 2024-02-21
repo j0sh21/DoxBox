@@ -1,5 +1,6 @@
+
 # Documentation for app.py
-# Overview 
+## Overview 
 
 `app.py` serves as a pivotal module in the application, orchestrating the user interface and facilitating user interactions. This module leverages the powerful PyQt5 framework to build a robust and responsive graphical user interface (GUI), making it a central piece for applications requiring user interaction through a visual interface.
 
@@ -11,8 +12,16 @@ The primary purpose of `app.py` is to define the structure and behavior of the a
 
 Within `app.py`, you'll find definitions for key classes and functions that collectively build up the application's front-end. This includes:
 
-- **AppState**: A class designed for managing the application's state, allowing for dynamic updates and interactions within the GUI.
+- **AppState**: A class designed for managing the application's state, allowing for dynamic updates and interactions within the GUI. It uses a `stateChanged` signal to notify other parts of the application when the state changes, promoting a reactive design where the UI can adjust based on the current application state.
 - **VendingMachineDisplay**: A custom `QWidget` subclass that acts as the main container for the application's UI elements, organizing them into a coherent and functional layout.
+
+## State Handling
+
+The `AppState` class is central to the application's state management. It holds a `state` variable that reflects the current condition or mode of the application. Changes to this state are propagated through the `stateChanged` signal, enabling other components, especially the UI, to react and update accordingly. This approach decouples the state management from the UI logic, enhancing modularity and maintainability.
+
+## Socket Programming and Server-Client Communication
+
+The application features a server component that listens for incoming connections using Python's `socket` library. The `start_server` function initializes this server, which awaits messages from clients. Upon receiving a message, the `handle_client_connection` function processes it and updates the `AppState`, leveraging the state management system to reflect changes in the UI dynamically. This server-client setup allows for remote or automated control over the application, ideal for kiosk-like or vending machine scenarios.
 
 ## Key Features
 
@@ -20,20 +29,80 @@ Within `app.py`, you'll find definitions for key classes and functions that coll
 - **State-Driven UI**: The application's UI dynamically responds to changes in application state, providing a reactive user experience that updates in real time to reflect the current context and data.
 - **Integration with PyQt5**: By utilizing PyQt5, `app.py` leverages a comprehensive set of tools and widgets for creating professional-grade GUIs, including support for multimedia components, event handling, and custom widget styling.
 
+## Dependencies
+
+- **Qt Widgets**: Inherits from `QWidget` and may use other widgets such as `QLabel`, `QVBoxLayout`, `QHBoxLayout` from PyQt5.QtWidgets.
+- **Qt Multimedia**: Potentially uses `QCamera`, `QCameraViewfinder` from PyQt5.QtMultimedia and `QCameraViewfinder` from PyQt5.QtMultimediaWidgets for camera integration.
+- **Qt Core**: Utilizes classes like `QPixmap`, `QMovie` from PyQt5.QtGui, and `Qt`, `QSize`, `QRect`, `QPoint` from PyQt5.QtCore for core GUI functionalities.
+
+## Multimedia Handling and GIF Animations
+
+The `VendingMachineDisplay` class incorporates advanced multimedia handling capabilities, notably for playing and managing GIF animations. This functionality enhances the application's visual appeal and user engagement, especially in interactive kiosks or vending machine interfaces.
+
+### Playing GIF Animations
+
+The application can display GIF animations as part of its UI, providing dynamic visual content. This is achieved through the `QMovie` class from PyQt5, which is used to load and play GIF files. The `VendingMachineDisplay` class includes methods to start playing a GIF, calculate its duration, and ensure it fits within the designated UI elements, offering a seamless multimedia experience.
+
+### Key Methods
+
+- **send_msg_to_LED(host, port, command)**: This method allows the application to communicate with external devices, such as an LED strip attached, over a network. It establishes a socket connection to the specified host and port, then sends a command, which could be used to display messages or control the LED strip.
+
+- **calculateDuration()**: Calculates the total duration of a GIF animation by iterating through its frames. This information can be used to synchronize the GIF playback with other events in the application, ensuring a coherent user experience.
+
+- **handle_client_connection(client_socket, appState)**: Handles incoming connections from clients. This function is a critical part of the server-client architecture, reading messages sent by clients, updating the application state based on these messages, and ensuring the UI reflects these changes.
+
+- **start_server(appState)**: Initializes and starts the server that listens for incoming connections. It binds to a specified port and waits for clients to connect, creating a new thread to handle each connection, thus allowing the application to continue operating smoothly while managing client requests.
+
+
+## Messages Handled by app.py
+
+The application uses numeric strings as messages to represent different states and actions within the application. Each message triggers specific behaviors, correlating with various functionalities or visual feedback through the GUI. Below is a table summarizing the numeric messages and their corresponding effects within the application:
+
+**State Messages**:
+
+| Message | Description                                                                   |
+|--------|-------------------------------------------------------------------------------|
+| "0"    | represents an initial or welcome state.                                       |
+| "1"    | indicate a payment or transaction completed.                                  |
+| "2"    | Start the countdown, preparation phase following a payment.                   |
+| "3"    | signifies the completion of a countdown, moving towards capturing the photo.  |
+| "4"    | Photo captured successfully, start to print now.                              |
+| "5"    | Printing finished: "Thank You" or completion state, the end of a transaction. |
+| "204"     | Image deleted sucessfully after print.                                     |
+
+
+**Error Messages**:
+
+| Message | Description                                                                   |
+|---------|-------------------------------------------------------------------------------|
+| "100"   | General Error in app.py.                                                      |
+| "101"   | Camera found no focus                                                         |
+| "102"   | no Camera found                                                               |
+| "103"   | file not found                                                                |
+| "104"   | permission denied                                                             |
+| "110"   | general error in print.py                                                     |
+| "112"   | printer not found                                                             |
+| "113"   | file not found                                                                |
+| "114"   | permission denied                                                             |
+| "115"   | error copy file                                                               |
+| "116"   | Print job stopped or canceled.                                                |
+| "119"   | error while creating print job                                                |
+| "120"   | general error in img_capture.py                                               |
+| "130"   | general error in led.py                                                       |
+| "140"   | general error in switch.py                                                    |
+
+
+These messages are processed by the application to update the `AppState` and, by extension, the UI and any external displays connected to the application. The specific actions taken in response to each message can vary depending on the current application context and the intended workflow.
+
 ## Usage
 
 Developers working with `app.py` can expect to interact with high-level abstractions for UI components, straightforward mechanisms for state management, and event-driven programming patterns. This module is typically invoked as part of the application's startup process, initializing the GUI and binding it to the underlying logic and data models.
-
 
 # AppState Class Documentation
 
 ## Overview
 
 The `AppState` class, defined within `app.py`, is a fundamental component designed for managing the application's state and enabling inter-component communication in a Qt-based GUI application. It inherits from `QObject` to utilize Qt's signal-slot mechanism, making it suitable for applications that require dynamic responses to state changes.
-
-## Dependencies
-
-- **Qt Modules**: `QObject`, `pyqtSignal` from PyQt5.QtCore
 
 ## Features
 
@@ -70,10 +139,6 @@ app_state.stateChanged.connect(on_state_changed)
 app_state.state = "1"  # This will emit the stateChanged signal and invoke on_state_changed
 ```
 
-### Considerations
-
-The AppState class is designed to be integrated into a Qt-based application. Ensure that the Qt event loop is running to enable signal-slot communication.
-The class currently manages a simple string-based state. 
 # VendingMachineDisplay Class Documentation
 
 ## Overview
@@ -115,7 +180,3 @@ vending_machine_display = VendingMachineDisplay(app_state)
 vending_machine_display.show()
 sys.exit(app.exec_())
 ```
-
-### Considerations
-
-Ensure that the AppState object is properly initialized and passed to the VendingMachineDisplay constructor to enable state-based functionality.

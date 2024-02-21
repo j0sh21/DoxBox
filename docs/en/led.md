@@ -1,4 +1,3 @@
-
 # Documentation for led.py
 
 Welcome to the DoxBox LED Controller module! This document is designed to help you understand and integrate the LED lighting effects into your DoxBox photo booth, enhancing the user experience during payment, photo-taking, and other interactions.
@@ -39,7 +38,7 @@ Initializes the controller with the GPIO pins connected to your RGB LEDs. `steps
 #### Managing Animations
 
 - `set_loop(self, animation_type)`: Chooses the type of animation (e.g., "breath", "blink", "fade").
-- `(self)`: Starts the selected animation loop.
+- `activate_loop()`: Starts the selected animation loop. Caution: This function is already called in set_loop()
 - `interrupt_current_animation(self)`: Stops any ongoing animation, useful for immediate user feedback.
 
 #### Direct LED Control
@@ -50,12 +49,33 @@ Initializes the controller with the GPIO pins connected to your RGB LEDs. `steps
 
 ### ServerThread
 
-For advanced setups, the `ServerThread` class allows the DoxBox to receive external commands (e.g., from app.py) to change LED effects dynamically.
+For advanced setups, the `ServerThread` class allows the DoxBox LED Controller to receive external commands (e.g., from `app.py`) to change LED effects dynamically.
 
 #### Setting Up the Server
 
 - `__init__(self, host, port, led_controller)`: Prepares the server with network details and binds it to the RGBLEDController.
 - `run(self)`: Launches the server, making the DoxBox responsive to external LED control commands.
+## Message Handling
+
+
+**`led.py` takes specific actions if a command is sent via message:**
+
+| Command                           | Action                                                                              |
+|-----------------------------------|-------------------------------------------------------------------------------------|
+| "color 0 255 0"                   | sets color to blue                                                                  |
+| "brightness 200"                  | sets brightness to 200. Range 0 - 255                                               |
+| "fadespeed 0.8"                   | set fade speed to 0.8                                                               |
+| "fade 1"                          | start fade                                                                          |
+| "blinkspeed 0.5 0.5"              | Setting on and off time in seconds for blink effect                                 |
+| "blink 1"                         | start blinkt unlimited times                                                        |
+| "blink 10"                        | start blink 10 times                                                                |
+| "breathbrightness 0.2 0.8"        | Setting the brightness range for the breath effect to 20% to 80% brightness         |
+| "breathspeed 0.5"                 | Setting the breathspeed to 0.5|
+| "fade 0", "breath 0" or "blink 0" | stop the given animation loop                                                       |
+| "breath 1"                        | start breath unlimited                                                              |
+| "breath 5"                        | start breath 5 times                                                                |
+| "interrupt"                       | interrupt current animation loop                                                    |
+| "fade 0", "breath 0" or "blink 0" | stop the given animation loop                                                       |
 
 ## Integration Example
 

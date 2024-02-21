@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `img_capture.py` script is an integral component of the application designed for managing image capture workflows. It interfaces with digital cameras via the gphoto2 command-line utility, performing tasks such as capturing images, downloading them to a designated directory, and managing file naming conventions. Additionally, it incorporates network communication to relay status updates or errors to other parts of the application.
+The `img_capture.py` script is an integral component of the DoxBox application designed for managing image capture workflows. It interfaces with digital cameras via the gphoto2 command-line utility, performing tasks such as capturing images, downloading them to a designated directory, and managing file naming conventions. Additionally, it incorporates network communication to relay status updates or errors to other parts of the application.
 
 ## Dependencies
 
@@ -33,7 +33,7 @@ The `img_capture.py` script is an integral component of the application designed
 
 ### `send_message_to_app(message)`
 
-Sends status messages or error codes to another component of the application, enhancing error handling and user feedback mechanisms.
+Sends status messages or error codes to another component of the application `app.py`, enhancing error handling and user feedback mechanisms.
 
 ### `kill_process()`
 
@@ -60,12 +60,18 @@ The script is designed to be run as part of a larger application workflow, typic
 1. Process Termination: Ensure no conflicting processes are accessing the camera.
 2. Directory Preparation: Create or validate the existence of the output directory for storing images.
 3. Image Capture: Trigger image capture and handle the camera interaction.
-4. File Management: Download images to the output directory and rename them according to the application's requirements.
+4. File Management: Download images to the output directory and rename them according to the application's requirements. Delete alle Files from the camera.
 
 ## Considerations
 
 - Ensure gphoto2 is installed and properly configured on the system where the application is running.
 - The script should have appropriate permissions to interact with the camera, file system, and network sockets.
+- Ensure that no other gphoto2 process is blocking the camera to kill the process use the commands:
+```bash
+ps -A | grep gphoto
+```
+- Kill processes like `gvfs-gphoto2-vo` etc.
+
 
 ## Installing gphoto2
 
@@ -86,4 +92,4 @@ This command will automatically download and install gphoto2, making it availabl
 
 With gphoto2 successfully installed, your Raspberry Pi or Debian-based system will be capable of communicating with and controlling DSLR cameras for image capturing functionalities.
 
-For more detailed information on gphoto2 and its extensive capabilities, you can visit the official gPhoto website.
+For more detailed information on gphoto2 and its extensive capabilities, you can [visit the official gPhoto website](http://www.gphoto.org/doc/remote/).

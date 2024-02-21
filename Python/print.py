@@ -38,7 +38,7 @@ def check_print_job_status(conn, job_id):
                 break
             elif 'job-stopped' in job['job-state-reasons'] or 'job-canceled' in job['job-state-reasons']:
                 print(f"Print job {job_id} stopped or canceled.")
-                send_message_to_app("140")
+                send_message_to_app("116")
                 break
             elif 'job-error' in job['job-state-reasons']:
                 print(f"Print job {job_id} encountered an error.")

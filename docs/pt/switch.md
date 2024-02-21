@@ -2,7 +2,7 @@
 
 ## Visão Geral
 
-O módulo `switch.py` é um componente crítico da aplicação, responsável por monitorar dados de API externa, detectar mudanças significativas e comunicar-se com outras partes da aplicação para acionar ações específicas com base nessas mudanças. Ele usa requisições de rede, threading e programação de soquete para atingir seus objetivos.
+O módulo `switch.py` é um componente crítico da aplicação, responsável por monitorar dados de LNbits API externa, detectar mudanças significativas e comunicar-se com outras partes da DoxBox para acionar ações específicas com base nessas mudanças. Ele usa requisições de rede, threading e programação de soquete para atingir seus objetivos.
 
 ## Dependências
 
@@ -23,7 +23,7 @@ O módulo depende de várias configurações definidas no módulo `config`, incl
 
 ### `send_message_to_app(message)`
 
-Envia uma mensagem para outro componente da aplicação (possivelmente `app.py`) usando programação de soquete. Esta função encapsula a lógica de comunicação em rede, incluindo o tratamento de erros.
+Envia uma mensagem para outro componente da aplicação (`app.py`) usando programação de soquete. Esta função encapsula a lógica de comunicação em rede, incluindo o tratamento de erros.
 
 ### `main_loop()`
 
@@ -45,4 +45,4 @@ A função principal que é executada em um loop contínuo, realizando as seguin
 Para executar o `switch.py`, execute o seguinte comando em um terminal:
 
 ```bash
-python switch.py
+python3 switch.py
