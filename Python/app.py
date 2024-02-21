@@ -138,7 +138,7 @@ class VendingMachineDisplay(QWidget):
         self.backgroundLabel.setAlignment(Qt.AlignCenter)
         self.backgroundLabel.setAttribute(Qt.WA_TranslucentBackground)
         self.backgroundLabel.setGeometry(0, 0, 1600, 720)
-        self.backgroundLabel.raise_()
+        self.backgroundLabel.lower()
 
         # GIF Label setup
         self.gifLabel = QLabel(self)
@@ -146,19 +146,19 @@ class VendingMachineDisplay(QWidget):
         self.gifLabel.setGeometry(0, (720 - 600) // 2, 800, 600)  # Positioned on the left half
         self.gifLabel.hide()
 
-        # Picture Label setup
-        self.pictureLabel = QLabel(self)
-        self.pictureLabel.setAlignment(Qt.AlignCenter)
-        picturePixmap = QPixmap(rf"../images/gifs/0_welcome/text_welcome.png")  # Replace with your actual image path
-        self.pictureLabel.setPixmap(picturePixmap.scaled(534, 532, Qt.KeepAspectRatio))
-        self.pictureLabel.setGeometry(605, 93, 530, 530)  # Positioned on the right half
+        # Picture Label setup for the right half
+        self.rightPictureLabel = QLabel(self)  # Renamed to differentiate from the other picture label
+        self.rightPictureLabel.setAlignment(Qt.AlignCenter)
+        rightPicturePixmap = QPixmap(rf"../images/gifs/0_welcome/text_welcome.png")  # Replace with your actual image path
+        self.rightPictureLabel.setPixmap(rightPicturePixmap.scaled(532, 532, Qt.KeepAspectRatio))
+        self.rightPictureLabel.setGeometry(605, 93, 530, 530)  # Positioned on the right half
 
-        # Picture Label setup
-        self.pictureLabel = QLabel(self)
-        self.pictureLabel.setAlignment(Qt.AlignCenter)
-        picturePixmap = QPixmap(rf"../images/gifs/0_welcome/text_welcome.png")  # Replace with your actual image path
-        self.pictureLabel.setPixmap(picturePixmap.scaled(534, 532, Qt.KeepAspectRatio))
-        self.pictureLabel.setGeometry(90, 93, 530, 530)
+        # Picture Label setup for the left half
+        self.leftPictureLabel = QLabel(self)  # Renamed to differentiate from the other picture label
+        self.leftPictureLabel.setAlignment(Qt.AlignCenter)
+        leftPicturePixmap = QPixmap(rf"../images/gifs/0_welcome/text_welcome.png")  # Replace with your actual image path
+        self.leftPictureLabel.setPixmap(leftPicturePixmap.scaled(532, 532, Qt.KeepAspectRatio))
+        self.leftPictureLabel.setGeometry(90, 93, 532, 532)  # Positioned on the left half
 
         self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)
 
