@@ -1,8 +1,6 @@
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout
-from PyQt5.QtMultimedia import QCamera, QCameraInfo, QCameraViewfinderSettings
-from PyQt5.QtMultimediaWidgets import QCameraViewfinder
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
 from PyQt5.QtGui import QPixmap, QMovie
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QSize, QRect, QPoint
+from PyQt5.QtCore import Qt, pyqtSignal, QObject, QSize, QPoint
 import subprocess
 import sys
 import threading
@@ -121,7 +119,7 @@ class VendingMachineDisplay(QWidget):
     def playGIF(self):
         self.movie.setFileName(self.gif_path)
         self.gifLabel.setMovie(self.movie)
-        self.movie.setScaledSize(QSize(500, 500))
+        self.gifLabel.setScaledContents(True)
         self.movie.start()
 
 
@@ -129,7 +127,10 @@ class VendingMachineDisplay(QWidget):
         # Set the layout
         self.layout = QVBoxLayout(self)
         self.setLayout(self.layout)
-               
+
+        display_width, display_height = 1600, 720
+        square_size = min(display_height, 600, display_width // 2)  # Calculate square size
+
         # Background setup
         self.backgroundLabel = QLabel(self)
         pixmap = QPixmap(rf"{config.PATH_TO_FRAME}")
@@ -139,36 +140,21 @@ class VendingMachineDisplay(QWidget):
         self.backgroundLabel.setAttribute(Qt.WA_TranslucentBackground)
         self.backgroundLabel.setGeometry(0, 0, 1600, 720)
         self.backgroundLabel.raise_()  # Bringe das Hintergrundbild nach vorne
-        
-        # Webcam Viewfinder setup
-        self.viewfinder = QCameraViewfinder(self)
-        viewfinderX = int((1600 - 1280) / 2)
-        viewfinderY = int((720 - 720) / 2)
-        self.setStyleSheet("""
-            QCameraViewfinder {
-                border-radius: 90px;
-                background-color: transparent;
-            }
-        """)
-        self.viewfinder.setGeometry(80, 70, int(1280*.79), int(720*.79))  # Korrektur der Größe
 
-        # Initialize and start the camera
-        self.camera = QCamera(QCameraInfo.defaultCamera())
-        viewfinder_settings = QCameraViewfinderSettings()
-        viewfinder_settings.setResolution(1280, 720)
-        self.camera.setViewfinderSettings(viewfinder_settings)
-        self.camera.setViewfinder(self.viewfinder)
-        self.camera.start()
-        
-        # GIF Label setup within viewfinder
-        self.gifLabel = QLabel(self.viewfinder)
+        # GIF Label setup
+        self.gifLabel = QLabel(self)
         self.gifLabel.setAlignment(Qt.AlignCenter)
-        gifLabelX = int((1280 - 500) / 2)  # Center the gif label within the viewfinder
-        gifLabelY = int((720 - 500) / 2) 
-        self.gifLabel.setGeometry(gifLabelX, gifLabelY, 500, 500)
+        self.gifLabel.setGeometry(0, (720 - 600) // 2, 800, 600)  # Positioned on the left half
         self.gifLabel.hide()
 
-        # Setze Transparenz und Fenstereigenschaften auf das Hauptfenster (TODO:Funktioniert nicht wie gewünscht, wir nutzen den scharzen frame als "rahmen".)
+        # Picture Label setup
+        self.pictureLabel = QLabel(self)
+        self.pictureLabel.setAlignment(Qt.AlignCenter)
+        picturePixmap = QPixmap(rf"../images/gifs/0_welcome/text_welcome.png")  # Replace with your actual image path
+        self.pictureLabel.setPixmap(picturePixmap.scaled(800, 600, Qt.KeepAspectRatio))
+        self.pictureLabel.setGeometry(800, (720 - 600) // 2, 800, 600)  # Positioned on the right half
+
+        # Transparency and window properties
         self.setAttribute(Qt.WA_TranslucentBackground)  # Fensterhintergrund transparent machen
         self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)
 
@@ -269,7 +255,8 @@ class VendingMachineDisplay(QWidget):
 
     def updateGIF(self, state):
         self.loopCount = 0  # Reset loop count each time a new GIF is played
-        self.desiredLoops = 0 # Reset desired Loops count each time a new GIF is played
+        self.desiredLoops = 0  # Reset desired Loops count each time a new GIF is played
+
         # Map states to subfolders
         subfolder_map = {
             "0": "0_welcome",
@@ -297,10 +284,6 @@ class VendingMachineDisplay(QWidget):
                 self.gifLabel.setAlignment(Qt.AlignCenter)  # Center the content
                 # Load the GIF
                 try:
-                    # Position the gifLabel in the center of the viewfinder
-                    vfCenter = self.viewfinder.geometry().center()
-                    gifTopLeft = vfCenter - QPoint(250, 250)  # Adjust for the size of the gifLabel
-                    self.gifLabel.move(gifTopLeft)
                     self.gifLabel.show()  # Make sure the gifLabel is visible
                     self.playGIF()
                 except Exception as e:
@@ -309,6 +292,12 @@ class VendingMachineDisplay(QWidget):
                 print("No GIF files found in the specified folder.")
         except FileNotFoundError:
             print(f"The folder {gif_folder_path} does not exist.")
+
+    def updatePicture(self, imagePath):
+        pixmap = QPixmap(imagePath)
+        # Ensure the pixmap fits within the defined square size, keeping aspect ratio
+        self.pictureLabel.setPixmap(pixmap.scaled(800, 600, Qt.KeepAspectRatio))
+        self.pictureLabel.show()
 
 def handle_client_connection(client_socket, appState):
     try:
@@ -342,7 +331,6 @@ if __name__ == '__main__':
     print("Building Display...")
     ex = VendingMachineDisplay(appState)
     print("Building Display completed!")
-
     # Start the server in a separate thread
     print("Start server...")
     server_thread = threading.Thread(target=start_server, args=(appState,))
