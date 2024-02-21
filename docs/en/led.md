@@ -71,7 +71,6 @@ For advanced setups, the `ServerThread` class allows the DoxBox LED Controller t
 | "blink 10"                        | start blink 10 times                                                                |
 | "breathbrightness 0.2 0.8"        | Setting the brightness range for the breath effect to 20% to 80% brightness         |
 | "breathspeed 0.5"                 | Setting the breathspeed to 0.5|
-| "fade 0", "breath 0" or "blink 0" | stop the given animation loop                                                       |
 | "breath 1"                        | start breath unlimited                                                              |
 | "breath 5"                        | start breath 5 times                                                                |
 | "interrupt"                       | interrupt current animation loop                                                    |

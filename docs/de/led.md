@@ -66,7 +66,6 @@ Für fortgeschrittene Setups ermöglicht die Klasse `ServerThread`, dass der Dox
 | "blink 10"                        | startet Blinken 10 Mal                                                            |
 | "breathbrightness 0.2 0.8"        | Einstellung des Helligkeitsbereichs für den Atemeffekt auf 20% bis 80% Helligkeit |
 | "breathspeed 0.5"                 | Einstellung der breath Geschwindigkeit auf 0.5                 |
-| "fade 0", "breath 0" oder "blink 0" | stoppt die gegebene Animationssequenz                                             |
 | "breath 1"                        | startet Atmen unbegrenzt                                                          |
 | "breath 5"                        | startet Atmen 5 Mal                                                               |
 | "interrupt"                       | unterbricht die aktuelle Animationssequenz                                        |

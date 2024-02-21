@@ -35,9 +35,9 @@ Dieses Modul dient als Einstiegspunkt für die DoxBox, koordiniert den Start und
 Konfigurationseinstellungen, einschließlich des Debug-Modus, werden über `config.py` verwaltet. Passen Sie die Einstellungen in dieser Datei an, um das Verhalten der Anwendung zu steuern.
 
 ## Anwendung ausführen
-- Starten Sie die Anwendung, indem Sie `main.py` ausführen.
-- Das Skript initialisiert den Anwendungs- und LED-Server in separaten Threads.
-- Abhängig vom Debug-Modus, der in `config.py` eingestellt ist, startet es entweder Debugging-Tools oder das Gerätesteuerungsskript.
+1. Starten Sie die Anwendung, indem Sie `main.py` ausführen.
+2. Das Skript initialisiert den Anwendungs- und LED-Server in separaten Threads.
+3. Abhängig vom Debug-Modus, der in `config.py` eingestellt ist, startet es entweder Debugging-Tools oder das Gerätesteuerungsskript.
 
 ## Debug-Modus
 - **Level 0**: Normalbetrieb, `switch.py` wird ausgeführt.
@@ -56,9 +56,9 @@ Um neue Funktionalitäten hinzuzufügen:
 - Überprüfen Sie `config.py` auf korrekte Debug-Modus-Einstellungen.
 
 ## Merkmale
-- **Gleichzeitige Ausführung**: Nutzt Threads, um `app.py` und möglicherweise einen Mock-Prozess parallel auszuführen.
-- **Bedingtes Debugging**: Abhängig vom `DEBUG_MODE` können zusätzliche Debugging-Prozesse ausgeführt werden, um bei der Entwicklung und beim Testen zu helfen.
-- **Subprozess-Management**: Führt Schlüsselkomponenten (`app.py`, `switch.py` oder Debug-Prozesse) als Subprozesse aus, was eine isolierte und kontrollierte Ausführungsumgebung gewährleistet.
+1. **Gleichzeitige Ausführung**: Nutzt Threads, um `app.py` und möglicherweise einen Mock-Prozess parallel auszuführen.
+2. **Bedingtes Debugging**: Abhängig vom `DEBUG_MODE` können zusätzliche Debugging-Prozesse ausgeführt werden, um bei der Entwicklung und beim Testen zu helfen.
+3. **Subprozess-Management**: Führt Schlüsselkomponenten (`app.py`, `switch.py` oder Debug-Prozesse) als Subprozesse aus, was eine isolierte und kontrollierte Ausführungsumgebung gewährleistet.
 
 ## Die DoxBox starten
 

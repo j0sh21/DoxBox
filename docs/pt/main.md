@@ -33,9 +33,9 @@ Este módulo serve como ponto de entrada para o DoxBox, orquestrando a inicializ
 As configurações, incluindo o modo de depuração, são gerenciadas através de `config.py`. Ajuste as configurações neste arquivo para controlar o comportamento da aplicação.
 
 ## Executando a Aplicação
-- Inicie a aplicação executando `main.py`.
-- O script inicializa o servidor de aplicação e o servidor LED em threads separadas.
-- Dependendo do modo de depuração definido em `config.py`, ele inicia as ferramentas de depuração ou o script de controle de dispositivos.
+1. Inicie a aplicação executando `main.py`.
+2. O script inicializa o servidor de aplicação e o servidor LED em threads separadas.
+3. Dependendo do modo de depuração definido em `config.py`, ele inicia as ferramentas de depuração ou o script de controle de dispositivos.
 
 ## Modo de Depuração
 - **Nível 0**: Operação normal, `switch.py` é executado.
@@ -55,9 +55,9 @@ Para adicionar novas funcionalidades:
 
 ## Recursos
 
-- **Execução Concorrente**: Utiliza threads para executar `app.py` e potencialmente um processo simulado em paralelo.
-- **Depuração Condicional**: Dependendo do `DEBUG_MODE`, pode executar processos de depuração adicionais para auxiliar no desenvolvimento e testes.
-- **Gestão de Subprocessos**: Executa componentes chave (`app.py`, `switch.py` ou processos de depuração) como subprocessos, garantindo ambientes de execução isolados e controlados.
+1. **Execução Concorrente**: Utiliza threads para executar `app.py` e potencialmente um processo simulado em paralelo.
+2.**Depuração Condicional**: Dependendo do `DEBUG_MODE`, pode executar processos de depuração adicionais para auxiliar no desenvolvimento e testes.
+3.**Gestão de Subprocessos**: Executa componentes chave (`app.py`, `switch.py` ou processos de depuração) como subprocessos, garantindo ambientes de execução isolados e controlados.
 
 ## Executando o Script
 

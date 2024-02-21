@@ -39,9 +39,9 @@ Configuration settings, including debug mode, are managed through `config.py`. A
 
 
 ## Running the Application
-- Start the application by running `main.py`.
-- The script initializes the application server and LED server in separate threads.
-- Depending on the debug mode set in `config.py`, it either launches debugging tools or the device control script.
+1. Start the application by running `main.py`.
+2. The script initializes the application server and LED server in separate threads.
+3. Depending on the debug mode set in `config.py`, it either launches debugging tools or the device control script.
 
 
 ## Debug Mode
@@ -65,9 +65,9 @@ To add new functionalities:
 
 ## Features
 
-- **Concurrent Execution**: Utilizes threads to run `app.py` and potentially a mock process in parallel.
-- **Conditional Debugging**: Depending on the `DEBUG_MODE`, it can execute additional debugging processes to aid in development and testing.
-- **Subprocess Management**: Executes key components (`app.py`, `switch.py`, or debug processes) as subprocesses, ensuring isolated and controlled execution environments.
+1. **Concurrent Execution**: Utilizes threads to run `app.py` and potentially a mock process in parallel.
+2. **Conditional Debugging**: Depending on the `DEBUG_MODE`, it can execute additional debugging processes to aid in development and testing.
+3. **Subprocess Management**: Executes key components (`app.py`, `switch.py`, or debug processes) as subprocesses, ensuring isolated and controlled execution environments.
 
 
 ## Running the Script

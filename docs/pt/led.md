@@ -73,10 +73,10 @@ Para configurações avançadas, a classe `ServerThread` permite que o Controlad
 | "blink 10" |	inicia o piscar 10 vezes  |
 | "breathbrightness 0.2 0.8"         | Define a faixa de brilho para o efeito de respiração de 20% a 80% de brilho |
 | "breathspeed 0.5" | Definindo a velocidade da respiração para 0.5|
-| "fade 0", "breath 0" ou "blink 0"  | interrompe o loop de animação dado                                          |
 | "breath 1"                         | inicia a respiração ilimitada                                               |
 | "breath 5"                         | inicia a respiração 5 vezes                                                 |
 | "interrupt"                        | interrompe o loop de animação atual                                         |
+| "fade 0", "breath 0" ou "blink 0"  | interrompe o loop de animação dado                                          |
 
 ## Exemplo de Integração
 
