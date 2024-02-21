@@ -1,81 +1,92 @@
-# Dokumentation für print.py
 
 ## Übersicht
 
-Das `print.py` Skript ist ein sich in Bearbeitung befindliches Modul, das für das Drucken von Bildern über Drucker konfiguriert auf dem CUPS (Common UNIX Printing System) Server entwickelt wurde. Es nutzt das `cups` Python Modul zur Interaktion mit CUPS und bietet Funktionen zum Auswählen von Druckern und Verwalten von Druckaufträgen, die speziell für den Druck von Bildern entwickelt wurden.
+Der `DoxBoxPrintManager` (`print.py`) ist eine wesentliche Komponente des DoxBox-Systems, die darauf ausgelegt ist, das Drucken von Bildern unmittelbar nach deren Erfassung nahtlos zu handhaben. Dieses Python-Skript integriert sich in CUPS (Common UNIX Printing System), um Druckaufträge zu verwalten und sicherzustellen, dass jedes Bild erfolgreich gedruckt wird, während es Echtzeit-Feedback zum Status des Auftrags gibt. Um Vertraulichkeit und Datensicherheit zu gewährleisten, wird das Bild unmittelbar nach dem Senden an den Drucker gelöscht.
 
+## Funktionen
+
+- **Direkte Integration mit CUPS**: Nutzt den CUPS-Server, um Druckaufträge einzureichen und zu verwalten, was eine breite Kompatibilität mit verschiedenen Druckern gewährleistet.
+- **Echtzeit-Überwachung von Druckaufträgen**: Verfolgt den Status jedes Druckauftrags in Echtzeit und bietet Updates zu Fertigstellung, Fehlern oder Stornierungen.
+- **Fehlerbehandlung und Berichterstattung**: Umfassende Fehlerbehandlungsmechanismen melden Probleme zurück an die Anwendung und gewährleisten einen reibungslosen Betrieb.
+- **Modulares Design**: Das Skript ist in klare, prägnante Funktionen strukturiert, was es leicht verständlich, wartbar und erweiterbar macht.
+- **Konfigurierbar**: Verwendet ein externes Konfigurationsmodul (`config.py`) für einfache Anpassungen ohne Änderung des Kernskripts.
+- **Debug-Modus**: Beinhaltet einen Debug-Modus für Tests und Fehlerbehebung ohne tatsächliche Druckaufträge an den Drucker zu senden.
+
+## Komponenten
+
+- `send_message_to_app(message)`: Sendet Statusmeldungen oder Fehlercodes an die Hauptanwendung DoxBox `app.py` zum Protokollieren oder zur Benachrichtigung des Benutzers.
+- `check_print_job_status(conn, job_id)`: Überwacht den Status der eingereichten Druckaufträge, um sicherzustellen, dass sie erfolgreich abgeschlossen werden oder Fehler bei Bedarf behandelt werden.
+- `print_image(printer_name, image_path)`: Reicht eine Bilddatei beim angegebenen Drucker ein und initiiert den Überwachungsprozess.
+- `copy_file(source_path, destination_path)`: Verwaltet den sicheren Transfer von Bilddateien vom Erfassungsort zur Druckwarteschlange.
+- `move_image()`: Orchestriert den Prozess der Vorbereitung von Bildern zum Drucken, einschließlich Dateitransfer und Löschung nach dem Drucken.
+
+Der Debug-Modus kann für Testzwecke aktiviert werden, um den Druckprozess zu simulieren, ohne Aufträge an den Drucker zu senden. Die Konsolenprotokollierung bietet Echtzeit-Feedback zum Betrieb des Skripts.
+## Funktionsweise
+
+1. **Bildaufnahme**: Sobald ein Bild von der DoxBox aufgenommen wurde, wird es in einem vordefinierten Verzeichnis gespeichert.
+2. **Dateivorbereitung**: Die Funktion `move_image` scannt das Verzeichnis nach neuen Bildern und bereitet sie zum Drucken vor.
+3. **Drucken**: Bilder werden an die Funktion `print_image` gesendet, wo sie als Druckaufträge an den konfigurierten Drucker übermittelt werden.
+4. **Überwachung**: Der Status jedes Druckauftrags wird in Echtzeit von `check_print_job_status` überwacht, wobei Rückmeldungen zum Fortschritt des Auftrags gegeben und auftretende Probleme behandelt werden.
+5. **Abschluss**: Nach erfolgreichem Druck wird die Bilddatei gelöscht und das System ist bereit für die nächste Aufnahme.
+
+## Konfiguration
+Das Skript stützt sich auf eine separate `config.py`-Datei für Konfigurationseinstellungen, wie die CUPS-Serverdetails, den Druckernamen und Verzeichnisse für die Bildspeicherung und den Druck. Dies ermöglicht einfache Anpassungen an unterschiedliche Umgebungen oder Drucker.
+
+## Debugging und Protokollierung
+
+Der Debug-Modus kann für Testzwecke aktiviert werden, um den Druckprozess zu simulieren, ohne Aufträge an den Drucker zu senden. Die Konsolenprotokollier
 ## Abhängigkeiten
 
-- **Externe Module**: `cups` (erfordert, dass das CUPS-System und seine Python-Bindungen auf dem Host-System installiert und konfiguriert sind).
-
-## Hauptfunktionalität
-
-### Bild drucken
-
-Die Kernfunktionalität des Skripts ist in der Funktion `print_image` zusammengefasst, die die folgenden Schritte ausführt:
-
-1. Stellt eine Verbindung zum CUPS-Server her.
-2. Ruft verfügbare Drucker ab und listet sie auf, um eine grundlegende Überprüfung sicherzustellen, dass der angegebene Drucker erreichbar ist.
-3. Übermittelt eine Bilddatei zum Drucken auf dem angegebenen Drucker und generiert eine Druckauftrags-ID zur Referenz.
-
-### Fehlerbehandlung
-
-Die Funktion enthält minimale Fehlerbehandlung, um den Benutzer zu benachrichtigen, wenn der angegebene Drucker nicht gefunden wird, und listet alle verfügbaren Drucker als Teil der Fehlermeldung auf, um bei der Fehlerbehebung zu helfen.
+- CUPS
+- Python-CUPS (für die Interaktion mit dem CUPS-Server von Python aus)
+- Standard Python-Bibliotheken: `datetime`, `shutil`, `socket`, `os`, `time`
 
 ## Beispielverwendung
 
-Das Skript enthält einen Abschnitt zur Beispielverwendung, der zeigt, wie die Funktion `print_image` mit fest codierten Werten für den Druckernamen und den Bildpfad aufgerufen wird. Dieses Beispiel dient als grundlegende Anleitung zur Integration der Druckfunktionalität in breitere Anwendungsworkflows.
+Ein Beispiel, das zeigt, wie die Funktion `print_image` mit festen Werten für den Druckernamen und den Bildpfad aufgerufen wird. Dieses Beispiel dient als grundlegende Anleitung für die Integration der Druckfunktionalität in umfassendere Anwendungsworkflows.
 
 ```python
-drucker_name = "Ihr_Drucker_Name_Hier"
-bildverzeichnis = "/Pfad/zum/Bildverzeichnis"
-bild_datei = "beispiel.jpg"
+printer_name = "Ihr_Druckername_Hier"
+image_directory = "/pfad/zum/bildverzeichnis"
+image_file = "beispiel.jpg"
 
-bildpfad = os.path.join(bildverzeichnis, bild_datei)
-print_image(drucker_name, bildpfad)
+image_path = os.path.join(image_directory, image_file)
+print_image(printer_name, image_path)
 ```
 
-## Überlegungen für die weitere Entwicklung
+## Erste Schritte
 
-Angesichts des sich in Bearbeitung befindlichen Status des Skripts könnten verschiedene Bereiche für die weitere Entwicklung in Betracht gezogen werden:
+1. Stellen Sie sicher, dass CUPS auf Ihrem System installiert und konfiguriert ist.
+2. Installieren Sie Python-CUPS mit pip: `pip install pycups`.
+3. Passen Sie die Datei `config.py` an Ihre Umgebung an.
+4. Führen Sie das Skript aus, nachdem ein Bild aufgenommen wurde, um den Druckprozess zu initiieren.
 
-1. Verbesserte Fehlerbehandlung: Implementierung einer robusten Fehlerbehandlung und Rückmeldung, um häufig auftretende Druckprobleme wie Druckeranbindung, Dateiformatkompatibilität und Überwachung des Druckauftragsstatus zu verwalten.
-2. Konfiguration und Flexibilität: Erweitern Sie die Funktion, um weitere Druckoptionen wie Druckqualität, Papiergröße und Ausrichtung einzuschließen, um eine größere Anpassungsfähigkeit basierend auf den Benutzeranforderungen oder spezifischen Anwendungsanforderungen zu ermöglichen.
-3. Integration in Anwendungsworkflows: Überlegen Sie, wie das Skript mit anderen Anwendungskomponenten integriert wird, insbesondere in Kontexten, die Stapeldruck, die Planung von Druckaufträgen oder die Benutzerauswahl für die Druckerauswahl erfordern.
-
-## Installation und Konfiguration
-
-Stellen Sie sicher, dass das CUPS-System auf Ihrem Host-System installiert und ordnungsgemäß konfiguriert ist, einschließlich der Installation der erforderlichen Druckertreiber. Das cups Python-Modul sollte ebenfalls installiert sein (pip install pycups).
-Installation der erforderlichen Abhängigkeiten auf z. B. einem Raspberry Pi:
+### Erforderliche Abhängigkeiten auf z.B. Raspberry Pi installieren:
 
 Um pycups auf Ihrem Raspberry Pi zu verwenden, müssen Sie sicherstellen, dass die erforderlichen Abhängigkeiten installiert sind. Hier sind die Schritte dazu:
 
-1. Ihr System aktualisieren: Stellen Sie sicher, dass Ihre Paketlisten und installierten Pakete auf dem neuesten Stand sind.
+1. **Aktualisieren Sie Ihr System**: Stellen Sie sicher, dass Ihre Paketlisten und installierten Pakete auf dem neuesten Stand sind.
 
-        sudo apt-get update
-        sudo apt-get upgrade
+   ```bash
+   sudo apt-get update
+   sudo apt-get upgrade
 
-    Dies stellt sicher, dass Ihr Raspberry Pi die neueste Software ausführt.
+Dies stellt sicher, dass Ihr Raspberry Pi die neueste Software ausführt.
 
-2. CUPS und Entwicklungstools installieren: Installieren Sie CUPS (Common UNIX Printing System), die CUPS-Entwicklungsbibliotheken und die Python-Entwicklungshauptdateien. Diese Bibliotheken sind für das Kompilieren von pycups unerlässlich.
+**CUPS und Entwicklungswerkzeuge installieren**: Installieren Sie CUPS (Common UNIX Printing System), die CUPS-Entwicklungsbibliotheken und die Python-Entwicklungsheader. Diese Bibliotheken sind für die Kompilierung von pycups unerlässlich.
 
-       sudo apt-get install libcups2-dev libcupsimage2-dev gcc python3-dev
+    sudo apt-get install libcups2-dev libcupsimage2-dev gcc python3-dev
 
-    Dieser Befehl installiert die erforderlichen Bibliotheken und Entwicklungswerkzeuge.
+Dieser Befehl installiert die notwendigen Bibliotheken und Entwicklungswerkzeuge.
 
-3. pycups mit pip installieren: Nach der Installation der erforderlichen Entwicklungspakete versuchen Sie erneut, pycups mit pip3 zu installieren.
+Installieren Sie pycups mit pip: Nachdem Sie die erforderlichen Entwicklungspakete installiert haben, versuchen Sie, pycups erneut mit pip3 zu installieren.
 
-       pip3 install pycups
+    pip3 install pycups
 
-    Jetzt sollte es Ihnen gelingen, pycups erfolgreich zu kompilieren und zu installieren.
+Jetzt sollten Sie in der Lage sein, pycups erfolgreich zu kompilieren und zu installieren.
 
-4. pip, setuptools und wheel aktualisieren (**bei Bedarf**) Nach dem Aktualisieren dieser Pakete versuchen Sie erneut, pycups zu installieren.
-   
-       pip3 install --upgrade pip setuptools wheel
+Upgrade pip, setuptools und wheel (falls erforderlich): In einigen Fällen müssen Sie möglicherweise sicherstellen, dass Ihre pip-, setuptools- und wheel-Pakete auf dem neuesten Stand sind.
 
-   In einigen Fällen müssen Sie sicherstellen, dass Ihre pip-, setuptools- und wheel-Pakete auf dem neuesten Stand sind.
+    pip3 install --upgrade pip setuptools wheel
 
-
-         
-
-Wenn Sie während des Installationsvorgangs Probleme haben oder Fehlermeldungen erhalten, stellen Sie diese bitte zur weiteren Unterstützung bereit.
+Nach dem Upgrade dieser Pakete versuchen Sie erneut, pycups zu installieren.

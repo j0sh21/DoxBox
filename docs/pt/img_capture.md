@@ -60,13 +60,17 @@ O script foi projetado para ser executado como parte de um fluxo de trabalho de 
 1. Encerramento de Processos: Certifique-se de que nenhum processo conflitante esteja acessando a câmera.
 2. Preparação de Diretório: Crie ou valide a existência do diretório de saída para armazenar imagens.
 3. Captura de Imagem: Acione a captura de imagens e lide com a interação da câmera.
-4. Gerenciamento de Arquivos: Faça o download das imagens para o diretório de saída e renomeie-as de acordo com os requisitos da aplicação.
+4. Gerenciamento de Arquivos: Faça o download das imagens para o diretório de saída e renomeie-as de acordo com os requisitos da aplicação. Excluir todos os arquivos da câmera.
 
 ## Considerações
 
 - Certifique-se de que o gphoto2 esteja instalado e configurado corretamente no sistema onde a aplicação está sendo executada.
 - O script deve ter permissões apropriadas para interagir com a câmera, o sistema de arquivos e os sockets de rede.
-
+- Garanta que nenhum outro processo gphoto2 esteja bloqueando a câmera. Para matar o processo, use os comandos:
+```bash
+ps -A | grep gphoto
+```
+- Mate processos como gvfs-gphoto2-vo, etc.
 ## Instalação do gphoto2
 
 Para habilitar a funcionalidade de controle de câmera DSLR do projeto, você precisa instalar o gphoto2 em seu Raspberry Pi ou qualquer sistema baseado no Debian. O gphoto2 é um utilitário versátil de linha de comando que facilita a interação com uma ampla variedade de câmeras digitais.
@@ -86,4 +90,4 @@ Este comando irá baixar e instalar automaticamente o gphoto2, tornando-o dispon
 
 Com o gphoto2 instalado com sucesso, seu Raspberry Pi ou sistema baseado no Debian será capaz de se comunicar e controlar câmeras DSLR para funcionalidades de captura de imagens.
 
-Para obter informações mais detalhadas sobre o gphoto2 e suas extensas capacidades, você pode visitar o site oficial do gPhoto.
+Para obter informações mais detalhadas sobre o gphoto2 e suas extensas capacidades, [você pode visitar o site oficial do gPhoto.](http://www.gphoto.org/doc/remote/)

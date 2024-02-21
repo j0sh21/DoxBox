@@ -1,49 +1,80 @@
 # Documentation for main.py
 
 ## Overview
-
-The `main.py` script serves as the central entry point for the application, orchestrating various components and managing their execution based on operational modes. It leverages threading and subprocesses to run different parts of the application concurrently, providing flexibility in debugging and functionality testing.
+This module serves as the entry point for the DoxBox, orchestrating the startup and management of various components, including an application server, LED server, and additional utilities for debugging and device control.
 
 ## Dependencies
+- Python 3
+- `subprocess` module for running scripts.
+- `threading` module for concurrent execution.
+- `pigpiod` for LED control (installed and run separately).
+- **Project Modules**: `led.py`, `app.py`, `switch.py` (conditionally `./dev/process_mock.py` and `./dev/debug_client.py` for debugging)
 
-- **Standard Libraries**: threading, subprocess
-- **Project Modules**: config, app.py, switch.py (conditionally `./dev/process_mock.py` and `./dev/debug_client.py` for debugging)
+## Key Components
+
+### 1. Application Server
+- **Functionality**: Manages the main application logic.
+- **Script**: `app.py`
+
+
+### 2. LED Server
+- **Functionality**: Controls LED operations.
+- **Script**: `led.py`
+- **Dependencies**: Requires `pigpiod` daemon for GPIO pin control.
+
+
+### 3. Debugging Tools
+- **Functionality**: Provides debugging capabilities.
+- **Scripts**: `debug_client.py` and `process_mock.py`
+- **Modes**: Controlled by `DEBUG` variable in `config.py`.
+
+
+### 4. Device Control
+- **Functionality**: Manages device-specific operations like payment and printing.
+- **Script**: `switch.py`
+
 
 ## Configuration
+Configuration settings, including debug mode, are managed through `config.py`. Adjust settings in this file to control the application's behavior.
 
-The script utilizes configuration settings from the `config` module, particularly the `DEBUG_MODE` flag, to determine the operational mode (debug or standard).
+
+## Running the Application
+1. Start the application by running `main.py`.
+2. The script initializes the application server and LED server in separate threads.
+3. Depending on the debug mode set in `config.py`, it either launches debugging tools or the device control script.
+
+
+## Debug Mode
+- **Level 0**: Normal operation, `switch.py` is executed.
+- **Level 1**: Basic debugging, `debug_client.py` is executed.
+- **Level 2**: Extended debugging, both `debug_client.py` and `process_mock.py` are executed.
+
+
+## Extending the Application
+To add new functionalities:
+1. Create a new script for the component.
+2. Define a function in `main.py` to run the script, similar to `run_app()` or `start_led()`.
+3. Add a thread or subprocess call in `main()` to execute the new function.
+
+
+## Troubleshooting
+- Ensure `pigpiod` is installed and can be started by the script.
+- Verify all scripts referenced (`app.py`, `led.py`, `switch.py`, etc.) are present in the expected directories.
+- Check `config.py` for correct debug mode settings.
+
 
 ## Features
 
-- **Concurrent Execution**: Utilizes threads to run `app.py` and potentially a mock process in parallel.
-- **Conditional Debugging**: Depending on the `DEBUG_MODE`, it can execute additional debugging processes to aid in development and testing.
-- **Subprocess Management**: Executes key components (`app.py`, `switch.py`, or debug processes) as subprocesses, ensuring isolated and controlled execution environments.
+1. **Concurrent Execution**: Utilizes threads to run `app.py` and potentially a mock process in parallel.
+2. **Conditional Debugging**: Depending on the `DEBUG_MODE`, it can execute additional debugging processes to aid in development and testing.
+3. **Subprocess Management**: Executes key components (`app.py`, `switch.py`, or debug processes) as subprocesses, ensuring isolated and controlled execution environments.
 
-## Functions
-
-### `run_app()`
-
-Runs `app.py` as a subprocess. This script contains the core functionality of the application and is always executed regardless of the debug mode.
-
-### `run_app2()`
-
-Executes a mock process (`./dev/process_mock.py`) as a subprocess, intended for use in debug mode for development or testing purposes.
-
-### `run_switch_or_debug_as_subprocess()`
-
-Determines whether to run `switch.py` or the debug client (`./dev/debug_client.py`) based on the `DEBUG` flag from the configuration. In standard mode, `switch.py` is executed, which might be responsible for controlling hardware or network switches or other pivotal application functions. In debug mode, the debug client is executed to facilitate debugging and development.
-
-## Execution Flow
-
-1. **Initialization**: The script starts by launching `app.py` in a separate thread to ensure its core functionality runs concurrently with other components.
-2. **Debug Mode Check**: If the application is in debug mode, it additionally starts a mock process in another thread for development or testing.
-3. **Component Execution**: Depending on the operational mode, `main.py` executes either `switch.py` for standard operations or a debug client for debugging purposes.
 
 ## Running the Script
 
 To execute the application, run the following command in the terminal:
 
 ```bash
-python main.md
+python3 main.py
 ```
 Ensure that all dependencies are properly installed and configured before running the script.

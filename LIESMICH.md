@@ -1,73 +1,90 @@
-# Projektübersicht
 
-Dieses Projekt ist darauf ausgelegt, die Fähigkeiten eines Raspberry Pi oder eines anderen auf Debian basierenden Hostsystems zu nutzen, um mit einer DSLR-Kamera hochwertige Bilder aufzunehmen und gleichzeitig einen bestimmten Anwendungsablauf zu verwalten und mit diesem zu interagieren. Dieser Ablauf umfasst die Aufnahme von Bildern, das Drucken und die Interaktion mit einer dynamischen Benutzeroberfläche. Die Anwendung läuft auf Python und integriert sich mit verschiedenen externen Systemen und Bibliotheken, wie CUPS zum Drucken und gphoto2 zur Kamerasteuerung, um ihre Funktionalität bereitzustellen.
+# Doxbox - eine Bitcoin ⚡️ Lightning Fotobox
 
-## Hauptkomponenten
 
-- **main.py**: Dient als Einstiegspunkt der Anwendung und orchestriert die Ausführung verschiedener Komponenten basierend auf den Betriebsmodi.
-- **app.py**: Verwaltet die grafische Benutzeroberfläche (GUI) der Anwendung, erleichtert die Benutzerinteraktionen und zeigt Informationen an.
-- **switch.py**: Handhabt externe API-Interaktionen und führt bestimmte Aktionen aufgrund der empfangenen Daten aus, wie das Auslösen anderer Anwendungskomponenten.
-- **img_capture.py**: Interagiert mit Kameras, um Bilder aufzunehmen, herunterzuladen und die Dateispeicherung zu verwalten, unter Verwendung von gphoto2.
-- **print.py (In Bearbeitung)**: Kommuniziert mit Druckern über CUPS, um Bilder zu drucken, mit der Möglichkeit, Drucker auszuwählen und Druckaufträge zu verwalten.
+<p align="center">
+<img src="https://github.com/j0sh21/DoxBox/assets/63317640/7eda15cf-c3a2-4236-9e24-a084b4512d96" width="200">
+</p>
+
+## Schlüsselkomponenten
+
+- **main.py**: Dient als Einstiegspunkt der Anwendung und koordiniert die Ausführung verschiedener Komponenten basierend auf Betriebsmodi.
+- **app.py**: Verwaltet die grafische Benutzeroberfläche (GUI) der Anwendung, erleichtert Benutzerinteraktionen und zeigt Informationen an.
+- **switch.py**: Behandelt externe API-Interaktionen und führt spezifische Aktionen basierend auf den empfangenen Daten aus, wie das Auslösen anderer Anwendungskomponenten.
+- **img_capture.py**: Interagiert mit Kameras, um Bilder aufzunehmen, herunterzuladen und die Dateispeicherung zu verwalten, nutzt gphoto2.
+- **print.py (In Arbeit)**: Verbindet sich mit Druckern über CUPS, um Bilder zu drucken, mit Funktionen zur Druckerauswahl und Druckauftragsverwaltung.
 - **config.py**: Enthält Konfigurationseinstellungen, die in der gesamten Anwendung verwendet werden, wie API-Schlüssel, Gerätenamen und Dateipfade.
 
-## Hardware-Anforderungen
+## Hardwareanforderungen
 
-- **Host-System**: Die Kernplattform zur Ausführung der Anwendung (z. B. Raspberry Pi, Mini-PC), die die notwendigen Rechenressourcen und die Konnektivität für Peripheriegeräte bereitstellt.
-- **DSLR-Kamera**: Wird für die Aufnahme hochwertiger Bilder verwendet. Stellen Sie sicher, dass sie mit gphoto2 kompatibel ist.
-- **Webcam**: Eine Webcam muss angeschlossen und für die Funktionen zur Bildaufnahme konfiguriert sein.
-- **Display**: Ein Display wird benötigt, um die GUI anzuzeigen, einschließlich Fotovorschauen und Animationen.
-- **Drucker**: Ein Fotodrucker, der auf dem Host-System eingerichtet und für das Drucken von Bildern mit CUPS kompatibel ist.
+- **Raspberry Pi 4** mit [Debian-Firmware](https://www.raspberrypi.com/software/operating-systems/)
+- **DSLR-Kamera**: Canon EOS 450D mit mindestens 1 GB SD-Karte. Bei Verwendung einer anderen Kamera ist die Kompatibilität mit gphoto2 sicherzustellen.
+- **Display**: Waveshare 10,4" QLED Quantum Dot Kapazitiver Bildschirm (1600 x 720)
+- **Drucker**: Xiaomi-Instant-Photo-Printer-1S, kompatibel mit CUPS, 6" Fotopapier
+- **LED**: 4-polige RGB-Leiste, Steckplatine, Kabel, 4 Mosfets
+- **Holz**: 3 x 80x80 cm Sperrholz, eventuell ein Laserschneider
+- **Magnete**: 20 Eckmagnete (je 2 Stück), 40 x 4 mm Schrauben, 120 x 4 mm Muttern
+- **Sprühfarbe**: 1 Dose Grundierung, 4 Dosen Farbe
 
-## Einrichtungsanweisungen
+  <img src="https://github.com/j0sh21/DoxBox/assets/63317640/384280e0-cc6e-4bd0-9953-c318b5e12f15" height="200">
 
-1. **Repository klonen**: Beginnen Sie mit dem Klonen dieses Repositorys auf Ihren lokalen Computer.
+  <img src="https://github.com/j0sh21/DoxBox/assets/63317640/e446af16-d840-4cbc-87f9-3d5f67b3a15d" height="200">
 
-   ```sh
-   git clone https://github.com/j0sh21/DoxBox.git
-    ```
-2. **Abhängigkeiten installieren**: Stellen Sie sicher, dass Python auf Ihrem System installiert ist und installieren Sie dann die erforderlichen Python-Pakete.
+## Beispiel Programmablauf:
+<img src="flowchart.JPG" height="1300">
 
-    ```sh
-    pip install -r requirements.txt
-    ```
-    **Hinweis**: Einige Komponenten erfordern möglicherweise zusätzliche systemweite Abhängigkeiten (z. B. gphoto2, CUPS).
-   
+## Einrichtungsanleitung
 
-   - Wenn Sie zusätzliche systemweite Abhängigkeiten automatisch installieren möchten, führen Sie stattdessen install.sh aus:
-      ```sh
-      chmod install.sh +x
-      ./install.sh
+1. **Repository klonen**: Beginnen Sie damit, dieses Repository auf Ihren lokalen Rechner zu klonen.
 
-3. **Konfigurieren**: Überprüfen und aktualisieren Sie config/cfg.ini mit Ihren spezifischen Einstellungen, wie Gerätenamen, API-Schlüsseln und Dateipfaden.
-   ```sh
-   nano cfg.ini
-## Verwendung
-
-Um die Anwendung auszuführen, navigieren Sie zum Projektverzeichnis und führen Sie main.py aus:
-
- ```sh
-python main.py
+```sh
+git clone https://github.com/j0sh21/DoxBox.git
 ```
 
-Für spezielle Funktionen, wie das Aufnehmen eines Bildes oder das Drucken, können Sie die entsprechenden Skripte ausführen (z. B. python img_capture.py für die Bildaufnahme).
-## Beispiel
+2. **Abhängigkeiten installieren**: Stellen Sie sicher, dass Python auf Ihrem System installiert ist, und installieren Sie dann die erforderlichen Python-Pakete.
 
-1. Ein Bild aufnehmen Stellen Sie sicher, dass Ihre Kamera angeschlossen und von Ihrem System erkannt wird, und führen Sie dann aus:
 
-        python img_capture.py
 
-2. Ein Bild drucken: Aktualisieren Sie print.py mit dem Namen Ihres Druckers und dem Dateipfad des Bildes, und führen Sie dann aus
-     ```
-    python print.py
-     ```
+```sh
+pip install -r requirements.txt
+```
+   **Hinweis**: Einige Komponenten können zusätzliche systemweite Abhängigkeiten erfordern (z.B. gphoto2, CUPS).
 
-# Mitwirken
+   - Wenn Sie zusätzliche systemweite Abhängigkeiten automatisch installieren möchten, führen Sie stattdessen install.sh aus:
 
-Beiträge zum Projekt sind willkommen! Bitte beachten Sie die Beitragshinweise für weitere Informationen zur Einreichung von Pull-Anfragen, zur Meldung von Problemen oder zur Vorschlagsverbesserung.
-# Lizenz
+      ```sh
+      cd DoxBox/install
+      chmod u+x install.sh
+      ./install.sh
+      ```
 
-Dieses Projekt steht unter der MIT-Lizenz - siehe die LICENSE-Datei für Details.
-# Danksagung
+3. **Konfigurieren**: Überprüfen und aktualisieren Sie `config/cfg.ini` mit Ihren spezifischen Einstellungen, wie Gerätenamen, API-Schlüsseln und Dateipfaden.
 
-Ein besonderer Dank geht an alle Beitragenden und Wartenden der externen Bibliotheken und Tools, die in diesem Projekt verwendet werden.
+## Nutzung
+
+Um die Anwendung auszuführen, navigieren Sie zum Projektverzeichnis und führen Sie `main.py` aus:
+ ```sh
+python3 main.py
+ ```
+Für spezifische Funktionen, wie das Aufnehmen eines Bildes oder **Drucken**, können Sie die jeweiligen Skripte ausführen.
+```sh
+python3 img_capture.py
+```
+für die Bildaufnahme 
+
+**Drucke ein Bild**: Aktualisiere print.py mit dem Namen dines Druckers und dem Pfad zum Bild, dann führe folgendes aus:
+```sh
+python3 print.py
+```
+
+## Mitwirken
+
+Beiträge zum Projekt sind willkommen! Bitte beachten Sie die Richtlinien für Beiträge, um Informationen darüber zu erhalten, wie Sie Pull Requests einreichen, Probleme melden oder Verbesserungen vorschlagen können.
+
+## Lizenz
+
+Dieses Projekt ist unter der MIT-Lizenz lizenziert - siehe die Datei LICENSE für Details.
+
+## Danksagungen
+
+Ein besonderer Dank gilt allen Mitwirkenden und Betreuern der externen Bibliotheken und Werkzeuge, die in diesem Projekt verwendet werden.

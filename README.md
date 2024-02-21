@@ -29,7 +29,8 @@
 
   <img src="https://github.com/j0sh21/DoxBox/assets/63317640/e446af16-d840-4cbc-87f9-3d5f67b3a15d" height="200">
 
-
+## Example programm flow:
+<img src="flowchart.JPG" height="1300">
 
 ## Setup Instructions
 
@@ -62,7 +63,7 @@
 To run the application, navigate to the project directory and execute main.py:
 
  ```sh
-python main.md
+python3 main.py
  ```
 For specific functionalities, such as capturing an image or printing, you can run the respective scripts (e.g., python img_capture.py for image capture).
 Example Usage
@@ -70,7 +71,7 @@ Example Usage
 **Capture an Image** Ensure your camera is connected and recognized by your system, then run:
 
  ```sh
-python img_capture.py
+python3 img_capture.py
  ```
 **Print an Image**: Update print.py with your printer's name and the image file path, then execute:
 
