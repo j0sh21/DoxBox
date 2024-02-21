@@ -56,8 +56,8 @@ Para adicionar novas funcionalidades:
 ## Recursos
 
 1. **Execução Concorrente**: Utiliza threads para executar `app.py` e potencialmente um processo simulado em paralelo.
-2.**Depuração Condicional**: Dependendo do `DEBUG_MODE`, pode executar processos de depuração adicionais para auxiliar no desenvolvimento e testes.
-3.**Gestão de Subprocessos**: Executa componentes chave (`app.py`, `switch.py` ou processos de depuração) como subprocessos, garantindo ambientes de execução isolados e controlados.
+2. **Depuração Condicional**: Dependendo do `DEBUG_MODE`, pode executar processos de depuração adicionais para auxiliar no desenvolvimento e testes.
+3. **Gestão de Subprocessos**: Executa componentes chave (`app.py`, `switch.py` ou processos de depuração) como subprocessos, garantindo ambientes de execução isolados e controlados.
 
 ## Executando o Script
 
