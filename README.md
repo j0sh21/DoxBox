@@ -30,7 +30,7 @@
   <img src="https://github.com/j0sh21/DoxBox/assets/63317640/e446af16-d840-4cbc-87f9-3d5f67b3a15d" height="200">
 
 ## Example programm flow
-<img src="flowchart.JPG" height="900">>
+<img src="flowchart.JPG" height="900">
 
 ## Setup Instructions
 
