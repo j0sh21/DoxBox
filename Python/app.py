@@ -149,16 +149,16 @@ class VendingMachineDisplay(QWidget):
         # Picture Label setup for the right half
         self.rightPictureLabel = QLabel(self)  # Renamed to differentiate from the other picture label
         self.rightPictureLabel.setAlignment(Qt.AlignCenter)
-        rightPicturePixmap = QPixmap(rf"../images/gifs/0_welcome/text_welcome.png")  # Replace with your actual image path
-        self.rightPictureLabel.setPixmap(rightPicturePixmap.scaled(532, 532, Qt.KeepAspectRatio))
-        self.rightPictureLabel.setGeometry(605, 93, 530, 530)  # Positioned on the right half
+        rightPicturePixmap = QPixmap(rf"../images/gifs/0_welcome/qr-code.png")  # Replace with your actual image path
+        self.rightPictureLabel.setPixmap(rightPicturePixmap.scaled(525, 525, Qt.KeepAspectRatio))
+        self.rightPictureLabel.setGeometry(605, 98, 525, 525)  # Positioned on the right half
 
         # Picture Label setup for the left half
         self.leftPictureLabel = QLabel(self)  # Renamed to differentiate from the other picture label
         self.leftPictureLabel.setAlignment(Qt.AlignCenter)
         leftPicturePixmap = QPixmap(rf"../images/gifs/0_welcome/text_welcome.png")  # Replace with your actual image path
-        self.leftPictureLabel.setPixmap(leftPicturePixmap.scaled(532, 532, Qt.KeepAspectRatio))
-        self.leftPictureLabel.setGeometry(90, 93, 532, 532)  # Positioned on the left half
+        self.leftPictureLabel.setPixmap(leftPicturePixmap.scaled(530, 530, Qt.KeepAspectRatio))
+        self.leftPictureLabel.setGeometry(90, 96, 530, 530)  # Positioned on the left half
 
         self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)
 
