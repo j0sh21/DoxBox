@@ -129,7 +129,6 @@ class VendingMachineDisplay(QWidget):
         self.setLayout(self.layout)
 
         display_width, display_height = 1600, 720
-        square_size = min(display_height, 600, display_width // 2)  # Calculate square size
 
         # Background setup
         self.backgroundLabel = QLabel(self)
@@ -139,7 +138,7 @@ class VendingMachineDisplay(QWidget):
         self.backgroundLabel.setAlignment(Qt.AlignCenter)
         self.backgroundLabel.setAttribute(Qt.WA_TranslucentBackground)
         self.backgroundLabel.setGeometry(0, 0, 1600, 720)
-        self.backgroundLabel.raise_()  # Bringe das Hintergrundbild nach vorne
+        self.backgroundLabel.raise_()
 
         # GIF Label setup
         self.gifLabel = QLabel(self)
@@ -151,11 +150,16 @@ class VendingMachineDisplay(QWidget):
         self.pictureLabel = QLabel(self)
         self.pictureLabel.setAlignment(Qt.AlignCenter)
         picturePixmap = QPixmap(rf"../images/gifs/0_welcome/text_welcome.png")  # Replace with your actual image path
-        self.pictureLabel.setPixmap(picturePixmap.scaled(800, 600, Qt.KeepAspectRatio))
-        self.pictureLabel.setGeometry(800, (720 - 600) // 2, 800, 600)  # Positioned on the right half
+        self.pictureLabel.setPixmap(picturePixmap.scaled(534, 532, Qt.KeepAspectRatio))
+        self.pictureLabel.setGeometry(605, 93, 530, 530)  # Positioned on the right half
 
-        # Transparency and window properties
-        self.setAttribute(Qt.WA_TranslucentBackground)  # Fensterhintergrund transparent machen
+        # Picture Label setup
+        self.pictureLabel = QLabel(self)
+        self.pictureLabel.setAlignment(Qt.AlignCenter)
+        picturePixmap = QPixmap(rf"../images/gifs/0_welcome/text_welcome.png")  # Replace with your actual image path
+        self.pictureLabel.setPixmap(picturePixmap.scaled(534, 532, Qt.KeepAspectRatio))
+        self.pictureLabel.setGeometry(90, 93, 530, 530)
+
         self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)
 
         if config.FULLSCREEN_MODE:
@@ -276,7 +280,7 @@ class VendingMachineDisplay(QWidget):
 
         # List all GIF files in the subfolder
         try:
-            gifs = [file for file in os.listdir(gif_folder_path) if file.endswith(".gif")]
+            gifs = [file.upper() for file in os.listdir(gif_folder_path) if file.endswith(".GIF")]
             if gifs:
                 # Randomly select a GIF
                 selected_gif = random.choice(gifs)
