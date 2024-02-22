@@ -4,15 +4,9 @@
 <img src="https://github.com/j0sh21/DoxBox/assets/63317640/7eda15cf-c3a2-4236-9e24-a084b4512d96" width="200">
 </p>
 
+The Doxbox prints captured pictures upon bitcoin lightning payments to its [LNbits](https://github.com/lnbits/lnbits) wallet. 
+You can set it up on any wedding, a conferece, a meetup or a festival. We build it in a modular way so that you can easily travel with it. 
 
-## Key Components
-
-- **main.py**: Serves as the entry point of the application, orchestrating the execution of various components based on operational modes.
-- **app.py**: Manages the graphical user interface (GUI) of the application, facilitating user interactions and displaying information.
-- **switch.py**: Handles external API interactions and performs specific actions based on the received data, such as triggering other application components.
-- **img_capture.py**: Interacts with cameras to capture images, download them, and manage file storage, leveraging gphoto2.
-- **print.py (In Progress)**: Interfaces with printers using CUPS to print images, with functionality to select printers and manage print jobs.
-- **config.py**: Contains configuration settings used across the application, such as API keys, device names, and file paths.
 
 ## Hardware Requirements
 
@@ -28,21 +22,35 @@
   <img src="https://github.com/j0sh21/DoxBox/assets/63317640/384280e0-cc6e-4bd0-9953-c318b5e12f15" height="200">
 
   <img src="https://github.com/j0sh21/DoxBox/assets/63317640/e446af16-d840-4cbc-87f9-3d5f67b3a15d" height="200">
+  
+  <img src="https://github.com/j0sh21/DoxBox/assets/63317640/4bcc6965-a1fa-41e5-8d07-cc7e3280bc58" height="200">
 
-  <img src="poc.gif" height="200">
-## Example programm flow:
+  
+## Example program flow:
 
-<img src="flowchart.JPG" height="900">
+<img src="flowchart.JPG" height="800">
+
+
 
 ## Setup Instructions
 
+### Key Components
 
-1. **Clone the Repository**: Start by cloning this repository to your local machine.
+- **main.py**: Serves as the entry point of the application, orchestrating the execution of various components based on operational modes.
+- **app.py**: Manages the graphical user interface (GUI) of the application, facilitating user interactions and displaying information.
+- **switch.py**: Handles external API interactions and performs specific actions based on the received data, such as triggering other application components.
+- **img_capture.py**: Interacts with cameras to capture images, download them, and manage file storage, leveraging gphoto2.
+- **print.py (In Progress)**: Interfaces with printers using CUPS to print images, with functionality to select printers and manage print jobs.
+- **config.py**: Contains configuration settings used across the application, such as API keys, device names, and file paths.
+
+### Installation
+
+1. **Clone the Repository**: Start by cloning this repository.
 
    ```sh
    git clone https://github.com/j0sh21/DoxBox.git
     ```
-2. **Install Dependencies**: Ensure Python is installed on your system, and then install the required Python packages.
+2. **Install Dependencies**: Ensure Python is installed on your system, install the required Python packages.
 
     ```sh
 
@@ -51,13 +59,13 @@
     **Note**: Some components may require additional system-level dependencies (e.g., gphoto2, CUPS).
    
 
-   - If you want to install  additional system-level dependencies automaticlly than run install.sh instead:
+   - If you want to install additional system-level dependencies automaticlly run install.sh instead:
       ```sh
       cd DoxBox/install
       chmod u+x install.sh
       ./install.sh
 
-3. **Configure**: Review and update config/cfg.ini with your specific settings, such as device names, API keys, and file paths.
+3. **Configure**: Review and update config/cfg.ini with your specific settings, such as device names, API keys and file paths.
    ```sh
    nano cfg.ini
 ## Usage
@@ -79,9 +87,11 @@ python3 img_capture.py
 
     python print.py
 
-## Contributing
-Contributions to the project are welcome! Please refer to the contributing guidelines for more information on how to submit pull requests, report issues, or suggest enhancements.
 ## License
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the LICENSE file for details. 
+Contributions to the project are welcome! 
+
 ## Acknowledgments
-Special thanks to all contributors and maintainers of the external libraries and tools used in this project.
+Special thanks to [Ben Arc](https://github.com/arcbtc) for [LNbits](https://github.com/lnbits/lnbits) and all maintainers of the external libraries and tools also used in this project.
+
+ ⚡️ [Tip this project](https://legend.lnbits.com/lnurlp/link/4Wc7ZE) if you like the DoxBox ⚡️
