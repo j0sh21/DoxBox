@@ -332,13 +332,13 @@ class ServerThread(Thread):
                 elif blink == 0:
                     self.led_controller.deactivate_loop()
                 else:
-                    print("blinking count must be one or more.")
+                    print("Blinking count must be one or more.")
             elif parts[0] == "blinkspeed" and len(parts) == 3:
                 on, off = map(float, parts[1:])
                 if on > 0 and off > 0:
                     self.led_controller.set_blink_times(on, off)
                 else:
-                    print("on and off time must both be bigger than 0 seconds.")
+                    print("On and off time must both be bigger than 0 seconds.")
             elif parts[0] == "breath" and len(parts) == 2:
                 breath = int(parts[1])
                 if breath >= 1:
@@ -346,25 +346,25 @@ class ServerThread(Thread):
                 elif breath == 0:
                     self.led_controller.deactivate_loop()
                 else:
-                    print("breath count must be one or more.")
+                    print("Breath count must be one or more.")
             elif parts[0] == "breathspeed" and len(parts) == 2:
                 speed = float(parts[1])
                 if speed > 0:
                     self.led_controller.set_breath_speed(speed)
                 else:
-                    print("breath speed must be bigger than 0.")
+                    print("Breath speed must be bigger than 0.")
             elif parts[0] == "fadespeed" and len(parts) == 2:
                 speed = float(parts[1])
                 if speed > 0:
                     self.led_controller.set_fade_speed(speed)
                 else:
-                    print("fade speed must be bigger than 0.")
+                    print("Fade speed must be bigger than 0.")
             elif parts[0] == "breathbrightness" and len(parts) == 3:
                 lower, upper = map(float, parts[1:])
                 if lower+upper > 0 and lower < 1 and upper < 1 and lower < upper:
                     self.led_controller.set_breath_lights(lower, upper)
                 else:
-                    print("upper and / or lower brighntess must be >= 0 and <= 1.")
+                    print("Upper and / or lower brighntess must be >= 0 and <= 1.")
             elif parts[0] == "interrupt" and len(parts) == 1:
                 self.led_controller.deactivate_loop()
             else:

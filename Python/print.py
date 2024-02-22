@@ -27,7 +27,7 @@ def check_print_job_status(conn, job_id):
 
         if job_id not in jobs:
             # Job is no longer in the list of uncompleted jobs, so it must be completed
-            print(f"Print job {job_id} status changed to 'successfully'.")
+            print(f"Print job {job_id} status changed to 'successful'.")
             break
         else:
             job = jobs[job_id]
@@ -58,7 +58,7 @@ def print_image(printer_name, image_path):
             print(f"{printer}\\n")
         return
 
-    print(f"Successfully Connected to the print Server {printer_name}")
+    print(f"Successfully connected to the print server {printer_name}")
     if config.DEBUG_MODE == 0:
         if not os.path.exists(image_path):
             print(f"Error: File {image_path} not found.")
@@ -105,7 +105,7 @@ def move_image():
         if copy_file(source_path, destination_path):
             print_image(printer_name, destination_path)
             os.remove(destination_path)
-            print(f'Removed {filename} after creating and sending print Job.')
+            print(f'Removed {filename} after creating and sending print job.')
             send_message_to_app("204")
 
 if __name__ == '__main__':
@@ -113,5 +113,5 @@ if __name__ == '__main__':
     print("print.py is now running.")
     print(f"Preparing print job")
     move_image()
-    print(f"Printing now up to 45 seconds ...")
-    print("print.py is now finished successfully")
+    print(f"Printing now, can take up to 45 seconds ...")
+    print("print.py finished successfully")
