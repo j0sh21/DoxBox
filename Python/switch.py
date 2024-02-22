@@ -21,7 +21,7 @@ def main_loop():
     response = None
 
     while True:
-        print("Request LNbits API for new payments")
+        print("Polling LNbits API for new payments")
         response = requests.get(config.API_URL, headers={'X-API-Key': config.API_KEY})
         if (response.status_code == 200):
             rsJson = response.json()
@@ -34,7 +34,7 @@ def main_loop():
                 amount = rsJson[0]['amount'] / 1000  # Amount in SATS
 
                 if (amount == config.AMOUNT_THRESHOLD):
-                    print("Sats recieved, sending msg = 1 to app.py!")
+                    print("Sats recieved ! Sending msg = 1 to app.py!")
                     send_message_to_app("1")
                     time.sleep(config.POST_PAYMENT_DELAY)
                 else:
