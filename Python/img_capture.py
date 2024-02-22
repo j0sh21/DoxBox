@@ -112,7 +112,7 @@ def make_picture():
     print(f"Trigger photo NOW!")
     run_gphoto2_command(trigger_photo_cmd)
     end_trigger = datetime.now()
-    print(f"Photo taken and saved on Camera in {(end_trigger - start_trigger).total_seconds()} Seconds.")
+    print(f"Photo taken and saved on camera in {(end_trigger - start_trigger).total_seconds()} seconds.")
     start_download = datetime.now()
     send_msg_to_LED(HOST, PORT, "breathbrightness 0.5 1.0")
     send_msg_to_LED(HOST, PORT, "breathspeed 0.125")
@@ -123,7 +123,7 @@ def make_picture():
     start_clear = datetime.now()
     run_gphoto2_command(clear_files_cmd)
     end_clear = datetime.now()
-    print(f"Cleared file from Camera in {(end_clear - start_clear).total_seconds()} Seconds.")
+    print(f"Cleared file from Camera in {(end_clear - start_clear).total_seconds()} seconds.")
 
 def rename_pics():
     shot_time = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
