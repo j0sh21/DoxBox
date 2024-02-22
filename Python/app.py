@@ -146,7 +146,7 @@ class VendingMachineDisplay(QWidget):
 
         # List all GIF files in the subfolder
         try:
-            gifs = [file.upper() for file in os.listdir(gif_folder_path) if file.endswith(".GIF")]
+            gifs = [file for file in os.listdir(gif_folder_path) if file.endswith(".gif")]
             if gifs:
                 # Randomly select a GIF
                 selected_gif = random.choice(gifs)
