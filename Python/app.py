@@ -123,6 +123,51 @@ class VendingMachineDisplay(QWidget):
         self.gifLabel.setScaledContents(True)
         self.movie.start()
 
+    def updateGIF(self, state):
+        self.loopCount = 0  # TODO: Maybe this is not the right place for resetting loop. But the skript works as designed... Reset loop count each time a new GIF is played
+        self.desiredLoops = 0  # TODO: Maybe this is not the right place for resetting loop. But the skript works as designed... Reset desired Loops count each time a new GIF is played
+
+        # Map states to subfolders TODO: Some status messages does not reflect a floder eg. 204 and everything > 100
+        subfolder_map = {
+            "0": "0_welcome",
+            "1": "1_payment",
+            "2": "2_countdown",
+            "3": "3_smile",
+            "4": "4_print",
+            "5": "5_thx",
+            "100": "100_error"
+        }
+
+        # default value if state not in subfolder map
+        subfolder = subfolder_map.get(state, "0_welcome")
+
+        # Construct the path to the subfolder
+        gif_folder_path = os.path.join("..", "images", "gifs", subfolder)
+
+        # List all GIF files in the subfolder
+        try:
+            gifs = [file.upper() for file in os.listdir(gif_folder_path) if file.endswith(".GIF")]
+            if gifs:
+                # Randomly select a GIF
+                selected_gif = random.choice(gifs)
+                self.gif_path = os.path.join(gif_folder_path, selected_gif)
+                self.gifLabel.setAlignment(Qt.AlignCenter)  # Center the content
+                # Load the GIF
+                try:
+                    self.gifLabel.show()  # Make sure the gifLabel is visible
+                    self.playGIF()
+                except Exception as e:
+                    print(f"Error while trying to start playing GIF: {str(e)}")
+            else:
+                print("No GIFs found in the specified folder.")
+        except FileNotFoundError:
+            print(f"The folder {gif_folder_path} does not exist.")
+
+    def updatePicture(self, imagePath):
+        pixmap = QPixmap(imagePath)
+        # Ensure the pixmap fits within the defined square size, keeping aspect ratio
+        self.pictureLabel.setPixmap(pixmap.scaled(800, 600, Qt.KeepAspectRatio))
+        self.pictureLabel.show()
 
     def initUI(self):
         # Set the layout
@@ -130,6 +175,18 @@ class VendingMachineDisplay(QWidget):
         self.setLayout(self.layout)
 
         display_width, display_height = 1600, 720
+        # Picture Label (used for .PNG Text) setup for the RIGHT half
+        self.rightPictureLabel = QLabel(self)  # Renamed to differentiate from the other picture label
+        self.rightPictureLabel.setAlignment(Qt.AlignCenter)
+        rightPicturePixmap = QPixmap(rf"../images/gifs/0_welcome/welcome.png") #TODO: for testing, needs to be set on state changed via self.updatePicture()
+        self.rightPictureLabel.setPixmap(rightPicturePixmap.scaled(1026, 530, Qt.KeepAspectRatio))
+        self.rightPictureLabel.setGeometry(100, 98, 1026, 530)  # Positioned on the right half
+
+        # GIF Label setup
+        self.gifLabel = QLabel(self)
+        self.gifLabel.setAlignment(Qt.AlignCenter)
+        self.gifLabel.setGeometry(100, 98, 1026, 530)  # Positioned on the left half TODO: Needs to change position depends on the state. When the screen is split in two square halfs and when the gif should be in the middle etc.
+        self.gifLabel.hide()
 
         # Background setup
         self.backgroundLabel = QLabel(self)
@@ -141,25 +198,6 @@ class VendingMachineDisplay(QWidget):
         self.backgroundLabel.setGeometry(0, 0, 1600, 720) # TODO: read resolution from cfg.ini
         self.backgroundLabel.raise_()  # Move image to the foreground
 
-        # GIF Label setup
-        self.gifLabel = QLabel(self)
-        self.gifLabel.setAlignment(Qt.AlignCenter)
-        self.gifLabel.setGeometry(0, (720 - 600) // 2, 800, 600)  # Positioned on the left half TODO: Needs to change position depends on the state. When the screen is split in two square halfs and when the gif should be in the middle etc.
-        self.gifLabel.hide()
-
-        # Picture Label (used for .PNG Text) setup for the RIGHT half
-        self.rightPictureLabel = QLabel(self)  # Renamed to differentiate from the other picture label
-        self.rightPictureLabel.setAlignment(Qt.AlignCenter)
-        rightPicturePixmap = QPixmap(rf"../images/gifs/0_welcome/qr-code.png") #TODO: for testing, needs to be set on state changed via self.updatePicture()
-        self.rightPictureLabel.setPixmap(rightPicturePixmap.scaled(525, 525, Qt.KeepAspectRatio))
-        self.rightPictureLabel.setGeometry(605, 98, 525, 525)  # Positioned on the right half
-
-        # Picture Label (used for .PNG Text) setup for the LEFT half
-        self.leftPictureLabel = QLabel(self)  # Renamed to differentiate from the other picture label
-        self.leftPictureLabel.setAlignment(Qt.AlignCenter)
-        leftPicturePixmap = QPixmap(rf"../images/gifs/0_welcome/text_welcome.png") #TODO: for testing, needs to be set on state changed via self.updatePicture()
-        self.leftPictureLabel.setPixmap(leftPicturePixmap.scaled(530, 530, Qt.KeepAspectRatio))
-        self.leftPictureLabel.setGeometry(90, 96, 530, 530)  # Positioned on the left half
         
         self.setAttribute(Qt.WA_TranslucentBackground)  # make background transparent
         self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint) # remove window frame
@@ -259,51 +297,6 @@ class VendingMachineDisplay(QWidget):
         self.movie.stop()
         self.updateGIF(state)
 
-    def updateGIF(self, state):
-        self.loopCount = 0  #TODO: Maybe this is not the right place for resetting loop. But the skript works as designed... Reset loop count each time a new GIF is played
-        self.desiredLoops = 0 #TODO: Maybe this is not the right place for resetting loop. But the skript works as designed... Reset desired Loops count each time a new GIF is played
-
-        # Map states to subfolders TODO: Some status messages does not reflect a floder eg. 204 and everything > 100
-        subfolder_map = {
-            "0": "0_welcome",
-            "1": "1_payment",
-            "2": "2_countdown",
-            "3": "3_smile",
-            "4": "4_print",
-            "5": "5_thx",
-            "100": "100_error"
-        }
-
-        #default value if state not in subfolder map
-        subfolder = subfolder_map.get(state, "0_welcome")
-
-        # Construct the path to the subfolder
-        gif_folder_path = os.path.join("..", "images", "gifs", subfolder)
-
-        # List all GIF files in the subfolder
-        try:
-            gifs = [file.upper() for file in os.listdir(gif_folder_path) if file.endswith(".GIF")]
-            if gifs:
-                # Randomly select a GIF
-                selected_gif = random.choice(gifs)
-                self.gif_path = os.path.join(gif_folder_path, selected_gif)
-                self.gifLabel.setAlignment(Qt.AlignCenter)  # Center the content
-                # Load the GIF
-                try:
-                    self.gifLabel.show()  # Make sure the gifLabel is visible
-                    self.playGIF()
-                except Exception as e:
-                    print(f"Error while trying to start playing GIF: {str(e)}")
-            else:
-                print("No GIFs found in the specified folder.")
-        except FileNotFoundError:
-            print(f"The folder {gif_folder_path} does not exist.")
-
-    def updatePicture(self, imagePath):
-        pixmap = QPixmap(imagePath)
-        # Ensure the pixmap fits within the defined square size, keeping aspect ratio
-        self.pictureLabel.setPixmap(pixmap.scaled(800, 600, Qt.KeepAspectRatio))
-        self.pictureLabel.show()
 
 def handle_client_connection(client_socket, appState):
     try:
