@@ -80,26 +80,26 @@ class VendingMachineDisplay(QWidget):
                 if self.loopCount >= self.desiredLoops:
                     self.movie.stop()
                     if self.appState.state == "1":
-                        print(f"({self.desiredLoops}x) Payment GIFF finished, next state: 2 and Gif")
+                        print(f"({self.desiredLoops}x) Payment GIF finished, next state: 2 and Gif")
                         self.desiredLoops = 3
                         self.loopCount = 0
                         self.appState.state = "2"
-                    print(f"({self.desiredLoops}x) Loops finished, next random Gif for state: {self.appState.state}")
+                    print(f"({self.desiredLoops}x) Loops finished, next random GIF for state: {self.appState.state}")
                     self.updateGIF(self.appState.state)
                 else:
-                    print(f"Replaying Gif ({self.desiredLoops}x), total duration is < 3 seconds")
+                    print(f"Replay GIF ({self.desiredLoops}x), total duration is < 3 seconds")
                     self.playGIF()
 
         else:
             if self.appState.state in("1","2","3"):
                 if self.appState.state == "1":
-                    print("Payment GIFF finished, next state: 2 and Gif")
+                    print("Payment GIF finished, next state: 2 and GIF")
                     self.appState.state = "2"
                 elif self.appState.state == "2":
-                    print("Countdown GIFF finished, next state: 3 and Gif")
+                    print("Countdown GIF finished, next state: 3 and GIF")
                     self.appState.state = "3"
                 else:
-                    print("Smile GIFF finished, capture photo very soon")
+                    print("Smile GIF finished, capture photo very soon")
                     try:
                         if self.loopCount == 1: #Only after 1st Loop
                             self.send_msg_to_LED(HOST, PORT, "fade 0")
@@ -109,10 +109,10 @@ class VendingMachineDisplay(QWidget):
                         print(f"Failed to start img_capture.py: {e}")
                         appState.stateChanged.emit("100")
             elif self.appState.state in("4", "100", "0"):
-                print(f"Gif for state {self.appState.state} finished play next gif for state {self.appState.state} until external state change")
+                print(f"GIF for state {self.appState.state} finished play next gif for state {self.appState.state} until external state change")
                 self.updateGIF(self.appState.state)
             elif self.appState.state == "5":
-                print("Thank You - GIFF finished, initial state 0, start welcome Gif")
+                print("Thank You - GIF finished, initial state 0, start welcome GIF")
                 self.appState.state = "0"
             else:
                 self.updateGIF(self.appState.state)
@@ -187,7 +187,7 @@ class VendingMachineDisplay(QWidget):
                 if "No printer" in error_message:
                     print("Error: No printer found. Please ensure the printer is connected properly.")
                 else:
-                    print("An unexpected error occurred with the printer:", error_message)
+                    print("An unexpected printer error occurred:", error_message)
 
     def photo_subprocess(self):
         if config.DEBUG_MODE == 1:
@@ -293,9 +293,9 @@ class VendingMachineDisplay(QWidget):
                     self.gifLabel.show()  # Make sure the gifLabel is visible
                     self.playGIF()
                 except Exception as e:
-                    print(f"Error while try to start playing Gif: {str(e)}")
+                    print(f"Error while trying to start playing GIF: {str(e)}")
             else:
-                print("No GIF files found in the specified folder.")
+                print("No GIFs found in the specified folder.")
         except FileNotFoundError:
             print(f"The folder {gif_folder_path} does not exist.")
 
