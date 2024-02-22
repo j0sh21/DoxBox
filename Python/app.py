@@ -42,6 +42,7 @@ class VendingMachineDisplay(QWidget):
         self.gif_path = ""
 
     def send_msg_to_LED(self , host, port, command):
+        #TODO: Read host and port from cfg.ini
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             # Connect to the server
             client_socket.connect((host, port))
@@ -137,30 +138,31 @@ class VendingMachineDisplay(QWidget):
         self.backgroundLabel.setScaledContents(True)
         self.backgroundLabel.setAlignment(Qt.AlignCenter)
         self.backgroundLabel.setAttribute(Qt.WA_TranslucentBackground)
-        self.backgroundLabel.setGeometry(0, 0, 1600, 720)
-        self.backgroundLabel.lower()
+        self.backgroundLabel.setGeometry(0, 0, 1600, 720) # TODO: read resolution from cfg.ini
+        self.backgroundLabel.raise_()  # Move image to the foreground
 
         # GIF Label setup
         self.gifLabel = QLabel(self)
         self.gifLabel.setAlignment(Qt.AlignCenter)
-        self.gifLabel.setGeometry(0, (720 - 600) // 2, 800, 600)  # Positioned on the left half
+        self.gifLabel.setGeometry(0, (720 - 600) // 2, 800, 600)  # Positioned on the left half TODO: Needs to change position depends on the state. When the screen is split in two square halfs and when the gif should be in the middle etc.
         self.gifLabel.hide()
 
-        # Picture Label setup for the right half
+        # Picture Label (used for .PNG Text) setup for the RIGHT half
         self.rightPictureLabel = QLabel(self)  # Renamed to differentiate from the other picture label
         self.rightPictureLabel.setAlignment(Qt.AlignCenter)
-        rightPicturePixmap = QPixmap(rf"../images/gifs/0_welcome/qr-code.png")  # Replace with your actual image path
+        rightPicturePixmap = QPixmap(rf"../images/gifs/0_welcome/qr-code.png") #TODO: for testing, needs to be set on state changed via self.updatePicture()
         self.rightPictureLabel.setPixmap(rightPicturePixmap.scaled(525, 525, Qt.KeepAspectRatio))
         self.rightPictureLabel.setGeometry(605, 98, 525, 525)  # Positioned on the right half
 
-        # Picture Label setup for the left half
+        # Picture Label (used for .PNG Text) setup for the LEFT half
         self.leftPictureLabel = QLabel(self)  # Renamed to differentiate from the other picture label
         self.leftPictureLabel.setAlignment(Qt.AlignCenter)
-        leftPicturePixmap = QPixmap(rf"../images/gifs/0_welcome/text_welcome.png")  # Replace with your actual image path
+        leftPicturePixmap = QPixmap(rf"../images/gifs/0_welcome/text_welcome.png") #TODO: for testing, needs to be set on state changed via self.updatePicture()
         self.leftPictureLabel.setPixmap(leftPicturePixmap.scaled(530, 530, Qt.KeepAspectRatio))
         self.leftPictureLabel.setGeometry(90, 96, 530, 530)  # Positioned on the left half
-
-        self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)
+        
+        self.setAttribute(Qt.WA_TranslucentBackground)  # make background transparent
+        self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint) # remove window frame
 
         if config.FULLSCREEN_MODE:
             self.showFullScreen()
@@ -258,10 +260,10 @@ class VendingMachineDisplay(QWidget):
         self.updateGIF(state)
 
     def updateGIF(self, state):
-        self.loopCount = 0  # Reset loop count each time a new GIF is played
-        self.desiredLoops = 0  # Reset desired Loops count each time a new GIF is played
+        self.loopCount = 0  #TODO: Maybe this is not the right place for resetting loop. But the skript works as designed... Reset loop count each time a new GIF is played
+        self.desiredLoops = 0 #TODO: Maybe this is not the right place for resetting loop. But the skript works as designed... Reset desired Loops count each time a new GIF is played
 
-        # Map states to subfolders
+        # Map states to subfolders TODO: Some status messages does not reflect a floder eg. 204 and everything > 100
         subfolder_map = {
             "0": "0_welcome",
             "1": "1_payment",
