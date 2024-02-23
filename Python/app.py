@@ -31,7 +31,7 @@ class VendingMachineDisplay(QWidget):
     def __init__(self, appState):
         super().__init__()
         self.loopCount = 0
-        self.desiredLoops = 3
+        self.desiredLoops = 2
         self.appState = appState
         self.initUI()
         self.appState.stateChanged.connect(self.onStateChanged)
@@ -40,6 +40,7 @@ class VendingMachineDisplay(QWidget):
         self.movie.frameChanged.connect(self.onFrameChanged)
         self.total_duration = 0
         self.gif_path = ""
+        self.isreplay = 0
 
     def send_msg_to_LED(self , host, port, command):
         #TODO: Read host and port from cfg.ini
@@ -73,24 +74,25 @@ class VendingMachineDisplay(QWidget):
                 if self.loopCount == 1:
                     if self.total_duration < 0.5:
                         self.desiredLoops *= 6
-                    elif self.total_duration < 1.0:
+                    elif self.total_duration < 1.5:
                         self.desiredLoops *= 3
-                    elif self.total_duration < 4.0:
+                    elif self.total_duration < 3.0:
                         self.desiredLoops *= 2
-                if self.loopCount >= self.desiredLoops:
+                elif self.loopCount >= self.desiredLoops:
                     self.movie.stop()
                     if self.appState.state == "1":
                         print(f"({self.desiredLoops}x) Payment GIF finished, next state: 2 and Gif")
-                        self.desiredLoops = 3
-                        self.loopCount = 0
                         self.appState.state = "2"
+                    self.isreplay = 0
                     print(f"({self.desiredLoops}x) Loops finished, next random GIF for state: {self.appState.state}")
                     self.updateGIF(self.appState.state)
                 else:
                     print(f"Replay GIF ({self.desiredLoops}x), total duration is < 3 seconds")
+                    self.isreplay = 1
                     self.playGIF()
 
         else:
+            self.isreplay = 0
             if self.appState.state in("1","2","3"):
                 if self.appState.state == "1":
                     print("Payment GIF finished, next state: 2 and GIF")
@@ -118,15 +120,15 @@ class VendingMachineDisplay(QWidget):
                 self.updateGIF(self.appState.state)
 
     def playGIF(self):
+        if self.isreplay == 0:
+            self.loopCount = 0
+            self.desiredLoops = 2
         self.movie.setFileName(self.gif_path)
         self.gifLabel.setMovie(self.movie)
         self.gifLabel.setScaledContents(True)
         self.movie.start()
 
     def updateGIF(self, state):
-        self.loopCount = 0  # TODO: Maybe this is not the right place for resetting loop. But the skript works as designed... Reset loop count each time a new GIF is played
-        self.desiredLoops = 0  # TODO: Maybe this is not the right place for resetting loop. But the skript works as designed... Reset desired Loops count each time a new GIF is played
-
         # Map states to subfolders TODO: Some status messages does not reflect a floder eg. 204 and everything > 100
         subfolder_map = {
             "0": "0_welcome",
@@ -198,7 +200,6 @@ class VendingMachineDisplay(QWidget):
         self.backgroundLabel.setGeometry(0, 0, 1600, 720) # TODO: read resolution from cfg.ini
         self.backgroundLabel.raise_()  # Move image to the foreground
 
-        
         self.setAttribute(Qt.WA_TranslucentBackground)  # make background transparent
         self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint) # remove window frame
 
