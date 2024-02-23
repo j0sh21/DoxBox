@@ -27,15 +27,15 @@ def send_msg_to_LED(command):
 
 def kill_process():
     try:
-        p = subprocess.Popen(['ps', '-A'], stdout=subprocess.PIPE)
-        out, err = p.communicate()
+        output = subprocess.check_output(['ps', '-A'], text=True)
         # Look for the process pid
-        for line in out.split():
-            if config.PROCESS_TO_KILL.encode() in line:
+        for line in output.splitlines():
+            if config.PROCESS_TO_KILL in line:
                 # Kill the process
                 pid = int(line.split(None, 1)[0])
+                os.kill(pid, signal.SIGTERM)
                 os.kill(pid, signal.SIGKILL)
-                print(f'Process with PID {pid} (gvfsd) killed.')
+                print(f'Process with PID {pid} ({config.PROCESS_TO_KILL}) killed.')
     except subprocess.CalledProcessError as e:
         print(f"Error while executing 'ps': {str(e)}")
         send_message_to_app("100")
