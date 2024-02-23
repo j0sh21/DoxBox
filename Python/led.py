@@ -364,7 +364,7 @@ class ServerThread(Thread):
                 if lower+upper > 0 and lower < 1 and upper < 1 and lower < upper:
                     self.led_controller.set_breath_lights(lower, upper)
                 else:
-                    print("Upper and / or lower brighntess must be >= 0 and <= 1.")
+                    print("Upper and / or lower brightness must be >= 0 and <= 1.")
             elif parts[0] == "interrupt" and len(parts) == 1:
                 self.led_controller.deactivate_loop()
             else:

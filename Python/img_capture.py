@@ -6,7 +6,7 @@ import signal
 import os
 import subprocess
 import sh
-#sudo apt-get install gphoto2
+#Make sure to sudo apt-get install gphoto2
 
 def send_message_to_app(message):
     try:
@@ -16,13 +16,13 @@ def send_message_to_app(message):
     except socket.error as e:
         print(f"Error in sending message to app: {e}")
 
-def send_msg_to_LED(host, port, command):
+def send_msg_to_LED(command):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
         # Connect to the server
-        client_socket.connect((host, port))
-        print(f"Connected to server at {host}:{port}")
+        client_socket.connect((config.LED_SERVER_HOST, config.LED_SERVER_PORT))
+        print(f"Connected to server at {config.LED_SERVER_HOST}:{config.LED_SERVER_PORT}")
         # Send the command to the server
-        print(f"Sending command to {host}:{command.encode('utf-8')}")
+        print(f"Sending command to {config.LED_SERVER_HOST}:{command.encode('utf-8')}")
         client_socket.sendall(command.encode('utf-8'))
 
 def kill_process():
@@ -101,22 +101,20 @@ def run_gphoto2_command(command):
             send_message_to_app("100")
 
 def make_picture():
-    HOST, PORT = '127.0.0.1', 12345  # Change host and port if needed
     global cwd
     trigger_photo_cmd = config.TRIGGER_PHOTO_COMMAND
     download_pics_cmd = config.DOWNLOAD_PHOTOS_COMMAND
     clear_files_cmd = config.CLEAR_FILES_COMMAND
     start_trigger = datetime.now()
-    send_msg_to_LED(HOST, PORT, "blink 0")
-    send_msg_to_LED(HOST, PORT, "color 255 255 255")
+    send_msg_to_LED("blink 0")
     print(f"Trigger photo NOW!")
     run_gphoto2_command(trigger_photo_cmd)
     end_trigger = datetime.now()
     print(f"Photo taken and saved on camera in {(end_trigger - start_trigger).total_seconds()} seconds.")
     start_download = datetime.now()
-    send_msg_to_LED(HOST, PORT, "breathbrightness 0.5 1.0")
-    send_msg_to_LED(HOST, PORT, "breathspeed 0.125")
-    send_msg_to_LED(HOST, PORT, "breath 1")
+    send_msg_to_LED("breathbrightness 0.5 1.0")
+    send_msg_to_LED("breathspeed 0.125")
+    send_msg_to_LED("breath 1")
     run_gphoto2_command(download_pics_cmd)
     end_download = datetime.now()
     print(f"Copied file from Camera to RaspberryPi in {(end_download - start_download).total_seconds()} Seconds.")
@@ -149,10 +147,9 @@ def rename_pics():
     print(f"Changed Working Directory to: {os.getcwd()}")
 
 def main():
-    HOST, PORT = '127.0.0.1', 12345  # Change host and port if needed
-    send_msg_to_LED(HOST, PORT, "color 255 255 255")
-    send_msg_to_LED(HOST, PORT, "blinkspeed 0.05 0.05 ")
-    send_msg_to_LED(HOST, PORT, "blink 1 ")
+    send_msg_to_LED("color 255 255 255")
+    send_msg_to_LED("blinkspeed 0.05 0.05 ")
+    send_msg_to_LED("blink 1 ")
     # main kills gphoto2 process and deletes alle old files from camera, before proceeding with create_output_folder and make_picture
     clear_files_cmd = ["--folder", "/store_00020001/DCIM/100CANON", "-R", "--delete-all-files"]
     #print("Kill old ghphoto2 processes to prevent connection issues with camera")

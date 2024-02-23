@@ -41,15 +41,16 @@ class VendingMachineDisplay(QWidget):
         self.total_duration = 0
         self.gif_path = ""
         self.isreplay = 0
+        self.LED_HOST = config.LED_SERVER_HOST
+        self.LED_PORT = config.LED_SERVER_PORT
 
-    def send_msg_to_LED(self , host, port, command):
-        #TODO: Read host and port from cfg.ini
+    def send_msg_to_LED(self, command):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             # Connect to the server
-            client_socket.connect((host, port))
-            print(f"Connected to server at {host}:{port}")
+            client_socket.connect((self.LED_HOST, self.LED_PORT))
+            print(f"Connected to server at {self.LED_HOST}:{self.LED_PORT}")
             # Send the command to the server
-            print(f"Sending command to {host}:{command.encode('utf-8')}")
+            print(f"Sending command to {self.LED_HOST}:{command.encode('utf-8')}")
             client_socket.sendall(command.encode('utf-8'))
 
     def calculateDuration(self):
@@ -67,7 +68,6 @@ class VendingMachineDisplay(QWidget):
             self.onGIFFinished()
 
     def onGIFFinished(self):
-        HOST, PORT = '127.0.0.1', 12345  # Change host and port if needed
         self.loopCount += 1
         if self.total_duration < 3.0 and self.appState.state not in ("2", "3"):
             if self.movie.currentFrameNumber() == self.movie.frameCount() - 1:  # Last frame
@@ -104,7 +104,7 @@ class VendingMachineDisplay(QWidget):
                     print("Smile GIF finished, capture photo very soon")
                     try:
                         if self.loopCount == 1: #Only after 1st Loop
-                            self.send_msg_to_LED(HOST, PORT, "fade 0")
+                            self.send_msg_to_LED("fade 0")
                             photo_thread = threading.Thread(target=self.photo_subprocess)
                             photo_thread.start()
                     except Exception as e:
@@ -167,7 +167,6 @@ class VendingMachineDisplay(QWidget):
 
     def updatePicture(self, imagePath):
         pixmap = QPixmap(imagePath)
-        # Ensure the pixmap fits within the defined square size, keeping aspect ratio
         self.pictureLabel.setPixmap(pixmap.scaled(800, 600, Qt.KeepAspectRatio))
         self.pictureLabel.show()
 
@@ -176,18 +175,17 @@ class VendingMachineDisplay(QWidget):
         self.layout = QVBoxLayout(self)
         self.setLayout(self.layout)
 
-        display_width, display_height = 1600, 720
-        # Picture Label (used for .PNG Text) setup for the RIGHT half
-        self.rightPictureLabel = QLabel(self)  # Renamed to differentiate from the other picture label
-        self.rightPictureLabel.setAlignment(Qt.AlignCenter)
-        rightPicturePixmap = QPixmap(rf"../images/gifs/0_welcome/welcome.png") #TODO: for testing, needs to be set on state changed via self.updatePicture()
-        self.rightPictureLabel.setPixmap(rightPicturePixmap.scaled(1026, 530, Qt.KeepAspectRatio))
-        self.rightPictureLabel.setGeometry(100, 98, 1026, 530)  # Positioned on the right half
+        # Picture Label (used for .PNG) positioned into the window inside the transparent background frame
+        self.pictureLabel = QLabel(self)
+        self.pictureLabel.setAlignment(Qt.AlignCenter)
+        PicturePixmap = QPixmap(rf"../images/gifs/0_welcome/welcome.png") # static image
+        self.pictureLabel.setPixmap(PicturePixmap.scaled(1026, 530, Qt.KeepAspectRatio))
+        self.pictureLabel.setGeometry(100, 98, 1026, 530)
 
-        # GIF Label setup
+        # GIF Label setup positioned into the window inside the transparent background frame
         self.gifLabel = QLabel(self)
         self.gifLabel.setAlignment(Qt.AlignCenter)
-        self.gifLabel.setGeometry(100, 98, 1026, 530)  # Positioned on the left half TODO: Needs to change position depends on the state. When the screen is split in two square halfs and when the gif should be in the middle etc.
+        self.gifLabel.setGeometry(100, 98, 1026, 530)
         self.gifLabel.hide()
 
         # Background setup
@@ -248,39 +246,36 @@ class VendingMachineDisplay(QWidget):
                 appState.stateChanged.emit("100")
 
     def onStateChanged(self, state):
-        HOST, PORT = '127.0.0.1', 12345  # Change host and port if needed
         # state handling
         if state == "0":
-            self.send_msg_to_LED(HOST, PORT, "breath 0")
-            self.send_msg_to_LED(HOST, PORT, "blink 0")
-            self.send_msg_to_LED(HOST, PORT, "fade 0")
+            self.send_msg_to_LED("breath 0")
+            self.send_msg_to_LED("blink 0")
+            self.send_msg_to_LED("fade 0")
             print(f"{'_' * 10}State changed to 0: Welcome screen{'_' * 10}")
-            self.send_msg_to_LED(HOST, PORT, "color 226 0 116")  # Set to lnbits color
-            self.send_msg_to_LED(HOST, PORT, "breathbrightness 0.1 0.7")
-            self.send_msg_to_LED(HOST, PORT, "breathspeed 0.09")
-            self.send_msg_to_LED(HOST, PORT, "breath 1")
+            self.send_msg_to_LED("color 226 0 116")  # Set to lnbits color
+            self.send_msg_to_LED("breathbrightness 0.1 0.7")
+            self.send_msg_to_LED("breathspeed 0.09")
+            self.send_msg_to_LED("breath 1")
         if state == "1":
             print(f"{'_' * 10}State changed to 1: Payment recived{'_' * 10}")
-            self.send_msg_to_LED(HOST, PORT, "breath 0")
-            self.send_msg_to_LED(HOST, PORT, "breathbrightness 0.2 0.8")
-            self.send_msg_to_LED(HOST, PORT, "breathspeed 0.02")
-            self.send_msg_to_LED(HOST, PORT, "breath 1")
+            self.send_msg_to_LED("breath 0")
+            self.send_msg_to_LED("breathbrightness 0.2 0.8")
+            self.send_msg_to_LED("breathspeed 0.02")
+            self.send_msg_to_LED("breath 1")
         if state == "2":
             print(f"{'_' * 10}State changed to 2: Start countdown{'_' * 10}")
-
-            self.send_msg_to_LED(HOST, PORT, "breath 0")
-            self.send_msg_to_LED(HOST, PORT, "blinkspeed 0.5 0.5")
-            self.send_msg_to_LED(HOST, PORT, "blink 1")
+            self.send_msg_to_LED("breath 0")
+            self.send_msg_to_LED("blinkspeed 0.5 0.5")
+            self.send_msg_to_LED("blink 1")
         if state == "3":
             print(f"{'_' * 10}State changed to 3: Smile now{'_' * 10}")
-            self.send_msg_to_LED(HOST, PORT, "fade 1")
-
+            self.send_msg_to_LED("fade 1")
         if state == "4":
             print(f"{'_' * 10}State changed to 4: Start printing{'_' * 10}")
-            self.send_msg_to_LED(HOST, PORT, "color 226 0 116")
-            self.send_msg_to_LED(HOST, PORT, "breathbrightness 0.35 0.8")
-            self.send_msg_to_LED(HOST, PORT, "breathspeed 0.12")
-            self.send_msg_to_LED(HOST, PORT, "breath 1")
+            self.send_msg_to_LED("color 226 0 116")
+            self.send_msg_to_LED("breathbrightness 0.35 0.8")
+            self.send_msg_to_LED("breathspeed 0.12")
+            self.send_msg_to_LED("breath 1")
             try:
                 print_thread = threading.Thread(target=self.print_subprocess)
                 print_thread.start()
@@ -289,15 +284,14 @@ class VendingMachineDisplay(QWidget):
                 appState.stateChanged.emit("100")
         if state == "5":
             print(f"{'_' * 10}State changed to 5: Thank You!{'_' * 10}")
-            self.send_msg_to_LED(HOST, PORT, "breath 0")
-            self.send_msg_to_LED(HOST, PORT, "fade 1")
+            self.send_msg_to_LED("breath 0")
+            self.send_msg_to_LED("fade 1")
         if state in("100", "101", "102", "103", "104", "110", "112", "113", "114", "115", "119"):
-            self.send_msg_to_LED(HOST, PORT, "color 255 0 0")
-            self.send_msg_to_LED(HOST, PORT, "blink 1")
+            self.send_msg_to_LED("color 255 0 0")
+            self.send_msg_to_LED("blink 1")
         
         self.movie.stop()
         self.updateGIF(state)
-
 
 def handle_client_connection(client_socket, appState):
     try:

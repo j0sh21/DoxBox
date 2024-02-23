@@ -8,7 +8,6 @@ def run_app():
     subprocess.run(["python3", "app.py"])
 
 def start_led():
-
     try:
         subprocess.run(['sudo', 'pigpiod'])
         print("pigpiod gestartet.")

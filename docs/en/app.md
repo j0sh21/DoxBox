@@ -61,35 +61,39 @@ The application uses numeric strings as messages to represent different states a
 **State Messages**:
 
 | Message | Description                                                                   |
-|--------|-------------------------------------------------------------------------------|
-| "0"    | represents an initial or welcome state.                                       |
-| "1"    | indicate a payment or transaction completed.                                  |
-| "2"    | Start the countdown, preparation phase following a payment.                   |
-| "3"    | signifies the completion of a countdown, moving towards capturing the photo.  |
-| "4"    | Photo captured successfully, start to print now.                              |
-| "5"    | Printing finished: "Thank You" or completion state, the end of a transaction. |
-| "204"     | Image deleted sucessfully after print.                                     |
+|---------|-------------------------------------------------------------------------------|
+| "0"     | represents an initial or welcome state.                                       |
+| "1"     | indicate a payment or transaction completed.                                  |
+| "2"     | Start the countdown, preparation phase following a payment.                   |
+| "3"     | signifies the completion of a countdown, moving towards capturing the photo.  |
+| "4"     | Photo captured successfully, start to print now.                              |
+| "5"     | Printing finished: "Thank You" or completion state, the end of a transaction. |
+| "144"   | Underpaid                                                                     |
+| "204"   | Image deleted successfully after print.                                       |
 
 
 **Error Messages**:
 
-| Message | Description                                                                   |
-|---------|-------------------------------------------------------------------------------|
-| "100"   | General Error in app.py.                                                      |
-| "101"   | Camera found no focus                                                         |
-| "102"   | no Camera found                                                               |
-| "103"   | file not found                                                                |
-| "104"   | permission denied                                                             |
-| "110"   | general error in print.py                                                     |
-| "112"   | printer not found                                                             |
-| "113"   | file not found                                                                |
-| "114"   | permission denied                                                             |
-| "115"   | error copy file                                                               |
-| "116"   | Print job stopped or canceled.                                                |
-| "119"   | error while creating print job                                                |
-| "120"   | general error in img_capture.py                                               |
-| "130"   | general error in led.py                                                       |
-| "140"   | general error in switch.py                                                    |
+| Message | Description                                |
+|---------|--------------------------------------------|
+| "100"   | General Error in app.py.                   |
+| "101"   | Camera found no focus                      |
+| "102"   | no Camera found                            |
+| "103"   | file not found                             |
+| "104"   | permission denied                          |
+| "110"   | general error in print.py                  |
+| "112"   | printer not found                          |
+| "113"   | file not found                             |
+| "114"   | permission denied                          |
+| "115"   | error copy file                            |
+| "116"   | Print job stopped or canceled.             |
+| "119"   | error while creating print job             |
+| "120"   | general error in img_capture.py            |
+| "130"   | general error in led.py                    |
+| "140"   | Unexpected error in switch.py              |
+| "141"   | LNbits API Response status code is not 200 |
+| "142"   | Connection error with LNbits API           |
+| "143"   | initial Connection error with LNbits API   |
 
 
 These messages are processed by the application to update the `AppState` and, by extension, the UI and any external displays connected to the application. The specific actions taken in response to each message can vary depending on the current application context and the intended workflow.

@@ -56,36 +56,40 @@ A aplicação usa strings numéricas como mensagens para representar diferentes 
 
 **Mensagens de Estado**:
 
-| Mensagem | Descrição                                                                   |
-|----------|-----------------------------------------------------------------------------|
-| "0"      | representa um estado inicial ou de boas-vindas.                             |
-| "1"      | indica um pagamento ou transação concluída.                                 |
-| "2"      | Inicia a contagem regressiva, fase de preparação após um pagamento.         |
+| Mensagem | Descrição                                                                            |
+|----------|--------------------------------------------------------------------------------------|
+| "0"      | representa um estado inicial ou de boas-vindas.                                      |
+| "1"      | indica um pagamento ou transação concluída.                                          |
+| "2"      | Inicia a contagem regressiva, fase de preparação após um pagamento.                  |
 | "3"      | significa a conclusão de uma contagem regressiva, movendo-se para a captura da foto. |
-| "4"      | Foto capturada com sucesso, início da impressão agora.                      |
-| "5"      | Impressão concluída: "Obrigado" ou estado de conclusão, o fim de uma transação. |
-| "204"    | Imagem excluída com sucesso após a impressão.                               |
+| "4"      | Foto capturada com sucesso, início da impressão agora.                               |
+| "5"      | Impressão concluída: "Obrigado" ou estado de conclusão, o fim de uma transação.      |
+| "144"    | Subpago                                                                              |
+| "204"    | Imagem excluída com sucesso após impressão.                                          |
 
 
 **Mensagens de Erro**:
 
-| Mensagem | Descrição                                                                   |
-|----------|-----------------------------------------------------------------------------|
-| "100"    | Erro Geral em app.py.                                                       |
-| "101"    | Câmera não encontrou foco                                                   |
-| "102"    | Nenhuma câmera encontrada                                                   |
-| "103"    | arquivo não encontrado                                                      |
-| "104"    | permissão negada                                                            |
-| "110"    | erro geral em print.py                                                      |
-| "112"    | impressora não encontrada                                                   |
-| "113"    | arquivo não encontrado                                                      |
-| "114"    | permissão negada                                                            |
-| "115"    | erro ao copiar arquivo                                                      |
-| "116"    | Trabalho de impressão interrompido ou cancelado.                            |
-| "119"    | erro ao criar trabalho de impressão                                          |
-| "120"    | erro geral em img_capture.py                                                |
-| "130"    | erro geral em led.py                                                        |
-| "140"    | erro geral em switch.py                                                     |
+| Mensagem | Descrição                                            |
+|----------|------------------------------------------------------|
+| "100"    | Erro Geral em app.py.                                |
+| "101"    | Câmera não encontrou foco                            |
+| "102"    | Nenhuma câmera encontrada                            |
+| "103"    | arquivo não encontrado                               |
+| "104"    | permissão negada                                     |
+| "110"    | erro geral em print.py                               |
+| "112"    | impressora não encontrada                            |
+| "113"    | arquivo não encontrado                               |
+| "114"    | permissão negada                                     |
+| "115"    | erro ao copiar arquivo                               |
+| "116"    | Trabalho de impressão interrompido ou cancelado.     |
+| "119"    | erro ao criar trabalho de impressão                  |
+| "120"    | erro geral em img_capture.py                         |
+| "130"    | erro geral em led.py                                 |
+| "140"    | Erro inesperado em switch.py                         |
+| "141"    | Código de status da resposta da API LNbits não é 200 |
+| "142"    | Erro de conexão com a API LNbits                     |
+| "143"    | Erro inicial de conexão com a API LNbits             |
 
 
 Essas mensagens são processadas pela aplicação para atualizar o `AppState` e, por extensão, a UI e quaisquer displays externos conectados à aplicação. As ações específicas tomadas em resposta a cada mensagem podem variar dependendo do contexto atual da aplicação e do fluxo de trabalho pretendido.

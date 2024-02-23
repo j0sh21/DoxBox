@@ -64,36 +64,40 @@ Die Anwendung verwendet numerische Zeichenketten als Nachrichten, um verschieden
 
 **Zustandsnachrichten**:
 
-| Nachricht | Beschreibung                                                                   |
-|-----------|--------------------------------------------------------------------------------|
-| "0"       | stellt einen anfänglichen oder Willkommenszustand dar.                         |
-| "1"       | zeigt eine abgeschlossene Zahlung oder Transaktion an.                         |
-| "2"       | Startet den Countdown, Vorbereitungsphase nach einer Zahlung.                  |
-| "3"       | bedeutet den Abschluss eines Countdowns, Übergang zur Fotoaufnahme.            |
-| "4"       | Foto erfolgreich aufgenommen, Beginn des Druckvorgangs.                        |
-| "5"       | Druck abgeschlossen: "Danke" oder Abschlusszustand, Ende einer Transaktion.    |
-| "204"     | Bild nach dem Druck erfolgreich gelöscht.                                      |
+| Nachricht | Beschreibung                                                                |
+|-----------|-----------------------------------------------------------------------------|
+| "0"       | stellt einen anfänglichen oder Willkommenszustand dar.                      |
+| "1"       | zeigt eine abgeschlossene Zahlung oder Transaktion an.                      |
+| "2"       | Startet den Countdown, Vorbereitungsphase nach einer Zahlung.               |
+| "3"       | bedeutet den Abschluss eines Countdowns, Übergang zur Fotoaufnahme.         |
+| "4"       | Foto erfolgreich aufgenommen, Beginn des Druckvorgangs.                     |
+| "5"       | Druck abgeschlossen: "Danke" oder Abschlusszustand, Ende einer Transaktion. |
+| "144"     | Unterbezahlt                                                                |
+| "204"     | Bild wurde nach dem Drucken erfolgreich gelöscht.                           |
 
 
 **Fehlermeldungen**:
 
-| Nachricht | Beschreibung                                                                   |
-|-----------|--------------------------------------------------------------------------------|
-| "100"     | Allgemeiner Fehler in app.py.                                                  |
-| "101"     | Kamera hat keinen Fokus gefunden                                               |
-| "102"     | Keine Kamera gefunden                                                          |
-| "103"     | Datei nicht gefunden                                                           |
-| "104"     | Zugriff verweigert                                                             |
-| "110"     | Allgemeiner Fehler in print.py                                                 |
-| "112"     | Drucker nicht gefunden                                                         |
-| "113"     | Datei nicht gefunden                                                           |
-| "114"     | Zugriff verweigert                                                             |
-| "115"     | Fehler beim Kopieren der Datei                                                 |
-| "116"     | Druckauftrag angehalten oder abgebrochen.                                      |
-| "119"     | Fehler beim Erstellen des Druckauftrags                                        |
-| "120"     | Allgemeiner Fehler in img_capture.py                                           |
-| "130"     | Allgemeiner Fehler in led.py                                                   |
-| "140"     | Allgemeiner Fehler in switch.py                                                |
+| Nachricht | Beschreibung                                  |
+|-----------|-----------------------------------------------|
+| "100"     | Allgemeiner Fehler in app.py.                 |
+| "101"     | Kamera hat keinen Fokus gefunden              |
+| "102"     | Keine Kamera gefunden                         |
+| "103"     | Datei nicht gefunden                          |
+| "104"     | Zugriff verweigert                            |
+| "110"     | Allgemeiner Fehler in print.py                |
+| "112"     | Drucker nicht gefunden                        |
+| "113"     | Datei nicht gefunden                          |
+| "114"     | Zugriff verweigert                            |
+| "115"     | Fehler beim Kopieren der Datei                |
+| "116"     | Druckauftrag angehalten oder abgebrochen.     |
+| "119"     | Fehler beim Erstellen des Druckauftrags       |
+| "120"     | Allgemeiner Fehler in img_capture.py          |
+| "130"     | Allgemeiner Fehler in led.py                  |
+| "140"     | Unerwarteter Fehler in switch.py              |
+| "141"     | LNbits API-Antwortstatuscode ist nicht 200    |
+| "142"     | Verbindungsfehler mit LNbits API              |
+| "143"     | Anfänglicher Verbindungsfehler mit LNbits API |
 
 
 Diese Nachrichten werden von der Anwendung verarbeitet, um den `AppState` und damit auch die Benutzeroberfläche und alle externen Anzeigen, die mit der Anwendung verbunden sind, zu aktualisieren. Die spezifischen Aktionen, die als Reaktion auf jede Nachricht unternommen werden, können je nach aktuellem Anwendungskontext und beabsichtigtem Arbeitsablauf variieren.
