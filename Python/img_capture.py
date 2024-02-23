@@ -32,6 +32,7 @@ def kill_process():
         for line in output.splitlines():
             if config.PROCESS_TO_KILL in line:
                 # Kill the process
+                print("Kill the old ghphoto2 server processes to prevent connection issues with camera")
                 pid = int(line.split(None, 1)[0])
                 os.kill(pid, signal.SIGTERM)
                 os.kill(pid, signal.SIGKILL)
@@ -152,13 +153,12 @@ def main():
     send_msg_to_LED("blink 1 ")
     # main kills gphoto2 process and deletes alle old files from camera, before proceeding with create_output_folder and make_picture
     clear_files_cmd = ["--folder", "/store_00020001/DCIM/100CANON", "-R", "--delete-all-files"]
-    #print("Kill old ghphoto2 processes to prevent connection issues with camera")
-    #kill_process()
+    kill_process()
     print("Remove all files from the Camera")
     try:
         gp(clear_files_cmd)
     except sh.ErrorReturnCode_1 as e:
-        # Now we can check the contents of the error message
+        # Now we can check the contents of the error message (The language of the error message is controlled by your camera settings)
         error_message = str(e)
         if "Keine Kamera gefunden" in error_message:
             # If the specific error message is found, print custom text
