@@ -69,60 +69,71 @@ class VendingMachineDisplay(QWidget):
 
     def onGIFFinished(self):
         self.loopCount += 1
-        if self.total_duration < 3.0 and self.appState.state not in ("2", "3"):
-            if self.movie.currentFrameNumber() == self.movie.frameCount() - 1:  # Last frame
-                if self.loopCount == 1:
-                    if self.total_duration < 0.5:
-                        self.desiredLoops *= 6
-                    elif self.total_duration < 1.5:
-                        self.desiredLoops *= 3
-                    elif self.total_duration < 3.0:
-                        self.desiredLoops *= 2
-                elif self.loopCount >= self.desiredLoops:
-                    self.movie.stop()
-                    if self.appState.state == "1":
-                        print(f"({self.desiredLoops}x) Payment GIF finished, next state: 2 and Gif")
-                        self.appState.state = "2"
-                    self.isreplay = 0
-                    print(f"({self.desiredLoops}x) Loops finished, next random GIF for state: {self.appState.state}")
+        last_gif_frame = self.movie.currentFrameNumber() == self.movie.frameCount() - 1
+        if self.total_duration < 3.3 and self.appState.state not in ("2", "3") and last_gif_frame:
+            if self.loopCount == 1:
+                if self.total_duration < 0.6:
+                    self.desiredLoops *= 6
+                elif self.total_duration < 1.6:
+                    self.desiredLoops *= 3
+                else:
+                    self.desiredLoops *= 2
+
+            if self.loopCount >= self.desiredLoops:
+                self.movie.stop()
+                self.isreplay = 0
+                if self.appState.state == "1":
+                    print(f"({self.desiredLoops}x) Payment GIF finished, next state: 2 and Gif")
+                    self.appState.state = "2"
                     self.updateGIF(self.appState.state)
                 else:
-                    print(f"Replay GIF ({self.desiredLoops}x), total duration is < 3 seconds")
-                    self.isreplay = 1
-                    self.playGIF()
+                    print(f"({self.desiredLoops}x) Loops finished, next random GIF for state: {self.appState.state}")
+                    self.updateGIF(self.appState.state)
+            else:
+                print(f"Replay GIF ({self.desiredLoops}x), total duration is < 3 seconds")
+                self.isreplay = 1
+                self.playGIF()
 
-        else:
+        elif last_gif_frame:
             self.isreplay = 0
-            if self.appState.state in("1","2","3"):
-                if self.appState.state == "1":
-                    print("Payment GIF finished, next state: 2 and GIF")
-                    self.appState.state = "2"
-                elif self.appState.state == "2":
-                    print("Countdown GIF finished, next state: 3 and GIF")
-                    self.appState.state = "3"
-                else:
-                    print("Smile GIF finished, capture photo very soon")
-                    try:
-                        if self.loopCount == 1: #Only after 1st Loop
-                            self.send_msg_to_LED("fade 0")
-                            photo_thread = threading.Thread(target=self.photo_subprocess)
-                            photo_thread.start()
-                    except Exception as e:
-                        print(f"Failed to start img_capture.py: {e}")
-                        appState.stateChanged.emit("100")
+            if self.appState.state == "1":
+                print("Payment GIF finished, next state: 2 and GIF")
+                self.appState.state = "2"
+                self.updateGIF(self.appState.state)
+            elif self.appState.state == "2":
+                print("Countdown GIF finished, next state: 3 and GIF")
+                self.appState.state = "3"
+                self.updateGIF(self.appState.state)
+            elif self.appState.state == "3":
+                print("Smile GIF finished, capture photo very soon")
+                try:
+                    if self.loopCount == 1: #Only after 1st Loop
+                        self.send_msg_to_LED("fade 0")
+                        self.updateGIF(self.appState.state)
+                        photo_thread = threading.Thread(target=self.photo_subprocess)
+                        photo_thread.start()
+                except Exception as e:
+                    print(f"Failed to start img_capture.py: {e}")
+                    self.appState.state = "100"
+                    self.updateGIF(self.appState.state)
             elif self.appState.state in("4", "100", "0"):
                 print(f"GIF for state {self.appState.state} finished play next gif for state {self.appState.state} until external state change")
                 self.updateGIF(self.appState.state)
             elif self.appState.state == "5":
                 print("Thank You - GIF finished, initial state 0, start welcome GIF")
                 self.appState.state = "0"
+                self.updateGIF(self.appState.state)
             else:
                 self.updateGIF(self.appState.state)
 
     def playGIF(self):
         if self.isreplay == 0:
+            print("Play GIF")
             self.loopCount = 0
-            self.desiredLoops = 2
+            self.desiredLoops = 1
+        else:
+            print("Replay GIF")
+
         self.movie.setFileName(self.gif_path)
         self.gifLabel.setMovie(self.movie)
         self.gifLabel.setScaledContents(True)

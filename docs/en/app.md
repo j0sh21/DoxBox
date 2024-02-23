@@ -37,7 +37,7 @@ The application features a server component that listens for incoming connection
 
 ## Multimedia Handling and GIF Animations
 
-The `VendingMachineDisplay` class incorporates advanced multimedia handling capabilities, notably for playing and managing GIF animations. This functionality enhances the application's visual appeal and user engagement, especially in interactive kiosks or vending machine interfaces.
+The `VendingMachineDisplay` class incorporates advanced multimedia handling capabilities, notably for playing and managing GIF animations.
 
 ### Playing GIF Animations
 
@@ -52,6 +52,44 @@ The application can display GIF animations as part of its UI, providing dynamic 
 - **handle_client_connection(client_socket, appState)**: Handles incoming connections from clients. This function is a critical part of the server-client architecture, reading messages sent by clients, updating the application state based on these messages, and ensuring the UI reflects these changes.
 
 - **start_server(appState)**: Initializes and starts the server that listens for incoming connections. It binds to a specified port and waits for clients to connect, creating a new thread to handle each connection, thus allowing the application to continue operating smoothly while managing client requests.
+
+
+### GIF Replay Logic
+
+The GIF replay logic in the DoxBox is designed to manage the playback of GIF animations based on the application's current state and the duration of the GIFs. This logic ensures that shorter GIFs are replayed a specified number of times to maintain user engagement, while longer GIFs transition smoothly to the next state or GIF when completed. Below is an overview of the key components and functionalities of the GIF replay logic.
+
+#### Components:
+
+- Movie Object: Represents the GIF animation to be played. It is responsible for managing the GIF playback.
+- GIF Label: A graphical UI component (label) that displays the GIF animation.
+- State Management: The application maintains a state that determines the context or phase it is currently in (e.g., payment, countdown, smile).
+
+#### Key Attributes:
+
+- `loopCount`: Tracks the number of times the current GIF has been replayed.
+- `desiredLoops`: The desired number of times the GIF should be replayed, which varies based on the GIF's duration.
+- `isreplay`: A flag indicating whether the current GIF playback is an original play (0) or a replay (1).
+- `total_duration`: The total duration of the current GIF. Used to determine the number of desired loops for shorter GIFs.
+- `gif_path`: The file path of the current GIF to be played.
+
+#### Functions:
+
+- `playGIF()`: Initiates the playback of a GIF. If `isreplay` is 0, it resets `loopCount` and `desiredLoops` for a new GIF. If `isreplay` is 1, it replays the current GIF without resetting the loop count.
+- `updateGIF(state)`: Updates the current GIF based on the application's state. It selects a random GIF from a specified subfolder corresponding to the current state and sets it up for playback.
+- `onGIFFinished()`: Triggered when a GIF finishes playing. It manages the logic for replaying or transitioning GIFs based on their duration and the application's state.
+
+#### GIF Duration and Replay Times:
+
+- Duration < 0.6 seconds: For GIFs shorter than 0.6 seconds, the desired number of replays (`desiredLoops`) is set to 6 times. This ensures that very short GIFs are played enough times to be noticeable and engaging to the user.
+- Duration between 0.6 and 1.6 seconds: For GIFs with a duration between 0.6 seconds and 1.6 seconds, the GIF is replayed 3 times. This duration range covers moderately short GIFs that require fewer replays to maintain user engagement.
+- Duration between 1.6 and 3.3 seconds: GIFs falling within this duration range are replayed 2 times. These are considered short but not so brief that they require many replays to be effective.
+
+#### Logic Flow with Specific Durations:
+
+- Initial Playback: Upon selecting a new GIF, `playGIF()` is called with `isreplay` set to 0. This initializes the playback, setting `loopCount` to 0 and `desiredLoops` to 1.
+- Determining Replay Needs: When a GIF completes (`onGIFFinished()`), the logic checks the total duration (`total_duration`) of the GIF and the current application state. If the state is not "2" or "3" and the GIF's duration is less than 3.3 seconds, it proceeds to determine the number of replays based on the specific duration brackets mentioned above.
+- Replay Execution: If the GIF meets the criteria for replay, `isreplay` is set to 1, and `playGIF()` is called again. This increments `loopCount` each time the GIF completes a loop. The replay continues until `loopCount` reaches `desiredLoops`.
+- Transition or Update: After completing the desired number of replays, or if the GIF does not meet the replay criteria (either due to its duration being longer than 3.3 seconds or the application state), the application either transitions to a new state or selects a new GIF based on the current state.
 
 
 ## Messages Handled by app.py
