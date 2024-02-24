@@ -114,7 +114,7 @@ def make_picture():
     print(f"Photo taken and saved on camera in {(end_trigger - start_trigger).total_seconds()} seconds.")
     start_download = datetime.now()
     send_msg_to_LED("breathbrightness 0.5 1.0")
-    send_msg_to_LED("breathspeed 0.125")
+    send_msg_to_LED("breathspeed 0.003")
     send_msg_to_LED("breath 1")
     run_gphoto2_command(download_pics_cmd)
     end_download = datetime.now()
