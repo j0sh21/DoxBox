@@ -1,4 +1,6 @@
 import socket
+import time
+
 import config
 from datetime import datetime
 from sh import gphoto2 as gp
@@ -37,6 +39,7 @@ def kill_process():
                 os.kill(pid, signal.SIGTERM)
                 os.kill(pid, signal.SIGKILL)
                 print(f'Process with PID {pid} ({config.PROCESS_TO_KILL}) killed.')
+                time.sleep(0.33)
     except subprocess.CalledProcessError as e:
         print(f"Error while executing 'ps': {str(e)}")
         send_message_to_app("100")
