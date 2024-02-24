@@ -152,8 +152,8 @@ def main():
     send_msg_to_LED("blinkspeed 0.05 0.05 ")
     send_msg_to_LED("blink 1 ")
     # main kills gphoto2 process and deletes alle old files from camera, before proceeding with create_output_folder and make_picture
-    clear_files_cmd = ["--folder", "/store_00020001/DCIM/100CANON", "-R", "--delete-all-files"]
     kill_process()
+    clear_files_cmd = ["--folder", "/store_00020001/DCIM/100CANON", "-R", "--delete-all-files"]
     print("Remove all files from the Camera")
     try:
         gp(clear_files_cmd)
