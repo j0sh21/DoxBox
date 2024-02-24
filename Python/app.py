@@ -265,13 +265,13 @@ class VendingMachineDisplay(QWidget):
             print(f"{'_' * 10}State changed to 0: Welcome screen{'_' * 10}")
             self.send_msg_to_LED("color 226 0 116")  # Set to lnbits color
             self.send_msg_to_LED("breathbrightness 0.1 0.7")
-            self.send_msg_to_LED("breathspeed 0.09")
+            self.send_msg_to_LED("breathspeed 0.02")
             self.send_msg_to_LED("breath 1")
         if state == "1":
             print(f"{'_' * 10}State changed to 1: Payment recived{'_' * 10}")
             self.send_msg_to_LED("breath 0")
             self.send_msg_to_LED("breathbrightness 0.2 0.8")
-            self.send_msg_to_LED("breathspeed 0.02")
+            self.send_msg_to_LED("breathspeed 0.005")
             self.send_msg_to_LED("breath 1")
         if state == "2":
             print(f"{'_' * 10}State changed to 2: Start countdown{'_' * 10}")
@@ -280,12 +280,13 @@ class VendingMachineDisplay(QWidget):
             self.send_msg_to_LED("blink 1")
         if state == "3":
             print(f"{'_' * 10}State changed to 3: Smile now{'_' * 10}")
+            self.send_msg_to_LED("fadespeed 2.3")
             self.send_msg_to_LED("fade 1")
         if state == "4":
             print(f"{'_' * 10}State changed to 4: Start printing{'_' * 10}")
             self.send_msg_to_LED("color 226 0 116")
             self.send_msg_to_LED("breathbrightness 0.35 0.8")
-            self.send_msg_to_LED("breathspeed 0.12")
+            self.send_msg_to_LED("breathspeed 0.1")
             self.send_msg_to_LED("breath 1")
             try:
                 print_thread = threading.Thread(target=self.print_subprocess)
@@ -296,6 +297,7 @@ class VendingMachineDisplay(QWidget):
         if state == "5":
             print(f"{'_' * 10}State changed to 5: Thank You!{'_' * 10}")
             self.send_msg_to_LED("breath 0")
+            self.send_msg_to_LED("fadespeed 1")
             self.send_msg_to_LED("fade 1")
         if state in("100", "101", "102", "103", "104", "110", "112", "113", "114", "115", "119"):
             self.send_msg_to_LED("color 255 0 0")
