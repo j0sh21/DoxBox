@@ -361,7 +361,7 @@ class ServerThread(Thread):
                     print("Fade speed must be bigger than 0.")
             elif parts[0] == "breathbrightness" and len(parts) == 3:
                 lower, upper = map(float, parts[1:])
-                if lower+upper > 0 and lower < 1 and upper < 1 and lower < upper:
+                if lower+upper > 0 and lower < 1 and upper <= 1 and lower < upper:
                     self.led_controller.set_breath_lights(lower, upper)
                 else:
                     print("Upper and / or lower brightness must be >= 0 and <= 1.")
@@ -384,7 +384,7 @@ def main():
         while True:
             time.sleep(1)  # Main loop doing other tasks
     except KeyboardInterrupt:
-        server.deactivate_loop()
+        RGBLEDController.deactivate_loop()
         print("LED Controller application stopped.")
 
 if __name__ == "__main__":
