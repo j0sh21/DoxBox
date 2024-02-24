@@ -156,10 +156,10 @@ def main():
     send_msg_to_LED("blink 1 ")
     # main kills gphoto2 process and deletes alle old files from camera, before proceeding with create_output_folder and make_picture
     kill_process()
-    clear_files_cmd = ["--folder", "/store_00020001/DCIM/100CANON", "-R", "--delete-all-files"]
+    clear_files_cmd = config.CLEAR_FILES_COMMAND
     print("Remove all files from the Camera")
     try:
-        gp(clear_files_cmd)
+        run_gphoto2_command(clear_files_cmd)
     except sh.ErrorReturnCode_1 as e:
         # Now we can check the contents of the error message (The language of the error message is controlled by your camera settings)
         error_message = str(e)
