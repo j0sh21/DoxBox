@@ -100,7 +100,7 @@ def run_gphoto2_command(command):
         elif "Zugriff verweigert" in error_message:
             send_message_to_app("104")
         else:
-            # If the error message does not match, print a generic error message or re-raise the exception
+            # If the error message does not match, print a generic error message
             print("An unexpected error occurred:", error_message)
             send_message_to_app("100")
 
@@ -156,10 +156,10 @@ def main():
     send_msg_to_LED("blink 1 ")
     # main kills gphoto2 process and deletes alle old files from camera, before proceeding with create_output_folder and make_picture
     kill_process()
-    clear_files_cmd = config.CLEAR_FILES_COMMAND
+    clear_files_cmd = ["--folder", "/store_00020001/DCIM/100CANON", "-R", "--delete-all-files"]
     print("Remove all files from the Camera")
     try:
-        run_gphoto2_command(clear_files_cmd)
+        gp(clear_files_cmd)
     except sh.ErrorReturnCode_1 as e:
         # Now we can check the contents of the error message (The language of the error message is controlled by your camera settings)
         error_message = str(e)
