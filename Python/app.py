@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
 from PyQt5.QtGui import QPixmap, QMovie
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QSize, QPoint
+from PyQt5.QtCore import Qt, pyqtSignal, QObject
 import subprocess
 import sys
 import threading
@@ -9,7 +9,7 @@ import os
 import random
 import config  #config.py from the same directory
 
-# A class for managing the application state and communication
+# A class for managing the DoxBox state and communication with other python subprocesses
 class AppState(QObject):
     stateChanged = pyqtSignal(str)
 
@@ -26,7 +26,7 @@ class AppState(QObject):
         self._state = value
         self.stateChanged.emit(self._state)
 
-# Main application class (Display)
+# Main DoxBox class (Display)
 class VendingMachineDisplay(QWidget):
     def __init__(self, appState):
         super().__init__()
@@ -57,9 +57,9 @@ class VendingMachineDisplay(QWidget):
             print(f"Start playing gif with {str(self.total_duration)} seconds total duration")
 
     def onFrameChanged(self):
-        if self.movie.currentFrameNumber() == 0: # Check if this is the first frame
+        if self.movie.currentFrameNumber() == 0:
             self.calculateDuration()
-        elif self.movie.currentFrameNumber() == self.movie.frameCount() - 1:  # Check if it's the last frame
+        elif self.movie.currentFrameNumber() == self.movie.frameCount() - 1:
             self.movie.stop()
             self.onGIFFinished()
 
@@ -138,13 +138,12 @@ class VendingMachineDisplay(QWidget):
         self.movie.start()
 
     def updateGIF(self, state):
-        # Map states to subfolders TODO: Error messages > 100 are not handled with a gif
         subfolder_map = {
             "0": "0_welcome",
             "1": "1_payment",
             "2": "2_countdown",
             "3": "3_smile",
-            "3.5": "3_smile",
+            "3.5": "4_print",
             "3.9": "4_print",
             "4": "4_print",
             "204": "4_print",
@@ -152,7 +151,7 @@ class VendingMachineDisplay(QWidget):
             "100": "100_error"
         }
 
-        subfolder = subfolder_map.get(state, "0_welcome")
+        subfolder = subfolder_map.get(state, "100_error")
         gif_folder_path = os.path.join("..", "images", "gifs", subfolder)
 
         try:
@@ -177,7 +176,6 @@ class VendingMachineDisplay(QWidget):
         self.pictureLabel.show()
 
     def initUI(self):
-        # Set the layout
         self.layout = QVBoxLayout(self)
         self.setLayout(self.layout)
 
@@ -185,13 +183,13 @@ class VendingMachineDisplay(QWidget):
         self.pictureLabel = QLabel(self)
         self.pictureLabel.setAlignment(Qt.AlignCenter)
         PicturePixmap = QPixmap(rf"{config.IMAGE_PATH}") # static image
-        self.pictureLabel.setPixmap(PicturePixmap.scaled(1026, 530, Qt.KeepAspectRatio))
-        self.pictureLabel.setGeometry(100, 98, 1026, 530)
+        self.pictureLabel.setPixmap(PicturePixmap.scaled(1026, 530, Qt.KeepAspectRatio)) #TODO: read resolution from cfg.ini
+        self.pictureLabel.setGeometry(100, 98, 1026, 530) #TODO: read resolution from cfg.ini
 
         # GIF Label setup positioned into the window inside the transparent background frame
         self.gifLabel = QLabel(self)
         self.gifLabel.setAlignment(Qt.AlignCenter)
-        self.gifLabel.setGeometry(100, 98, 1026, 530)
+        self.gifLabel.setGeometry(100, 98, 1026, 530) #TODO: read resolution from cfg.ini
         self.gifLabel.hide()
 
         # Background setup
@@ -202,13 +200,14 @@ class VendingMachineDisplay(QWidget):
         self.backgroundLabel.setAlignment(Qt.AlignCenter)
         self.backgroundLabel.setAttribute(Qt.WA_TranslucentBackground)
         self.backgroundLabel.setGeometry(0, 0, 1600, 720) # TODO: read resolution from cfg.ini
-        self.backgroundLabel.raise_()  # Move image to the foreground
+        self.backgroundLabel.raise_()
 
-        self.setAttribute(Qt.WA_TranslucentBackground)  # make background transparent
-        self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint) # remove window frame
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)
 
         if config.FULLSCREEN_MODE:
             self.showFullScreen()
+            self.setCursor(Qt.BlankCursor)
         else:
             self.setWindowTitle(config.WINDOW_TITLE)
             self.show()
@@ -224,8 +223,7 @@ class VendingMachineDisplay(QWidget):
                                         text=True, check=True)
                 print("Output:", result.stdout)
             except subprocess.CalledProcessError as e:
-                # This block will run if the subprocess returns a non-zero exit status
-                error_message = e.stderr  # Capture the stderr from the error
+                error_message = e.stderr
 
                 if "No printer" in error_message:
                     print("Error: No printer found. Please ensure the printer is connected properly.")
@@ -240,7 +238,6 @@ class VendingMachineDisplay(QWidget):
                 process = subprocess.Popen(["python3", "img_capture.py"],
                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 print("img_capture.py started successfully.")
-                # Reading the output and errors for debugging
                 stdout, stderr = process.communicate()
 
                 if stdout:
@@ -313,13 +310,14 @@ def handle_client_connection(client_socket, appState):
 
 def start_server(appState):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind((config.SERVER_HOST, config.SERVER_PORT))  # Use server host and port from config.py
-    server_socket.listen(config.MAX_CONNECTIONS)  # Use max connections from config.py
+    server_socket.bind((config.SERVER_HOST, config.SERVER_PORT))
+    server_socket.listen(config.MAX_CONNECTIONS)
     print(f"App server listening on {config.SERVER_HOST}:{config.SERVER_PORT}")
 
     while True:
         client_socket, addr = server_socket.accept()
-        print(f"Connection established with {addr}")
+        if config.DEBUG_MODE != 0:
+            print(f"Connection established with {addr}")
         client_thread = threading.Thread(target=handle_client_connection, args=(client_socket, appState))
         client_thread.start()
 
@@ -334,7 +332,6 @@ if __name__ == '__main__':
     print("Building Display...")
     ex = VendingMachineDisplay(appState)
     print("Building Display completed!")
-    # Start the server in a separate thread
     print("Start server...")
     server_thread = threading.Thread(target=start_server, args=(appState,))
     server_thread.start()

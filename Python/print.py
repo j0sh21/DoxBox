@@ -51,7 +51,7 @@ def check_print_job_status(conn, job_id):
         print("Waiting 45 seconds finished print ready!")
 
 def print_image(printer_name, image_path):
-    print("Connect to the CUPS printing server")
+    print("Connecting to the CUPS printing server...")
     conn = cups.Connection()
     printers = conn.getPrinters()
     if printer_name not in printers:
@@ -104,15 +104,12 @@ def move_image():
         source_path = os.path.join(pic_dir, filename)
         destination_path = os.path.join(config.PRINT_DIR, filename)
 
-
         if copy_file(source_path, destination_path):
             print_image(printer_name, destination_path)
             os.remove(destination_path)
-            print(f'Removed {filename} after creating and sending print job.')
-            #send_message_to_app("5")
+            print(f'Removed {filename} after creating and sending print job and waiting 65 Seconds.')
 
 if __name__ == '__main__':
-    time.sleep(8)
     print("print.py is now running.")
     print(f"Preparing print job")
     move_image()

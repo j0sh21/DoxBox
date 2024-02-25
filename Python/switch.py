@@ -16,7 +16,6 @@ def send_message_to_app(message):
 def check_connection():
     command = ['ping', '-c', '1', 'google.com']
     try:
-        # Führe den Ping-Befehl aus
         subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
         print("Connection check successful.")
         return True
@@ -47,7 +46,7 @@ def main_loop():
                     amount = rsJson[0]['amount'] / 1000  # Amount in SATS
 
                     if (amount == config.AMOUNT_THRESHOLD):
-                        print("Sats recieved ! Sending msg = 1 to app.py!")
+                        print("Sats recieved! Sending msg = 1 to app.py!")
                         send_message_to_app("1")
                         time.sleep(config.POST_PAYMENT_DELAY)
                     else:
@@ -56,10 +55,10 @@ def main_loop():
                     time.sleep(config.CHECK_INTERVAL)
             else:
                 print(f"LNbits API response status code: {response.status_code}")
-                print("Polling LNbits API again in 5 seconds.")
+                print(f"Polling LNbits API again in {config.CHECK_INTERVAL} seconds.")
                 time.sleep(config.CHECK_INTERVAL)
         else:
-            print("No Internet Connection, checking again in 5 seconds")
+            print(f"No Internet Connection, checking again in {config.CHECK_INTERVAL} seconds")
             time.sleep(config.CHECK_INTERVAL)
             if check_connection():
                 print("Connection reestablished polling LNbits API")
