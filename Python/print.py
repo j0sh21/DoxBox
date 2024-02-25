@@ -109,7 +109,7 @@ def move_image():
             print_image(printer_name, destination_path)
             os.remove(destination_path)
             print(f'Removed {filename} after creating and sending print job.')
-            send_message_to_app("204")
+            #send_message_to_app("5")
 
 if __name__ == '__main__':
     time.sleep(8)
