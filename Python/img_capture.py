@@ -19,11 +19,7 @@ def send_message_to_app(message):
 
 def send_msg_to_LED(command):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-        # Connect to the server
         client_socket.connect((config.LED_SERVER_HOST, config.LED_SERVER_PORT))
-        #print(f"Connected to server at {config.LED_SERVER_HOST}:{config.LED_SERVER_PORT}")
-        # Send the command to the server
-        #print(f"Sending command to {config.LED_SERVER_HOST}:{command.encode('utf-8')}")
         client_socket.sendall(command.encode('utf-8'))
 
 def kill_process():
@@ -155,7 +151,7 @@ def main():
     send_msg_to_LED("color 255 255 255")
     send_msg_to_LED("blinkspeed 0.05 0.05 ")
     send_msg_to_LED("blink 1 ")
-    # main kills gphoto2 process and deletes alle old files from camera, before proceeding with create_output_folder and make_picture
+    # kill gphoto2 process and deletes alle old files from camera, before proceeding with create_output_folder and make_picture
     kill_process()
     start_clear = datetime.now()
     clear_files_cmd = ["--folder", "/store_00020001/DCIM/100CANON", "-R", "--delete-all-files"]

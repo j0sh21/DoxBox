@@ -46,18 +46,13 @@ class VendingMachineDisplay(QWidget):
 
     def send_msg_to_LED(self, command):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-            # Connect to the server
             client_socket.connect((self.LED_HOST, self.LED_PORT))
-            print(f"Connected to server at {self.LED_HOST}:{self.LED_PORT}")
-            # Send the command to the server
-            print(f"Sending command to {self.LED_HOST}:{command.encode('utf-8')}")
             client_socket.sendall(command.encode('utf-8'))
 
     def calculateDuration(self):
-        # Calculate the total duration of the GIF
         frame_count = self.movie.frameCount()
         frame_rate = self.movie.nextFrameDelay()  # Delay between frames in milliseconds
-        self.total_duration = frame_count * frame_rate / 1000  # Total duration in seconds
+        self.total_duration = frame_count * frame_rate / 1000
         if not self.appState.state == 0:
             print(f"Start playing gif with {str(self.total_duration)} seconds total duration")
 
@@ -157,23 +152,17 @@ class VendingMachineDisplay(QWidget):
             "100": "100_error"
         }
 
-        # default value if state not in subfolder map
         subfolder = subfolder_map.get(state, "0_welcome")
-
-        # Construct the path to the subfolder
         gif_folder_path = os.path.join("..", "images", "gifs", subfolder)
 
-        # List all GIF files in the subfolder
         try:
             gifs = [file for file in os.listdir(gif_folder_path) if file.endswith(".gif")]
             if gifs:
-                # Randomly select a GIF
                 selected_gif = random.choice(gifs)
                 self.gif_path = os.path.join(gif_folder_path, selected_gif)
-                self.gifLabel.setAlignment(Qt.AlignCenter)  # Center the content
-                # Load the GIF
+                self.gifLabel.setAlignment(Qt.AlignCenter)
                 try:
-                    self.gifLabel.show()  # Make sure the gifLabel is visible
+                    self.gifLabel.show()
                     self.playGIF()
                 except Exception as e:
                     print(f"Error while trying to start playing GIF: {str(e)}")
@@ -198,7 +187,6 @@ class VendingMachineDisplay(QWidget):
         PicturePixmap = QPixmap(rf"{config.IMAGE_PATH}") # static image
         self.pictureLabel.setPixmap(PicturePixmap.scaled(1026, 530, Qt.KeepAspectRatio))
         self.pictureLabel.setGeometry(100, 98, 1026, 530)
-
 
         # GIF Label setup positioned into the window inside the transparent background frame
         self.gifLabel = QLabel(self)

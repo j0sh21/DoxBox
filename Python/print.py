@@ -16,7 +16,6 @@ def send_message_to_app(message):
 
 def check_print_job_status(conn, job_id):
     try:
-        # Initial wait time in seconds before checking the job status for the first time
         initial_wait = 20
         time.sleep(initial_wait)
         while True:
@@ -27,7 +26,6 @@ def check_print_job_status(conn, job_id):
                 break
 
             if job_id not in jobs:
-                # Job is no longer in the list of uncompleted jobs, so it must be completed
                 print(f"Print job {job_id} status changed to 'successful'.")
                 break
             else:
@@ -45,7 +43,6 @@ def check_print_job_status(conn, job_id):
                     print(f"Print job {job_id} encountered an error.")
                     send_message_to_app("110")
                     break
-            # Wait some time before checking the status again
             time.sleep(1)
     except Exception as e:
         print(f"Error while checking print job Status: {e}\n\n Sleeping 45 seconds...\nPhoto should be printed finish correctly in about 45 seconds... ")

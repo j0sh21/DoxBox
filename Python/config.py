@@ -2,7 +2,6 @@ import configparser
 
 config = configparser.ConfigParser()
 
-# Attempt to read the config file
 try:
     config.read(r'../config/cfg.ini')
 except Exception as e:
