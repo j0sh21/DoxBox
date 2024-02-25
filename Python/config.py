@@ -37,6 +37,11 @@ TRIGGER_PHOTO_COMMAND = get_config_value('Camera', 'TRIGGER_PHOTO_COMMAND')
 DOWNLOAD_PHOTOS_COMMAND = get_config_value('Camera', 'DOWNLOAD_PHOTOS_COMMAND')
 CLEAR_FILES_COMMAND = get_config_value('Camera', 'CLEAR_FILES_COMMAND')
 
+# Camera Error handling
+IMG_SLEEP_TIME_SHORT = get_config_value('ON_Error', 'IMG_SLEEP_TIME_SHORT')
+IMG_SLEEP_TIME_LONG = get_config_value('ON_Error', 'IMG_SLEEP_TIME_LONG')
+MAX_RETRIES = get_config_value('ON_Error', 'MAX_RETRIES')
+
 # Storage Configuration
 PICTURE_SAVE_DIRECTORY = get_config_value('Storage', 'PICTURE_SAVE_DIRECTORY')
 

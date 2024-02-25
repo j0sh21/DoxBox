@@ -16,7 +16,7 @@ def send_message_to_app(message):
 
 def check_print_job_status(conn, job_id):
     # Initial wait time in seconds before checking the job status for the first time
-    initial_wait = 9
+    initial_wait = 20
     time.sleep(initial_wait)
     while True:
         jobs = conn.getJobs(which_jobs='not-completed')
@@ -45,7 +45,7 @@ def check_print_job_status(conn, job_id):
                 send_message_to_app("110")
                 break
         # Wait some time before checking the status again
-        time.sleep(10)
+        time.sleep(1)
 
 def print_image(printer_name, image_path):
     print("Connect to the CUPS printing server")
@@ -68,7 +68,7 @@ def print_image(printer_name, image_path):
             print_job_id = conn.printFile(printer_name, image_path, "Photo Print", {})
             print(f"Print job submitted. Job ID: {print_job_id} - {image_path} on {printer_name}")
             # Check the status of the print job
-            check_print_job_status(conn, printer_name, print_job_id)
+            check_print_job_status(conn, print_job_id)
         except Exception as e:
             print(f"Error in print job: {e}")
             send_message_to_app("119")

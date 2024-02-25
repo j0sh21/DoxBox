@@ -78,7 +78,6 @@ class VendingMachineDisplay(QWidget):
                     self.desiredLoops *= 3
                 else:
                     self.desiredLoops *= 2
-
             if self.loopCount >= self.desiredLoops:
                 self.movie.stop()
                 self.isreplay = 0
@@ -96,7 +95,6 @@ class VendingMachineDisplay(QWidget):
                 print(f"Replay GIF ({self.desiredLoops}x), total duration is < 3 seconds")
                 self.isreplay = 1
                 self.playGIF()
-
         elif last_gif_frame:
             self.isreplay = 0
             if self.appState.state == "1":
@@ -112,6 +110,7 @@ class VendingMachineDisplay(QWidget):
                 try:
                     if self.loopCount == 1: #Only after 1st Loop
                         self.send_msg_to_LED("fade 0")
+                        self.appState.state = "3.5"
                         self.updateGIF(self.appState.state)
                         photo_thread = threading.Thread(target=self.photo_subprocess)
                         photo_thread.start()
@@ -119,7 +118,7 @@ class VendingMachineDisplay(QWidget):
                     print(f"Failed to start img_capture.py: {e}")
                     self.appState.state = "100"
                     self.updateGIF(self.appState.state)
-            elif self.appState.state in("4", "100", "0"):
+            elif self.appState.state in("3.5", "4", "100", "0", "3.9"):
                 print(f"GIF for state {self.appState.state} finished play next gif for state {self.appState.state} until external state change")
                 self.updateGIF(self.appState.state)
             elif self.appState.state == "5":
@@ -149,6 +148,8 @@ class VendingMachineDisplay(QWidget):
             "1": "1_payment",
             "2": "2_countdown",
             "3": "3_smile",
+            "3.5": "3_smile",
+            "3.9": "4_print",
             "4": "4_print",
             "5": "5_thx",
             "100": "100_error"
@@ -192,9 +193,10 @@ class VendingMachineDisplay(QWidget):
         # Picture Label (used for .PNG) positioned into the window inside the transparent background frame
         self.pictureLabel = QLabel(self)
         self.pictureLabel.setAlignment(Qt.AlignCenter)
-        PicturePixmap = QPixmap(rf"../images/gifs/0_welcome/welcome.png") # static image
+        PicturePixmap = QPixmap(rf"{config.IMAGE_PATH}") # static image
         self.pictureLabel.setPixmap(PicturePixmap.scaled(1026, 530, Qt.KeepAspectRatio))
         self.pictureLabel.setGeometry(100, 98, 1026, 530)
+
 
         # GIF Label setup positioned into the window inside the transparent background frame
         self.gifLabel = QLabel(self)
