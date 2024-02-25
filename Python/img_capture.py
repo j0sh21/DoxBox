@@ -115,7 +115,7 @@ def make_picture():
     download_pics_cmd = config.DOWNLOAD_PHOTOS_COMMAND
     start_trigger = datetime.now()
     send_msg_to_LED("blink 0")
-    print(f"{"_"*20}\n|Trigger photo NOW!|\n{"_"*20}")
+    print(f"{"_"*10}\n|Trigger photo NOW!|\n{"_"*10}")
     run_gphoto2_command(trigger_photo_cmd)
     end_trigger = datetime.now()
     print(f"Photo taken and saved on camera in {(end_trigger - start_trigger).total_seconds()} seconds.\n")
