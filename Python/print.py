@@ -15,40 +15,43 @@ def send_message_to_app(message):
         print(f"Error in sending message to app: {e}")
 
 def check_print_job_status(conn, job_id):
-    # Initial wait time in seconds before checking the job status for the first time
-    initial_wait = 9
-    time.sleep(initial_wait)
-    while True:
-        jobs = conn.getJobs(which_jobs='not-completed')
+    try:
+        initial_wait = 20
+        time.sleep(initial_wait)
+        while True:
+            jobs = conn.getJobs(which_jobs='not-completed')
+            print(f"Checking print job status: {len(jobs)} not-completed print jobs found")
+            if not jobs:
+                print("No not-completed print jobs")
+                break
 
-        if not jobs:
-            print("No not-completed print jobs")
-            break
-
-        if job_id not in jobs:
-            # Job is no longer in the list of uncompleted jobs, so it must be completed
-            print(f"Print job {job_id} status changed to 'successful'.")
-            break
-        else:
-            job = jobs[job_id]
-            print(f"Print job {job_id} status: {job['job-state']}, {job['job-state-reasons']}")
-            if 'job-completed' in job['job-state-reasons']:
-                print(f"Print job {job_id} completed successfully.")
-                send_message_to_app("5")
+            if job_id not in jobs:
+                print(f"Print job {job_id} status changed to 'successful'.")
                 break
-            elif 'job-stopped' in job['job-state-reasons'] or 'job-canceled' in job['job-state-reasons']:
-                print(f"Print job {job_id} stopped or canceled.")
-                send_message_to_app("116")
-                break
-            elif 'job-error' in job['job-state-reasons']:
-                print(f"Print job {job_id} encountered an error.")
-                send_message_to_app("110")
-                break
-        # Wait some time before checking the status again
-        time.sleep(10)
+            else:
+                job = jobs[job_id]
+                print(f"Print job {job_id} status: {job['job-state']}, {job['job-state-reasons']}")
+                if 'job-completed' in job['job-state-reasons']:
+                    print(f"Print job {job_id} completed successfully.")
+                    send_message_to_app("5")
+                    break
+                elif 'job-stopped' in job['job-state-reasons'] or 'job-canceled' in job['job-state-reasons']:
+                    print(f"Print job {job_id} stopped or canceled.")
+                    send_message_to_app("116")
+                    break
+                elif 'job-error' in job['job-state-reasons']:
+                    print(f"Print job {job_id} encountered an error.")
+                    send_message_to_app("110")
+                    break
+            time.sleep(1)
+    except Exception as e:
+        print(f"Error while checking print job Status: {e}\n\n Sleeping 45 seconds...\nPhoto should be printed finish correctly in about 45 seconds... ")
+        time.sleep(45)
+        send_message_to_app("5")
+        print("Waiting 45 seconds finished print ready!")
 
 def print_image(printer_name, image_path):
-    print("Connect to the CUPS printing server")
+    print("Connecting to the CUPS printing server...")
     conn = cups.Connection()
     printers = conn.getPrinters()
     if printer_name not in printers:
@@ -68,7 +71,7 @@ def print_image(printer_name, image_path):
             print_job_id = conn.printFile(printer_name, image_path, "Photo Print", {})
             print(f"Print job submitted. Job ID: {print_job_id} - {image_path} on {printer_name}")
             # Check the status of the print job
-            check_print_job_status(conn, printer_name, print_job_id)
+            check_print_job_status(conn, print_job_id)
         except Exception as e:
             print(f"Error in print job: {e}")
             send_message_to_app("119")
@@ -101,15 +104,12 @@ def move_image():
         source_path = os.path.join(pic_dir, filename)
         destination_path = os.path.join(config.PRINT_DIR, filename)
 
-
         if copy_file(source_path, destination_path):
             print_image(printer_name, destination_path)
             os.remove(destination_path)
-            print(f'Removed {filename} after creating and sending print job.')
-            send_message_to_app("204")
+            print(f'Removed {filename} after creating and sending print job and waiting 65 Seconds.')
 
 if __name__ == '__main__':
-    time.sleep(8)
     print("print.py is now running.")
     print(f"Preparing print job")
     move_image()

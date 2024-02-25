@@ -28,7 +28,7 @@ You can set it up on any wedding, a conferece, a meetup or a festival. We build 
   
 ## Example program flow:
 
-<img src="flowchart.JPG" height="800">
+<img src="./docs/images/flowchart.JPG" height="1100">
 
 
 

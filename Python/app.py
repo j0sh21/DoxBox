@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
 from PyQt5.QtGui import QPixmap, QMovie
-from PyQt5.QtCore import Qt, pyqtSignal, QObject, QSize, QPoint
+from PyQt5.QtCore import Qt, pyqtSignal, QObject
 import subprocess
 import sys
 import threading
@@ -9,7 +9,7 @@ import os
 import random
 import config  #config.py from the same directory
 
-# A class for managing the application state and communication
+# A class for managing the DoxBox state and communication with other python subprocesses
 class AppState(QObject):
     stateChanged = pyqtSignal(str)
 
@@ -26,12 +26,12 @@ class AppState(QObject):
         self._state = value
         self.stateChanged.emit(self._state)
 
-# Main application class (Display)
+# Main DoxBox class (Display)
 class VendingMachineDisplay(QWidget):
     def __init__(self, appState):
         super().__init__()
         self.loopCount = 0
-        self.desiredLoops = 3
+        self.desiredLoops = 1
         self.appState = appState
         self.initUI()
         self.appState.stateChanged.connect(self.onStateChanged)
@@ -40,96 +40,157 @@ class VendingMachineDisplay(QWidget):
         self.movie.frameChanged.connect(self.onFrameChanged)
         self.total_duration = 0
         self.gif_path = ""
+        self.isreplay = 0
+        self.LED_HOST = config.LED_SERVER_HOST
+        self.LED_PORT = config.LED_SERVER_PORT
 
-    def send_msg_to_LED(self , host, port, command):
-        #TODO: Read host and port from cfg.ini
+    def send_msg_to_LED(self, command):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-            # Connect to the server
-            client_socket.connect((host, port))
-            print(f"Connected to server at {host}:{port}")
-            # Send the command to the server
-            print(f"Sending command to {host}:{command.encode('utf-8')}")
+            client_socket.connect((self.LED_HOST, self.LED_PORT))
             client_socket.sendall(command.encode('utf-8'))
 
     def calculateDuration(self):
-        # Calculate the total duration of the GIF
         frame_count = self.movie.frameCount()
         frame_rate = self.movie.nextFrameDelay()  # Delay between frames in milliseconds
-        self.total_duration = frame_count * frame_rate / 1000  # Total duration in seconds
-        print(f"Start playing gif with {str(self.total_duration)} seconds total duration")
+        self.total_duration = frame_count * frame_rate / 1000
+        if not self.appState.state == 0:
+            print(f"Start playing gif with {str(self.total_duration)} seconds total duration")
 
     def onFrameChanged(self):
-        if self.movie.currentFrameNumber() == 0: # Check if this is the first frame
+        if self.movie.currentFrameNumber() == 0:
             self.calculateDuration()
-        elif self.movie.currentFrameNumber() == self.movie.frameCount() - 1:  # Check if it's the last frame
+        elif self.movie.currentFrameNumber() == self.movie.frameCount() - 1:
             self.movie.stop()
             self.onGIFFinished()
 
     def onGIFFinished(self):
-        HOST, PORT = '127.0.0.1', 12345  # Change host and port if needed
         self.loopCount += 1
-        if self.total_duration < 3.0 and self.appState.state not in ("2", "3"):
-            if self.movie.currentFrameNumber() == self.movie.frameCount() - 1:  # Last frame
-                if self.loopCount == 1:
-                    if self.total_duration < 0.5:
-                        self.desiredLoops *= 6
-                    elif self.total_duration < 1.0:
-                        self.desiredLoops *= 3
-                    elif self.total_duration < 4.0:
-                        self.desiredLoops *= 2
-                if self.loopCount >= self.desiredLoops:
-                    self.movie.stop()
-                    if self.appState.state == "1":
-                        print(f"({self.desiredLoops}x) Payment GIF finished, next state: 2 and Gif")
-                        self.desiredLoops = 3
-                        self.loopCount = 0
-                        self.appState.state = "2"
+        last_gif_frame = self.movie.currentFrameNumber() == self.movie.frameCount() - 1
+        if self.total_duration < 3.3 and self.appState.state not in ("2", "3") and last_gif_frame:
+            if self.loopCount == 1:
+                if self.total_duration < 0.6:
+                    self.desiredLoops *= 6
+                elif self.total_duration < 1.6:
+                    self.desiredLoops *= 3
+                else:
+                    self.desiredLoops *= 2
+            if self.loopCount >= self.desiredLoops:
+                self.movie.stop()
+                self.isreplay = 0
+                if self.appState.state == "1":
+                    print(f"({self.desiredLoops}x) Loops of Payment GIF finished, next state: 2 and GIF")
+                    self.appState.state = "2"
+                    self.updateGIF(self.appState.state)
+                elif self.appState.state == "5":
+                    self.appState.state = "0"
+                    print(f"({self.desiredLoops}x) Loops of the Thank You - GIF finished, initial state 0, start welcome PNG")
+                else:
                     print(f"({self.desiredLoops}x) Loops finished, next random GIF for state: {self.appState.state}")
                     self.updateGIF(self.appState.state)
-                else:
-                    print(f"Replay GIF ({self.desiredLoops}x), total duration is < 3 seconds")
-                    self.playGIF()
-
-        else:
-            if self.appState.state in("1","2","3"):
-                if self.appState.state == "1":
-                    print("Payment GIF finished, next state: 2 and GIF")
-                    self.appState.state = "2"
-                elif self.appState.state == "2":
-                    print("Countdown GIF finished, next state: 3 and GIF")
-                    self.appState.state = "3"
-                else:
-                    print("Smile GIF finished, capture photo very soon")
-                    try:
-                        if self.loopCount == 1: #Only after 1st Loop
-                            self.send_msg_to_LED(HOST, PORT, "fade 0")
-                            photo_thread = threading.Thread(target=self.photo_subprocess)
-                            photo_thread.start()
-                    except Exception as e:
-                        print(f"Failed to start img_capture.py: {e}")
-                        appState.stateChanged.emit("100")
-            elif self.appState.state in("4", "100", "0"):
+            else:
+                print(f"Replay GIF ({self.desiredLoops}x), total duration is < 3 seconds")
+                self.isreplay = 1
+                self.playGIF()
+        elif last_gif_frame:
+            self.isreplay = 0
+            if self.appState.state == "1":
+                print("Payment GIF finished, next state: 2 and GIF")
+                self.appState.state = "2"
+                self.updateGIF(self.appState.state)
+            elif self.appState.state == "2":
+                print("Countdown GIF finished, next state: 3 and GIF")
+                self.appState.state = "3"
+                self.updateGIF(self.appState.state)
+            elif self.appState.state == "3":
+                print("Smile GIF finished, capture photo very soon")
+                try:
+                    if self.loopCount == 1: #Only after 1st Loop
+                        self.send_msg_to_LED("fade 0")
+                        self.appState.state = "3.5"
+                        self.updateGIF(self.appState.state)
+                        photo_thread = threading.Thread(target=self.photo_subprocess)
+                        photo_thread.start()
+                except Exception as e:
+                    print(f"Failed to start img_capture.py: {e}")
+                    self.appState.state = "100"
+                    self.updateGIF(self.appState.state)
+            elif self.appState.state in("3.5", "4", "100", "0", "3.9", "204"):
                 print(f"GIF for state {self.appState.state} finished play next gif for state {self.appState.state} until external state change")
                 self.updateGIF(self.appState.state)
             elif self.appState.state == "5":
                 print("Thank You - GIF finished, initial state 0, start welcome GIF")
                 self.appState.state = "0"
+                self.updateGIF(self.appState.state)
             else:
                 self.updateGIF(self.appState.state)
 
     def playGIF(self):
+        if self.isreplay == 0:
+            print("Play GIF")
+            self.loopCount = 0
+            self.desiredLoops = 1
+        else:
+            print("Replay GIF")
+
         self.movie.setFileName(self.gif_path)
         self.gifLabel.setMovie(self.movie)
         self.gifLabel.setScaledContents(True)
         self.movie.start()
 
+    def updateGIF(self, state):
+        subfolder_map = {
+            "0": "0_welcome",
+            "1": "1_payment",
+            "2": "2_countdown",
+            "3": "3_smile",
+            "3.5": "4_print",
+            "3.9": "4_print",
+            "4": "4_print",
+            "204": "4_print",
+            "5": "5_thx",
+            "100": "100_error"
+        }
+
+        subfolder = subfolder_map.get(state, "100_error")
+        gif_folder_path = os.path.join("..", "images", "gifs", subfolder)
+
+        try:
+            gifs = [file for file in os.listdir(gif_folder_path) if file.endswith(".gif")]
+            if gifs:
+                selected_gif = random.choice(gifs)
+                self.gif_path = os.path.join(gif_folder_path, selected_gif)
+                self.gifLabel.setAlignment(Qt.AlignCenter)
+                try:
+                    self.gifLabel.show()
+                    self.playGIF()
+                except Exception as e:
+                    print(f"Error while trying to start playing GIF: {str(e)}")
+            else:
+                print("No GIFs found in the specified folder.")
+        except FileNotFoundError:
+            print(f"The folder {gif_folder_path} does not exist.")
+
+    def updatePicture(self, imagePath):
+        pixmap = QPixmap(imagePath)
+        self.pictureLabel.setPixmap(pixmap.scaled(800, 600, Qt.KeepAspectRatio))
+        self.pictureLabel.show()
 
     def initUI(self):
-        # Set the layout
         self.layout = QVBoxLayout(self)
         self.setLayout(self.layout)
 
-        display_width, display_height = 1600, 720
+        # Picture Label (used for .PNG) positioned into the window inside the transparent background frame
+        self.pictureLabel = QLabel(self)
+        self.pictureLabel.setAlignment(Qt.AlignCenter)
+        PicturePixmap = QPixmap(rf"{config.IMAGE_PATH}") # static image
+        self.pictureLabel.setPixmap(PicturePixmap.scaled(1026, 530, Qt.KeepAspectRatio)) #TODO: read resolution from cfg.ini
+        self.pictureLabel.setGeometry(100, 98, 1026, 530) #TODO: read resolution from cfg.ini
+
+        # GIF Label setup positioned into the window inside the transparent background frame
+        self.gifLabel = QLabel(self)
+        self.gifLabel.setAlignment(Qt.AlignCenter)
+        self.gifLabel.setGeometry(100, 98, 1026, 530) #TODO: read resolution from cfg.ini
+        self.gifLabel.hide()
 
         # Background setup
         self.backgroundLabel = QLabel(self)
@@ -139,33 +200,14 @@ class VendingMachineDisplay(QWidget):
         self.backgroundLabel.setAlignment(Qt.AlignCenter)
         self.backgroundLabel.setAttribute(Qt.WA_TranslucentBackground)
         self.backgroundLabel.setGeometry(0, 0, 1600, 720) # TODO: read resolution from cfg.ini
-        self.backgroundLabel.raise_()  # Move image to the foreground
+        self.backgroundLabel.raise_()
 
-        # GIF Label setup
-        self.gifLabel = QLabel(self)
-        self.gifLabel.setAlignment(Qt.AlignCenter)
-        self.gifLabel.setGeometry(0, (720 - 600) // 2, 800, 600)  # Positioned on the left half TODO: Needs to change position depends on the state. When the screen is split in two square halfs and when the gif should be in the middle etc.
-        self.gifLabel.hide()
-
-        # Picture Label (used for .PNG Text) setup for the RIGHT half
-        self.rightPictureLabel = QLabel(self)  # Renamed to differentiate from the other picture label
-        self.rightPictureLabel.setAlignment(Qt.AlignCenter)
-        rightPicturePixmap = QPixmap(rf"../images/gifs/0_welcome/qr-code.png") #TODO: for testing, needs to be set on state changed via self.updatePicture()
-        self.rightPictureLabel.setPixmap(rightPicturePixmap.scaled(525, 525, Qt.KeepAspectRatio))
-        self.rightPictureLabel.setGeometry(605, 98, 525, 525)  # Positioned on the right half
-
-        # Picture Label (used for .PNG Text) setup for the LEFT half
-        self.leftPictureLabel = QLabel(self)  # Renamed to differentiate from the other picture label
-        self.leftPictureLabel.setAlignment(Qt.AlignCenter)
-        leftPicturePixmap = QPixmap(rf"../images/gifs/0_welcome/text_welcome.png") #TODO: for testing, needs to be set on state changed via self.updatePicture()
-        self.leftPictureLabel.setPixmap(leftPicturePixmap.scaled(530, 530, Qt.KeepAspectRatio))
-        self.leftPictureLabel.setGeometry(90, 96, 530, 530)  # Positioned on the left half
-        
-        self.setAttribute(Qt.WA_TranslucentBackground)  # make background transparent
-        self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint) # remove window frame
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setWindowFlags(self.windowFlags() | Qt.FramelessWindowHint)
 
         if config.FULLSCREEN_MODE:
             self.showFullScreen()
+            self.setCursor(Qt.BlankCursor)
         else:
             self.setWindowTitle(config.WINDOW_TITLE)
             self.show()
@@ -181,8 +223,7 @@ class VendingMachineDisplay(QWidget):
                                         text=True, check=True)
                 print("Output:", result.stdout)
             except subprocess.CalledProcessError as e:
-                # This block will run if the subprocess returns a non-zero exit status
-                error_message = e.stderr  # Capture the stderr from the error
+                error_message = e.stderr
 
                 if "No printer" in error_message:
                     print("Error: No printer found. Please ensure the printer is connected properly.")
@@ -197,7 +238,6 @@ class VendingMachineDisplay(QWidget):
                 process = subprocess.Popen(["python3", "img_capture.py"],
                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 print("img_capture.py started successfully.")
-                # Reading the output and errors for debugging
                 stdout, stderr = process.communicate()
 
                 if stdout:
@@ -209,39 +249,37 @@ class VendingMachineDisplay(QWidget):
                 appState.stateChanged.emit("100")
 
     def onStateChanged(self, state):
-        HOST, PORT = '127.0.0.1', 12345  # Change host and port if needed
         # state handling
         if state == "0":
-            self.send_msg_to_LED(HOST, PORT, "breath 0")
-            self.send_msg_to_LED(HOST, PORT, "blink 0")
-            self.send_msg_to_LED(HOST, PORT, "fade 0")
+            self.send_msg_to_LED("breath 0")
+            self.send_msg_to_LED("blink 0")
+            self.send_msg_to_LED("fade 0")
             print(f"{'_' * 10}State changed to 0: Welcome screen{'_' * 10}")
-            self.send_msg_to_LED(HOST, PORT, "color 226 0 116")  # Set to lnbits color
-            self.send_msg_to_LED(HOST, PORT, "breathbrightness 0.1 0.7")
-            self.send_msg_to_LED(HOST, PORT, "breathspeed 0.09")
-            self.send_msg_to_LED(HOST, PORT, "breath 1")
+            self.send_msg_to_LED("color 226 0 116")  # Set to lnbits color
+            self.send_msg_to_LED("breathbrightness 0.1 0.7")
+            self.send_msg_to_LED("breathspeed 0.02")
+            self.send_msg_to_LED("breath 1")
         if state == "1":
             print(f"{'_' * 10}State changed to 1: Payment recived{'_' * 10}")
-            self.send_msg_to_LED(HOST, PORT, "breath 0")
-            self.send_msg_to_LED(HOST, PORT, "breathbrightness 0.2 0.8")
-            self.send_msg_to_LED(HOST, PORT, "breathspeed 0.02")
-            self.send_msg_to_LED(HOST, PORT, "breath 1")
+            self.send_msg_to_LED("breath 0")
+            self.send_msg_to_LED("breathbrightness 0.2 0.8")
+            self.send_msg_to_LED("breathspeed 0.005")
+            self.send_msg_to_LED("breath 1")
         if state == "2":
             print(f"{'_' * 10}State changed to 2: Start countdown{'_' * 10}")
-
-            self.send_msg_to_LED(HOST, PORT, "breath 0")
-            self.send_msg_to_LED(HOST, PORT, "blinkspeed 0.5 0.5")
-            self.send_msg_to_LED(HOST, PORT, "blink 1")
+            self.send_msg_to_LED("breath 0")
+            self.send_msg_to_LED("blinkspeed 0.5 0.5")
+            self.send_msg_to_LED("blink 1")
         if state == "3":
             print(f"{'_' * 10}State changed to 3: Smile now{'_' * 10}")
-            self.send_msg_to_LED(HOST, PORT, "fade 1")
-
+            self.send_msg_to_LED("fadespeed 2.3")
+            self.send_msg_to_LED("fade 1")
         if state == "4":
             print(f"{'_' * 10}State changed to 4: Start printing{'_' * 10}")
-            self.send_msg_to_LED(HOST, PORT, "color 226 0 116")
-            self.send_msg_to_LED(HOST, PORT, "breathbrightness 0.35 0.8")
-            self.send_msg_to_LED(HOST, PORT, "breathspeed 0.12")
-            self.send_msg_to_LED(HOST, PORT, "breath 1")
+            self.send_msg_to_LED("color 226 0 116")
+            self.send_msg_to_LED("breathbrightness 0.35 0.8")
+            self.send_msg_to_LED("breathspeed 0.1")
+            self.send_msg_to_LED("breath 1")
             try:
                 print_thread = threading.Thread(target=self.print_subprocess)
                 print_thread.start()
@@ -250,60 +288,16 @@ class VendingMachineDisplay(QWidget):
                 appState.stateChanged.emit("100")
         if state == "5":
             print(f"{'_' * 10}State changed to 5: Thank You!{'_' * 10}")
-            self.send_msg_to_LED(HOST, PORT, "breath 0")
-            self.send_msg_to_LED(HOST, PORT, "fade 1")
+            self.send_msg_to_LED("breath 0")
+            self.send_msg_to_LED("fadespeed 1")
+            self.send_msg_to_LED("fade 1")
         if state in("100", "101", "102", "103", "104", "110", "112", "113", "114", "115", "119"):
-            self.send_msg_to_LED(HOST, PORT, "color 255 0 0")
-            self.send_msg_to_LED(HOST, PORT, "blink 1")
+            self.send_msg_to_LED("color 255 0 0")
+            self.send_msg_to_LED("blinkspeed 0.5 0.5")
+            self.send_msg_to_LED("blink 1")
         
         self.movie.stop()
         self.updateGIF(state)
-
-    def updateGIF(self, state):
-        self.loopCount = 0  #TODO: Maybe this is not the right place for resetting loop. But the skript works as designed... Reset loop count each time a new GIF is played
-        self.desiredLoops = 0 #TODO: Maybe this is not the right place for resetting loop. But the skript works as designed... Reset desired Loops count each time a new GIF is played
-
-        # Map states to subfolders TODO: Some status messages does not reflect a floder eg. 204 and everything > 100
-        subfolder_map = {
-            "0": "0_welcome",
-            "1": "1_payment",
-            "2": "2_countdown",
-            "3": "3_smile",
-            "4": "4_print",
-            "5": "5_thx",
-            "100": "100_error"
-        }
-
-        #default value if state not in subfolder map
-        subfolder = subfolder_map.get(state, "0_welcome")
-
-        # Construct the path to the subfolder
-        gif_folder_path = os.path.join("..", "images", "gifs", subfolder)
-
-        # List all GIF files in the subfolder
-        try:
-            gifs = [file.upper() for file in os.listdir(gif_folder_path) if file.endswith(".GIF")]
-            if gifs:
-                # Randomly select a GIF
-                selected_gif = random.choice(gifs)
-                self.gif_path = os.path.join(gif_folder_path, selected_gif)
-                self.gifLabel.setAlignment(Qt.AlignCenter)  # Center the content
-                # Load the GIF
-                try:
-                    self.gifLabel.show()  # Make sure the gifLabel is visible
-                    self.playGIF()
-                except Exception as e:
-                    print(f"Error while trying to start playing GIF: {str(e)}")
-            else:
-                print("No GIFs found in the specified folder.")
-        except FileNotFoundError:
-            print(f"The folder {gif_folder_path} does not exist.")
-
-    def updatePicture(self, imagePath):
-        pixmap = QPixmap(imagePath)
-        # Ensure the pixmap fits within the defined square size, keeping aspect ratio
-        self.pictureLabel.setPixmap(pixmap.scaled(800, 600, Qt.KeepAspectRatio))
-        self.pictureLabel.show()
 
 def handle_client_connection(client_socket, appState):
     try:
@@ -316,13 +310,14 @@ def handle_client_connection(client_socket, appState):
 
 def start_server(appState):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind((config.SERVER_HOST, config.SERVER_PORT))  # Use server host and port from config.py
-    server_socket.listen(config.MAX_CONNECTIONS)  # Use max connections from config.py
+    server_socket.bind((config.SERVER_HOST, config.SERVER_PORT))
+    server_socket.listen(config.MAX_CONNECTIONS)
     print(f"App server listening on {config.SERVER_HOST}:{config.SERVER_PORT}")
 
     while True:
         client_socket, addr = server_socket.accept()
-        print(f"Connection established with {addr}")
+        if config.DEBUG_MODE != 0:
+            print(f"Connection established with {addr}")
         client_thread = threading.Thread(target=handle_client_connection, args=(client_socket, appState))
         client_thread.start()
 
@@ -337,7 +332,6 @@ if __name__ == '__main__':
     print("Building Display...")
     ex = VendingMachineDisplay(appState)
     print("Building Display completed!")
-    # Start the server in a separate thread
     print("Start server...")
     server_thread = threading.Thread(target=start_server, args=(appState,))
     server_thread.start()

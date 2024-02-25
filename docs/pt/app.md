@@ -49,6 +49,43 @@ A aplicação pode exibir animações GIF como parte de sua UI, fornecendo conte
 - **handle_client_connection(client_socket, appState)**: Lida com conexões de entrada de clientes. Esta função é uma parte crítica da arquitetura servidor-cliente, lendo mensagens enviadas pelos clientes, atualizando o estado da aplicação com base nessas mensagens e garantindo que a UI reflita essas mudanças.
 - **start_server(appState)**: Inicializa e inicia o servidor que escuta por conexões de entrada. Ele se vincula a uma porta especificada e espera que os clientes se conectem, criando uma nova thread para lidar com cada conexão, permitindo assim que a aplicação continue operando suavemente enquanto gerencia as solicitações dos clientes.
 
+### Lógica de Replay de GIF
+
+A lógica de replay de GIF no DoxBox é projetada para gerenciar a reprodução de animações GIF com base no estado atual do aplicativo e na duração dos GIFs. Essa lógica garante que os GIFs mais curtos sejam repetidos um número especificado de vezes para manter o engajamento do usuário, enquanto os GIFs mais longos fazem a transição suavemente para o próximo estado ou GIF quando concluídos. Abaixo está uma visão geral dos principais componentes e funcionalidades da lógica de replay de GIF.
+
+#### Componentes:
+- Objeto Filme: Representa a animação GIF a ser reproduzida. É responsável por gerenciar a reprodução do GIF.
+- Etiqueta GIF: Um componente gráfico da interface do usuário (etiqueta) que exibe a animação GIF.
+- Gerenciamento de Estado: O aplicativo mantém um estado que determina o contexto ou fase em que atualmente se encontra (por exemplo, pagamento, contagem regressiva, sorriso).
+
+
+#### Atributos Chave:
+
+- `loopCount`: Rastreia o número de vezes que o GIF atual foi repetido.
+- `desiredLoops`: O número desejado de vezes que o GIF deve ser repetido, que varia de acordo com a duração do GIF.
+- `isreplay`: Uma bandeira indicando se a reprodução atual do GIF é uma reprodução original (0) ou um replay (1).
+- `total_duration`: A duração total do GIF atual. Usado para determinar o número de loops desejados para GIFs mais curtos.
+- `gif_path`: O caminho do arquivo do GIF atual a ser reproduzido.
+
+
+#### Funções:
+
+- `playGIF()`: Inicia a reprodução de um GIF. Se `isreplay` for 0, ele redefine `loopCount` e `desiredLoops` para um novo GIF. Se `isreplay` for 1, ele repete o GIF atual sem redefinir a contagem de loops.
+- `updateGIF(state)`: Atualiza o GIF atual com base no estado do aplicativo. Ele seleciona um GIF aleatório de uma subpasta especificada correspondente ao estado atual e o prepara para reprodução.
+- `onGIFFinished()`: Acionado quando um GIF termina de ser reproduzido. Ele gerencia a lógica para repetir ou fazer a transição de GIFs com base em sua duração e no estado do aplicativo.
+
+#### Duração do GIF e Tempos de Replay:
+
+- Duração < 0,6 segundos: Para GIFs menores que 0,6 segundos, o número desejado de repetições (`desiredLoops`) é definido como 6 vezes. Isso garante que os GIFs muito curtos sejam reproduzidos vezes suficientes para serem notados e envolverem o usuário.
+- Duração entre 0,6 e 1,6 segundos: Para GIFs com duração entre 0,6 segundos e 1,6 segundos, o GIF é repetido 3 vezes. Esta faixa de duração abrange GIFs moderadamente curtos que requerem menos repetições para manter o engajamento do usuário.
+- Duração entre 1,6 e 3,3 segundos: Os GIFs que se enquadram nesta faixa de duração são repetidos 2 vezes. Estes são considerados curtos, mas não tão breves que necessitem de muitas repetições para serem eficazes.
+
+#### Fluxo Lógico com Durações Específicas:
+
+- Reprodução Inicial: Ao selecionar um novo GIF, `playGIF()` é chamado com `isreplay` definido como 0. Isso inicia a reprodução, definindo `loopCount` como 0 e `desiredLoops` como 1.
+- Determinando a Necessidade de Replay: Quando um GIF é concluído (`onGIFFinished()`), a lógica verifica a duração total (`total_duration`) do GIF e o estado atual do aplicativo. Se o estado não for "2" ou "3" e a duração do GIF for menor que 3,3 segundos, ele prossegue para determinar o número de repetições com base nas faixas de duração específicas mencionadas acima.
+- Execução do Replay: Se o GIF atender aos critérios para replay, `isreplay` é definido como 1, e `playGIF()` é chamado novamente. Isso incrementa `loopCount` cada vez que o GIF completa um loop. O replay continua até `loopCount` atingir `desiredLoops`.
+- Transição ou Atualização: Após completar o número desejado de replays, ou se o GIF não atender aos critérios de replay (seja devido à sua duração ser maior que 3,3 segundos ou ao estado do aplicativo), o aplicativo ou faz a transição para um novo estado ou seleciona um novo GIF com base no estado atual.
 
 ## Mensagens Tratadas por app.py
 
@@ -56,36 +93,40 @@ A aplicação usa strings numéricas como mensagens para representar diferentes 
 
 **Mensagens de Estado**:
 
-| Mensagem | Descrição                                                                   |
-|----------|-----------------------------------------------------------------------------|
-| "0"      | representa um estado inicial ou de boas-vindas.                             |
-| "1"      | indica um pagamento ou transação concluída.                                 |
-| "2"      | Inicia a contagem regressiva, fase de preparação após um pagamento.         |
+| Mensagem | Descrição                                                                            |
+|----------|--------------------------------------------------------------------------------------|
+| "0"      | representa um estado inicial ou de boas-vindas.                                      |
+| "1"      | indica um pagamento ou transação concluída.                                          |
+| "2"      | Inicia a contagem regressiva, fase de preparação após um pagamento.                  |
 | "3"      | significa a conclusão de uma contagem regressiva, movendo-se para a captura da foto. |
-| "4"      | Foto capturada com sucesso, início da impressão agora.                      |
-| "5"      | Impressão concluída: "Obrigado" ou estado de conclusão, o fim de uma transação. |
-| "204"    | Imagem excluída com sucesso após a impressão.                               |
+| "4"      | Foto capturada com sucesso, início da impressão agora.                               |
+| "5"      | Impressão concluída: "Obrigado" ou estado de conclusão, o fim de uma transação.      |
+| "144"    | Subpago                                                                              |
+| "204"    | Imagem excluída com sucesso após impressão.                                          |
 
 
 **Mensagens de Erro**:
 
-| Mensagem | Descrição                                                                   |
-|----------|-----------------------------------------------------------------------------|
-| "100"    | Erro Geral em app.py.                                                       |
-| "101"    | Câmera não encontrou foco                                                   |
-| "102"    | Nenhuma câmera encontrada                                                   |
-| "103"    | arquivo não encontrado                                                      |
-| "104"    | permissão negada                                                            |
-| "110"    | erro geral em print.py                                                      |
-| "112"    | impressora não encontrada                                                   |
-| "113"    | arquivo não encontrado                                                      |
-| "114"    | permissão negada                                                            |
-| "115"    | erro ao copiar arquivo                                                      |
-| "116"    | Trabalho de impressão interrompido ou cancelado.                            |
-| "119"    | erro ao criar trabalho de impressão                                          |
-| "120"    | erro geral em img_capture.py                                                |
-| "130"    | erro geral em led.py                                                        |
-| "140"    | erro geral em switch.py                                                     |
+| Mensagem | Descrição                                            |
+|----------|------------------------------------------------------|
+| "100"    | Erro Geral em app.py.                                |
+| "101"    | Câmera não encontrou foco                            |
+| "102"    | Nenhuma câmera encontrada                            |
+| "103"    | arquivo não encontrado                               |
+| "104"    | permissão negada                                     |
+| "110"    | erro geral em print.py                               |
+| "112"    | impressora não encontrada                            |
+| "113"    | arquivo não encontrado                               |
+| "114"    | permissão negada                                     |
+| "115"    | erro ao copiar arquivo                               |
+| "116"    | Trabalho de impressão interrompido ou cancelado.     |
+| "119"    | erro ao criar trabalho de impressão                  |
+| "120"    | erro geral em img_capture.py                         |
+| "130"    | erro geral em led.py                                 |
+| "140"    | Erro inesperado em switch.py                         |
+| "141"    | Código de status da resposta da API LNbits não é 200 |
+| "142"    | Erro de conexão com a API LNbits                     |
+| "143"    | Erro inicial de conexão com a API LNbits             |
 
 
 Essas mensagens são processadas pela aplicação para atualizar o `AppState` e, por extensão, a UI e quaisquer displays externos conectados à aplicação. As ações específicas tomadas em resposta a cada mensagem podem variar dependendo do contexto atual da aplicação e do fluxo de trabalho pretendido.

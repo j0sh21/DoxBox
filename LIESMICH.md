@@ -29,9 +29,9 @@
   <img src="https://github.com/j0sh21/DoxBox/assets/63317640/384280e0-cc6e-4bd0-9953-c318b5e12f15" height="200">
 
   <img src="https://github.com/j0sh21/DoxBox/assets/63317640/e446af16-d840-4cbc-87f9-3d5f67b3a15d" height="200">
-  <img src="poc.gif" height="200">
+  <img src="docs/images/poc.gif" height="200">
 ## Beispiel Programmablauf:
-<img src="flowchart.JPG" height="900">
+<img src="docs/images/flowchart.JPG" height="900">
 
 ## Einrichtungsanleitung
 

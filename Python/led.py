@@ -114,7 +114,7 @@ class RGBLEDController:
         self.blink_active = False
         self.breath_active = False
         self.fade_active = False
-        self.loop_type = None  # or any default value that indicates no active loop
+        self.loop_type = None
         self.current_animation = None
 
     #dimm the lights
@@ -130,8 +130,8 @@ class RGBLEDController:
 
     def set_color(self, r, g, b):
         if r or g or b:
-            self.deactivate_loop()  # Signal animations to stop
-            self.animation_active.wait(timeout=3) # Wait for the current animation to finish, with a timeout to avoid blocking indefinitely
+            self.deactivate_loop()
+            self.animation_active.wait(timeout=3)
             print("Previous loop finished successfully.")
 
             # Set the new color after ensuring the animations have stopped
@@ -161,12 +161,12 @@ class RGBLEDController:
             # Turn off the LED
             self.r, self.g, self.b = 0, 0, 0
             self.update_leds()
-            time.sleep(self.blink_offtime)  # LED is off for 'off_time' seconds
+            time.sleep(self.blink_offtime)
 
             # Restore the original LED state
             self.r, self.g, self.b = original_r, original_g, original_b
             self.update_leds()
-            time.sleep(self.blink_ontime)  # LED is on for 'on_time' seconds
+            time.sleep(self.blink_ontime)
 
             self.blink_count -= 1
             if self.blink_count < 3 and self.loop_type == "blinkcount":
@@ -174,14 +174,13 @@ class RGBLEDController:
                 # Turn off the LED
                 self.r, self.g, self.b = 0, 0, 0
                 self.update_leds()
-                time.sleep(self.blink_offtime)  # LED is off for 'off_time' seconds
+                time.sleep(self.blink_offtime)
 
                 # Restore the original LED state
                 self.r, self.g, self.b = original_r, original_g, original_b
                 self.update_leds()
-                time.sleep(self.blink_ontime)  # LED is on for 'on_time' seconds
+                time.sleep(self.blink_ontime)
 
-                # This part is reached when blinkt count is 0
                 time.sleep(0.01)  # Small delay to prevent high CPU usage
                 self.animation_active.set()
                 break
@@ -229,7 +228,7 @@ class RGBLEDController:
                 self.update_leds()
                 time.sleep(0.01)
                 self.animation_active.set()
-                break  # Exit after one cycle if breath_count is set to 1
+                break
 
         # This part is reached when self.breath_active is no longer 1
         self.r, self.g, self.b = original_r, original_g, original_b
@@ -361,10 +360,10 @@ class ServerThread(Thread):
                     print("Fade speed must be bigger than 0.")
             elif parts[0] == "breathbrightness" and len(parts) == 3:
                 lower, upper = map(float, parts[1:])
-                if lower+upper > 0 and lower < 1 and upper < 1 and lower < upper:
+                if lower+upper > 0 and lower < 1 and upper <= 1 and lower < upper:
                     self.led_controller.set_breath_lights(lower, upper)
                 else:
-                    print("Upper and / or lower brighntess must be >= 0 and <= 1.")
+                    print("Upper and / or lower brightness must be >= 0 and <= 1.")
             elif parts[0] == "interrupt" and len(parts) == 1:
                 self.led_controller.deactivate_loop()
             else:
@@ -382,9 +381,9 @@ def main():
 
     try:
         while True:
-            time.sleep(1)  # Main loop doing other tasks
+            time.sleep(1)
     except KeyboardInterrupt:
-        server.deactivate_loop()
+        RGBLEDController.deactivate_loop()
         print("LED Controller application stopped.")
 
 if __name__ == "__main__":

@@ -1,4 +1,5 @@
 import socket
+import time
 import config
 from datetime import datetime
 from sh import gphoto2 as gp
@@ -6,7 +7,7 @@ import signal
 import os
 import subprocess
 import sh
-#sudo apt-get install gphoto2
+#Make sure to install gphoto2
 
 def send_message_to_app(message):
     try:
@@ -16,26 +17,22 @@ def send_message_to_app(message):
     except socket.error as e:
         print(f"Error in sending message to app: {e}")
 
-def send_msg_to_LED(host, port, command):
+def send_msg_to_LED(command):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-        # Connect to the server
-        client_socket.connect((host, port))
-        print(f"Connected to server at {host}:{port}")
-        # Send the command to the server
-        print(f"Sending command to {host}:{command.encode('utf-8')}")
+        client_socket.connect((config.LED_SERVER_HOST, config.LED_SERVER_PORT))
         client_socket.sendall(command.encode('utf-8'))
 
 def kill_process():
     try:
-        p = subprocess.Popen(['ps', '-A'], stdout=subprocess.PIPE)
-        out, err = p.communicate()
-        # Look for the process pid
-        for line in out.split():
-            if config.PROCESS_TO_KILL.encode() in line:
-                # Kill the process
+        output = subprocess.check_output(['ps', '-A'], text=True)
+        for line in output.splitlines():
+            if config.PROCESS_TO_KILL in line:
+                print("Kill the old ghphoto2 server processes to prevent connection issues with camera")
                 pid = int(line.split(None, 1)[0])
+                os.kill(pid, signal.SIGTERM)
                 os.kill(pid, signal.SIGKILL)
-                print(f'Process with PID {pid} (gvfsd) killed.')
+                print(f'Process with PID {pid} ({config.PROCESS_TO_KILL}) killed.\nWaiting 330ms to continue...')
+                time.sleep(0.33)
     except subprocess.CalledProcessError as e:
         print(f"Error while executing 'ps': {str(e)}")
         send_message_to_app("100")
@@ -75,55 +72,57 @@ def create_output_folder():
         print(f"An unexpected error occurred: {str(e)}")
         send_message_to_app("100")
 
-def run_gphoto2_command(command):
+def run_gphoto2_command(command, retries=0, max_retries=config.MAX_RETRIES):
     try:
-        subprocess.run(command, shell=True, check=True)
+        subprocess.run(command, shell=True, check=True, stderr=subprocess.PIPE)
+    except subprocess.CalledProcessError as e:
+        error_message = e.stderr.decode()
+        if retries < max_retries:
+            handle_error(error_message, retries)
+            run_gphoto2_command(command, retries + 1, max_retries)
+        else:
+            print(f"Error and Max retries {str(retries)} reached, aborting.\n{error_message}")
 
-    except sh.ErrorReturnCode_1 as e:
-        # Now we can check the contents of the error message
-        error_message = str(e)
+def handle_error(error_message, retries):
         if "focus" in error_message:
-            # If the specific error message is found, print custom text
-            print("Error: Camera has no Focus. Please ensure placing the subject on the focus mark and try again.")
+            print(f"\nError: Camera has no Focus. Please ensure placing the subject on the focus mark and try again.\nSLEEP for 10 SECONDS NOW!\nRetry number {str(retries)} Photo in 10 seconds...")
             send_message_to_app("101")
+            time.sleep(config.IMG_SLEEP_TIME_SHORT)
         elif "failed to release" in error_message:
-            print("Error: Capture failed to release")
+            print("Error: Capture failed to release\nSLEEP for 10 SECONDS NOW!\nRetry Photo in 10 seconds...")
+            time.sleep(config.IMG_SLEEP_TIME_SHORT)
             send_message_to_app("101")
         elif "Keine Kamera gefunden" in error_message:
-            # If the specific error message is found, print custom text
-            print("Error: No camera found. Please ensure the camera is connected properly.")
+            print("\n\nError: No camera found. Please ensure the camera is connected properly.\n\nSLEEP for 3 MINUTES NOW!\n\nRetry Photo in 3 minutes...")
             send_message_to_app("102")
+            time.sleep(config.IMG_SLEEP_TIME_LONG)
+            kill_process()
         elif "Zugriff verweigert" in error_message:
+            print("\nError: Access to camera denied.\nSLEEP for 10 SECONDS NOW!\nRetry Photo in 10 seconds...")
             send_message_to_app("104")
+            time.sleep(config.IMG_SLEEP_TIME_SHORT)
         else:
-            # If the error message does not match, print a generic error message or re-raise the exception
             print("An unexpected error occurred:", error_message)
             send_message_to_app("100")
 
 def make_picture():
-    HOST, PORT = '127.0.0.1', 12345  # Change host and port if needed
     global cwd
     trigger_photo_cmd = config.TRIGGER_PHOTO_COMMAND
     download_pics_cmd = config.DOWNLOAD_PHOTOS_COMMAND
-    clear_files_cmd = config.CLEAR_FILES_COMMAND
     start_trigger = datetime.now()
-    send_msg_to_LED(HOST, PORT, "blink 0")
-    send_msg_to_LED(HOST, PORT, "color 255 255 255")
-    print(f"Trigger photo NOW!")
+    send_msg_to_LED("blink 0")
+    print(f"{'_'*10}\n|Trigger photo NOW!|\n{'_'*10}")
     run_gphoto2_command(trigger_photo_cmd)
     end_trigger = datetime.now()
-    print(f"Photo taken and saved on camera in {(end_trigger - start_trigger).total_seconds()} seconds.")
+    print(f"Photo taken and saved on camera in {(end_trigger - start_trigger).total_seconds()} seconds.\n")
+    send_message_to_app("3.9")
+    send_msg_to_LED("breathbrightness 0.5 1.0")
+    send_msg_to_LED("breathspeed 0.003")
+    send_msg_to_LED("breath 1")
     start_download = datetime.now()
-    send_msg_to_LED(HOST, PORT, "breathbrightness 0.5 1.0")
-    send_msg_to_LED(HOST, PORT, "breathspeed 0.125")
-    send_msg_to_LED(HOST, PORT, "breath 1")
     run_gphoto2_command(download_pics_cmd)
     end_download = datetime.now()
-    print(f"Copied file from Camera to RaspberryPi in {(end_download - start_download).total_seconds()} Seconds.")
-    start_clear = datetime.now()
-    run_gphoto2_command(clear_files_cmd)
-    end_clear = datetime.now()
-    print(f"Cleared file from Camera in {(end_clear - start_clear).total_seconds()} seconds.")
+    print(f"Copied file from Camera to RaspberryPi in {(end_download - start_download).total_seconds()} Seconds.\n")
 
 def rename_pics():
     shot_time = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
@@ -131,7 +130,7 @@ def rename_pics():
             if len(filename) < 13 and filename.endswith(".JPG"):
                 try:
                     os.rename(filename, (shot_time + ".JPG"))
-                    print("Picture renamed!")
+                    print("Picture renamed! to " + shot_time + ".JPG\n")
                     return True
                 except FileNotFoundError:
                     print("Error: The Picture does not exist.")
@@ -149,35 +148,38 @@ def rename_pics():
     print(f"Changed Working Directory to: {os.getcwd()}")
 
 def main():
-    HOST, PORT = '127.0.0.1', 12345  # Change host and port if needed
-    send_msg_to_LED(HOST, PORT, "color 255 255 255")
-    send_msg_to_LED(HOST, PORT, "blinkspeed 0.05 0.05 ")
-    send_msg_to_LED(HOST, PORT, "blink 1 ")
-    # main kills gphoto2 process and deletes alle old files from camera, before proceeding with create_output_folder and make_picture
+    send_msg_to_LED("color 255 255 255")
+    send_msg_to_LED("blinkspeed 0.05 0.05 ")
+    send_msg_to_LED("blink 1 ")
+    # kill gphoto2 process and deletes alle old files from camera, before proceeding with create_output_folder and make_picture
+    kill_process()
+    start_clear = datetime.now()
     clear_files_cmd = ["--folder", "/store_00020001/DCIM/100CANON", "-R", "--delete-all-files"]
-    #print("Kill old ghphoto2 processes to prevent connection issues with camera")
-    #kill_process()
-    print("Remove all files from the Camera")
+    print("\nRemove all files from the Camera\n")
     try:
         gp(clear_files_cmd)
+        end_clear = datetime.now()
+        print(f"Cleared file from Camera in {(end_clear - start_clear).total_seconds()} seconds.\n\n")
     except sh.ErrorReturnCode_1 as e:
-        # Now we can check the contents of the error message
+        # checking the contents of the error message (The language of the error message is controlled by your camera settings)
         error_message = str(e)
         if "Keine Kamera gefunden" in error_message:
-            # If the specific error message is found, print custom text
             print("Error: No camera found. Please ensure the camera is connected properly.")
             send_message_to_app("102")
         else:
-            # If the error message does not match, print a generic error message
             print("An unexpected error occurred:", error_message)
             send_message_to_app("100")
 
     create_output_folder()
     print("Make Picture")
     make_picture()
-    print("Rename the Picture")
+    print("Rename the Picture on the Raspberry Pi")
     if rename_pics():
         send_message_to_app("4")
+    start_clear = datetime.now()
+    gp(clear_files_cmd)
+    end_clear = datetime.now()
+    print(f"Cleared file from Camera in {(end_clear - start_clear).total_seconds()} seconds.\n\n")
 
 if __name__ == '__main__':
     cwd = ""
