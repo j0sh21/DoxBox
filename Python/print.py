@@ -15,37 +15,40 @@ def send_message_to_app(message):
         print(f"Error in sending message to app: {e}")
 
 def check_print_job_status(conn, job_id):
-    # Initial wait time in seconds before checking the job status for the first time
-    initial_wait = 20
-    time.sleep(initial_wait)
-    while True:
-        jobs = conn.getJobs(which_jobs='not-completed')
+    try:
+        # Initial wait time in seconds before checking the job status for the first time
+        initial_wait = 20
+        time.sleep(initial_wait)
+        while True:
+            jobs = conn.getJobs(which_jobs='not-completed')
 
-        if not jobs:
-            print("No not-completed print jobs")
-            break
+            if not jobs:
+                print("No not-completed print jobs")
+                break
 
-        if job_id not in jobs:
-            # Job is no longer in the list of uncompleted jobs, so it must be completed
-            print(f"Print job {job_id} status changed to 'successful'.")
-            break
-        else:
-            job = jobs[job_id]
-            print(f"Print job {job_id} status: {job['job-state']}, {job['job-state-reasons']}")
-            if 'job-completed' in job['job-state-reasons']:
-                print(f"Print job {job_id} completed successfully.")
-                send_message_to_app("5")
+            if job_id not in jobs:
+                # Job is no longer in the list of uncompleted jobs, so it must be completed
+                print(f"Print job {job_id} status changed to 'successful'.")
                 break
-            elif 'job-stopped' in job['job-state-reasons'] or 'job-canceled' in job['job-state-reasons']:
-                print(f"Print job {job_id} stopped or canceled.")
-                send_message_to_app("116")
-                break
-            elif 'job-error' in job['job-state-reasons']:
-                print(f"Print job {job_id} encountered an error.")
-                send_message_to_app("110")
-                break
-        # Wait some time before checking the status again
-        time.sleep(1)
+            else:
+                job = jobs[job_id]
+                print(f"Print job {job_id} status: {job['job-state']}, {job['job-state-reasons']}")
+                if 'job-completed' in job['job-state-reasons']:
+                    print(f"Print job {job_id} completed successfully.")
+                    send_message_to_app("5")
+                    break
+                elif 'job-stopped' in job['job-state-reasons'] or 'job-canceled' in job['job-state-reasons']:
+                    print(f"Print job {job_id} stopped or canceled.")
+                    send_message_to_app("116")
+                    break
+                elif 'job-error' in job['job-state-reasons']:
+                    print(f"Print job {job_id} encountered an error.")
+                    send_message_to_app("110")
+                    break
+            # Wait some time before checking the status again
+            time.sleep(1)
+    except Exception as e:
+        print(f"Error while checking print job Status: {e}")
 
 def print_image(printer_name, image_path):
     print("Connect to the CUPS printing server")

@@ -31,7 +31,7 @@ class VendingMachineDisplay(QWidget):
     def __init__(self, appState):
         super().__init__()
         self.loopCount = 0
-        self.desiredLoops = 2
+        self.desiredLoops = 1
         self.appState = appState
         self.initUI()
         self.appState.stateChanged.connect(self.onStateChanged)
@@ -58,7 +58,8 @@ class VendingMachineDisplay(QWidget):
         frame_count = self.movie.frameCount()
         frame_rate = self.movie.nextFrameDelay()  # Delay between frames in milliseconds
         self.total_duration = frame_count * frame_rate / 1000  # Total duration in seconds
-        print(f"Start playing gif with {str(self.total_duration)} seconds total duration")
+        if not self.appState.state == 0:
+            print(f"Start playing gif with {str(self.total_duration)} seconds total duration")
 
     def onFrameChanged(self):
         if self.movie.currentFrameNumber() == 0: # Check if this is the first frame
@@ -118,7 +119,7 @@ class VendingMachineDisplay(QWidget):
                     print(f"Failed to start img_capture.py: {e}")
                     self.appState.state = "100"
                     self.updateGIF(self.appState.state)
-            elif self.appState.state in("3.5", "4", "100", "0", "3.9"):
+            elif self.appState.state in("3.5", "4", "100", "0", "3.9", "204"):
                 print(f"GIF for state {self.appState.state} finished play next gif for state {self.appState.state} until external state change")
                 self.updateGIF(self.appState.state)
             elif self.appState.state == "5":
@@ -142,7 +143,7 @@ class VendingMachineDisplay(QWidget):
         self.movie.start()
 
     def updateGIF(self, state):
-        # Map states to subfolders TODO: Some status messages does not reflect a floder eg. 204 and everything > 100
+        # Map states to subfolders TODO: Error messages > 100 are not handled with a gif
         subfolder_map = {
             "0": "0_welcome",
             "1": "1_payment",
@@ -151,6 +152,7 @@ class VendingMachineDisplay(QWidget):
             "3.5": "3_smile",
             "3.9": "4_print",
             "4": "4_print",
+            "204": "4_print",
             "5": "5_thx",
             "100": "100_error"
         }
@@ -306,6 +308,7 @@ class VendingMachineDisplay(QWidget):
             self.send_msg_to_LED("fade 1")
         if state in("100", "101", "102", "103", "104", "110", "112", "113", "114", "115", "119"):
             self.send_msg_to_LED("color 255 0 0")
+            self.send_msg_to_LED("blinkspeed 0.5 0.5")
             self.send_msg_to_LED("blink 1")
         
         self.movie.stop()
