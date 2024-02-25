@@ -21,7 +21,7 @@ def check_print_job_status(conn, job_id):
         time.sleep(initial_wait)
         while True:
             jobs = conn.getJobs(which_jobs='not-completed')
-
+            print(f"Checking print job status: {len(jobs)} not-completed print jobs found")
             if not jobs:
                 print("No not-completed print jobs")
                 break
@@ -48,7 +48,10 @@ def check_print_job_status(conn, job_id):
             # Wait some time before checking the status again
             time.sleep(1)
     except Exception as e:
-        print(f"Error while checking print job Status: {e}")
+        print(f"Error while checking print job Status: {e}\n\n Sleeping 45 seconds...\nPhoto should be printed finish correctly in about 45 seconds... ")
+        time.sleep(45)
+        send_message_to_app("5")
+        print("Waiting 45 seconds finished print ready!")
 
 def print_image(printer_name, image_path):
     print("Connect to the CUPS printing server")
