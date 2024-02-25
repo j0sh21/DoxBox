@@ -44,6 +44,11 @@ class VendingMachineDisplay(QWidget):
         self.LED_HOST = config.LED_SERVER_HOST
         self.LED_PORT = config.LED_SERVER_PORT
 
+    def send_message_to_mini_display(self, command):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+            client_socket.connect(('localhost', 6548))
+            client_socket.sendall(command.encode('utf-8'))
+
     def send_msg_to_LED(self, command):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
             client_socket.connect((self.LED_HOST, self.LED_PORT))
@@ -54,7 +59,8 @@ class VendingMachineDisplay(QWidget):
         frame_rate = self.movie.nextFrameDelay()  # Delay between frames in milliseconds
         self.total_duration = frame_count * frame_rate / 1000
         if not self.appState.state == 0:
-            print(f"Start playing gif with {str(self.total_duration)} seconds total duration")
+            self.send_message_to_mini_display(f"Start playing gif with {str(self.total_duration)} seconds total duration")
+            self.send_message_to_mini_display(f"Start playing gif with {str(self.total_duration)} seconds total duration")
 
     def onFrameChanged(self):
         if self.movie.currentFrameNumber() == 0:
@@ -78,31 +84,31 @@ class VendingMachineDisplay(QWidget):
                 self.movie.stop()
                 self.isreplay = 0
                 if self.appState.state == "1":
-                    print(f"({self.desiredLoops}x) Loops of Payment GIF finished, next state: 2 and GIF")
+                    self.send_message_to_mini_display(f"({self.desiredLoops}x) Loops of Payment GIF finished, next state: 2 and GIF")
                     self.appState.state = "2"
                     self.updateGIF(self.appState.state)
                 elif self.appState.state == "5":
                     self.appState.state = "0"
-                    print(f"({self.desiredLoops}x) Loops of the Thank You - GIF finished, initial state 0, start welcome PNG")
+                    self.send_message_to_mini_display(f"({self.desiredLoops}x) Loops of the Thank You - GIF finished, initial state 0, start welcome PNG")
                 else:
-                    print(f"({self.desiredLoops}x) Loops finished, next random GIF for state: {self.appState.state}")
+                    self.send_message_to_mini_display(f"({self.desiredLoops}x) Loops finished, next random GIF for state: {self.appState.state}")
                     self.updateGIF(self.appState.state)
             else:
-                print(f"Replay GIF ({self.desiredLoops}x), total duration is < 3 seconds")
+                self.send_message_to_mini_display(f"Replay GIF ({self.desiredLoops}x), total duration is < 3 seconds")
                 self.isreplay = 1
                 self.playGIF()
         elif last_gif_frame:
             self.isreplay = 0
             if self.appState.state == "1":
-                print("Payment GIF finished, next state: 2 and GIF")
+                self.send_message_to_mini_display("Payment GIF finished, next state: 2 and GIF")
                 self.appState.state = "2"
                 self.updateGIF(self.appState.state)
             elif self.appState.state == "2":
-                print("Countdown GIF finished, next state: 3 and GIF")
+                self.send_message_to_mini_display("Countdown GIF finished, next state: 3 and GIF")
                 self.appState.state = "3"
                 self.updateGIF(self.appState.state)
             elif self.appState.state == "3":
-                print("Smile GIF finished, capture photo very soon")
+                self.send_message_to_mini_display("Smile GIF finished, capture photo very soon")
                 try:
                     if self.loopCount == 1: #Only after 1st Loop
                         self.send_msg_to_LED("fade 0")
@@ -111,14 +117,14 @@ class VendingMachineDisplay(QWidget):
                         photo_thread = threading.Thread(target=self.photo_subprocess)
                         photo_thread.start()
                 except Exception as e:
-                    print(f"Failed to start img_capture.py: {e}")
+                    self.send_message_to_mini_display(f"Failed to start img_capture.py: {e}")
                     self.appState.state = "100"
                     self.updateGIF(self.appState.state)
             elif self.appState.state in("3.5", "4", "100", "0", "3.9", "204"):
-                print(f"GIF for state {self.appState.state} finished play next gif for state {self.appState.state} until external state change")
+                self.send_message_to_mini_display(f"GIF for state {self.appState.state} finished play next gif for state {self.appState.state} until external state change")
                 self.updateGIF(self.appState.state)
             elif self.appState.state == "5":
-                print("Thank You - GIF finished, initial state 0, start welcome GIF")
+                self.send_message_to_mini_display("Thank You - GIF finished, initial state 0, start welcome GIF")
                 self.appState.state = "0"
                 self.updateGIF(self.appState.state)
             else:
@@ -126,11 +132,11 @@ class VendingMachineDisplay(QWidget):
 
     def playGIF(self):
         if self.isreplay == 0:
-            print("Play GIF")
+            self.send_message_to_mini_display("Play GIF")
             self.loopCount = 0
             self.desiredLoops = 1
         else:
-            print("Replay GIF")
+            self.send_message_to_mini_display("Replay GIF")
 
         self.movie.setFileName(self.gif_path)
         self.gifLabel.setMovie(self.movie)
@@ -164,11 +170,11 @@ class VendingMachineDisplay(QWidget):
                     self.gifLabel.show()
                     self.playGIF()
                 except Exception as e:
-                    print(f"Error while trying to start playing GIF: {str(e)}")
+                    self.send_message_to_mini_display(f"Error while trying to start playing GIF: {str(e)}")
             else:
-                print("No GIFs found in the specified folder.")
+                self.send_message_to_mini_display("No GIFs found in the specified folder.")
         except FileNotFoundError:
-            print(f"The folder {gif_folder_path} does not exist.")
+            self.send_message_to_mini_display(f"The folder {gif_folder_path} does not exist.")
 
     def updatePicture(self, imagePath):
         pixmap = QPixmap(imagePath)
@@ -214,38 +220,38 @@ class VendingMachineDisplay(QWidget):
 
     def print_subprocess(self):
         if config.DEBUG_MODE == 1:
-            print("DEBUG MODE: Simulate print")
+            self.send_message_to_mini_display("DEBUG MODE: Simulate print")
             subprocess.run(["python3", "dev/printer_mock.py"],
                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         else:
             try:
                 result = subprocess.run(["python3", "print.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                         text=True, check=True)
-                print("Output:", result.stdout)
+                self.send_message_to_mini_display("Output:", result.stdout)
             except subprocess.CalledProcessError as e:
                 error_message = e.stderr
 
                 if "No printer" in error_message:
-                    print("Error: No printer found. Please ensure the printer is connected properly.")
+                    self.send_message_to_mini_display("Error: No printer found. Please ensure the printer is connected properly.")
                 else:
-                    print("An unexpected printer error occurred:", error_message)
+                    self.send_message_to_mini_display("An unexpected printer error occurred:", error_message)
 
     def photo_subprocess(self):
         if config.DEBUG_MODE == 1:
-            print("DEBUG MODE: Simulate Photo")
+            self.send_message_to_mini_display("DEBUG MODE: Simulate Photo")
         else:
             try:
                 process = subprocess.Popen(["python3", "img_capture.py"],
                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                print("img_capture.py started successfully.")
+                self.send_message_to_mini_display("img_capture.py started successfully.")
                 stdout, stderr = process.communicate()
 
                 if stdout:
-                    print("Output:", stdout.decode())
+                    self.send_message_to_mini_display("Output:", stdout.decode())
                 if stderr:
-                    print("Error:", stderr.decode())
+                    self.send_message_to_mini_display("Error:", stderr.decode())
             except Exception as e:
-                print(f"Failed to start img_capture.py: {e}")
+                self.send_message_to_mini_display(f"Failed to start img_capture.py: {e}")
                 appState.stateChanged.emit("100")
 
     def onStateChanged(self, state):
@@ -254,28 +260,28 @@ class VendingMachineDisplay(QWidget):
             self.send_msg_to_LED("breath 0")
             self.send_msg_to_LED("blink 0")
             self.send_msg_to_LED("fade 0")
-            print(f"{'_' * 10}State changed to 0: Welcome screen{'_' * 10}")
+            self.send_message_to_mini_display(f"{'_' * 10}State changed to 0: Welcome screen{'_' * 10}")
             self.send_msg_to_LED("color 226 0 116")  # Set to lnbits color
             self.send_msg_to_LED("breathbrightness 0.1 0.7")
             self.send_msg_to_LED("breathspeed 0.02")
             self.send_msg_to_LED("breath 1")
         if state == "1":
-            print(f"{'_' * 10}State changed to 1: Payment recived{'_' * 10}")
+            self.send_message_to_mini_display(f"{'_' * 10}State changed to 1: Payment recived{'_' * 10}")
             self.send_msg_to_LED("breath 0")
             self.send_msg_to_LED("breathbrightness 0.2 0.8")
             self.send_msg_to_LED("breathspeed 0.005")
             self.send_msg_to_LED("breath 1")
         if state == "2":
-            print(f"{'_' * 10}State changed to 2: Start countdown{'_' * 10}")
+            self.send_message_to_mini_display(f"{'_' * 10}State changed to 2: Start countdown{'_' * 10}")
             self.send_msg_to_LED("breath 0")
             self.send_msg_to_LED("blinkspeed 0.5 0.5")
             self.send_msg_to_LED("blink 1")
         if state == "3":
-            print(f"{'_' * 10}State changed to 3: Smile now{'_' * 10}")
+            self.send_message_to_mini_display(f"{'_' * 10}State changed to 3: Smile now{'_' * 10}")
             self.send_msg_to_LED("fadespeed 2.3")
             self.send_msg_to_LED("fade 1")
         if state == "4":
-            print(f"{'_' * 10}State changed to 4: Start printing{'_' * 10}")
+            self.send_message_to_mini_display(f"{'_' * 10}State changed to 4: Start printing{'_' * 10}")
             self.send_msg_to_LED("color 226 0 116")
             self.send_msg_to_LED("breathbrightness 0.35 0.8")
             self.send_msg_to_LED("breathspeed 0.1")
@@ -284,10 +290,10 @@ class VendingMachineDisplay(QWidget):
                 print_thread = threading.Thread(target=self.print_subprocess)
                 print_thread.start()
             except Exception as e:
-                print(f"Failed to start print.py: {e}")
+                self.send_message_to_mini_display(f"Failed to start print.py: {e}")
                 appState.stateChanged.emit("100")
         if state == "5":
-            print(f"{'_' * 10}State changed to 5: Thank You!{'_' * 10}")
+            self.send_message_to_mini_display(f"{'_' * 10}State changed to 5: Thank You!{'_' * 10}")
             self.send_msg_to_LED("breath 0")
             self.send_msg_to_LED("fadespeed 1")
             self.send_msg_to_LED("fade 1")
@@ -299,41 +305,46 @@ class VendingMachineDisplay(QWidget):
         self.movie.stop()
         self.updateGIF(state)
 
+def send_message_to_mini_display(command):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+        client_socket.connect(('localhost', 6548))
+        client_socket.sendall(command.encode('utf-8'))
+
 def handle_client_connection(client_socket, appState):
     try:
         message = client_socket.recv(1024).decode()
-        print(f"Received message: {message}")
+        send_message_to_mini_display(f"Received message: {message}")
         appState.state = message
         client_socket.close()
     except Exception as e:
-        print(f"Error in handling client connection: {e}")
+        send_message_to_mini_display(f"Error in handling client connection: {e}")
 
 def start_server(appState):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((config.SERVER_HOST, config.SERVER_PORT))
     server_socket.listen(config.MAX_CONNECTIONS)
-    print(f"App server listening on {config.SERVER_HOST}:{config.SERVER_PORT}")
+    send_message_to_mini_display(f"App server listening on {config.SERVER_HOST}:{config.SERVER_PORT}")
 
     while True:
         client_socket, addr = server_socket.accept()
         if config.DEBUG_MODE != 0:
-            print(f"Connection established with {addr}")
+            send_message_to_mini_display(f"Connection established with {addr}")
         client_thread = threading.Thread(target=handle_client_connection, args=(client_socket, appState))
         client_thread.start()
 
 if __name__ == '__main__':
-    print("app.py is now running")
-    print("Building app...")
+    send_message_to_mini_display("app.py is now running")
+    send_message_to_mini_display("Building app...")
     app = QApplication(sys.argv)
-    print("Building app completed!")
-    print("Building state object...")
+    send_message_to_mini_display("Building app completed!")
+    send_message_to_mini_display("Building state object...")
     appState = AppState()
-    print("Building state object completed!")
-    print("Building Display...")
+    send_message_to_mini_display("Building state object completed!")
+    send_message_to_mini_display("Building Display...")
     ex = VendingMachineDisplay(appState)
-    print("Building Display completed!")
-    print("Start server...")
+    send_message_to_mini_display("Building Display completed!")
+    send_message_to_mini_display("Start server...")
     server_thread = threading.Thread(target=start_server, args=(appState,))
     server_thread.start()
-    print("Start app (display)")
+    send_message_to_mini_display("Start app (display)")
     sys.exit(app.exec_())

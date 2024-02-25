@@ -1,22 +1,29 @@
 import configparser
+import socket
+
+def send_message_to_mini_display(command):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+        client_socket.connect(('localhost', 6548))
+        client_socket.sendall(command.encode('utf-8'))
+
 
 config = configparser.ConfigParser()
 
 try:
     config.read(r'../config/cfg.ini')
 except Exception as e:
-    print(f"Error reading the config file: {e}")
+    send_message_to_mini_display(f"Error reading the config file: {e}")
 
 # Helper function to get configuration values with error handling
 def get_config_value(section, key):
     try:
         return config.get(section, key)
     except configparser.NoSectionError:
-        print(f"Missing section '{section}' in config file.")
+        send_message_to_mini_display(f"Missing section '{section}' in config file.")
     except configparser.NoOptionError:
-        print(f"Missing key '{key}' in section '{section}' in config file.")
+        send_message_to_mini_display(f"Missing key '{key}' in section '{section}' in config file.")
     except Exception as e:
-        print(f"Error retrieving configuration value: {e}")
+        send_message_to_mini_display(f"Error retrieving configuration value: {e}")
 
 # API Configuration
 API_KEY = get_config_value('API', 'API_KEY')
@@ -81,4 +88,4 @@ LED_SERVER_PORT = config.getint('LED_Server', 'SERVER_PORT')
 #DEBUG MODE
 DEBUG_MODE = config.getint('DEV', 'DEBUG')
 
-print("Config successfully loaded!")
+send_message_to_mini_display("Config successfully loaded!")
