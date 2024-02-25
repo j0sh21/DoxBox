@@ -52,6 +52,7 @@ PROCESS_TO_KILL = get_config_value('System', 'PROCESS_TO_KILL')
 FULLSCREEN_MODE = config.getboolean('Display', 'FULLSCREEN_MODE')
 WINDOW_TITLE = get_config_value('Display', 'WINDOW_TITLE')
 PATH_TO_FRAME= get_config_value('Display', 'PATH_TO_FRAME')
+IMAGE_PATH = get_config_value('Display', 'IMAGE_PATH')
 
 # Server Configuration
 SERVER_HOST = get_config_value('Server', 'SERVER_HOST')
