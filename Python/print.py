@@ -6,10 +6,14 @@ import os
 import config
 import time
 
+
 def send_message_to_mini_display(command):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-        client_socket.connect(('localhost', 6548))
-        client_socket.sendall(command.encode('utf-8'))
+    if config.DEBUG_MODE == 0:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+            client_socket.connect(('localhost', 6548))
+            client_socket.sendall(command.encode('utf-8'))
+    else:
+        print(command)
 
 def send_message_to_app(message):
     try:
@@ -113,6 +117,7 @@ def move_image():
             print_image(printer_name, destination_path)
             os.remove(destination_path)
             send_message_to_mini_display(f'Removed {filename} after creating and sending print job and waiting 65 Seconds.')
+
 
 if __name__ == '__main__':
     send_message_to_mini_display("print.py is now running.")

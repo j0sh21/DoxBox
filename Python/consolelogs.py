@@ -1,5 +1,6 @@
 import socket
 
+
 def run():
     print(f"Server listening on {host}:{port}")
     while True:

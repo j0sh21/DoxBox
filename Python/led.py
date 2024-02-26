@@ -7,6 +7,7 @@ import time
 import config
 import math
 
+
 class RGBLEDController:
     def __init__(self, red_pin, green_pin, blue_pin, steps=config.fade_steps, brightness_steps=config.brightness_steps):
         self.red_pin, self.green_pin, self.blue_pin = red_pin, green_pin, blue_pin # GPIO Pins
@@ -27,9 +28,12 @@ class RGBLEDController:
         self.stop_requested = False
 
     def send_message_to_mini_display(self, command):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-            client_socket.connect(('localhost', 6548))
-            client_socket.sendall(command.encode('utf-8'))
+        if config.DEBUG_MODE == 0:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+                client_socket.connect(('localhost', 6548))
+                client_socket.sendall(command.encode('utf-8'))
+        else:
+            print(command)
 
     #Functions for changing speed and other LED effect related settings by external input while loop is running.
     def set_fade_speed(self, speed):
@@ -288,9 +292,12 @@ class ServerThread(Thread):
         self.server_socket.listen()
 
     def send_message_to_mini_display(self, command):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-            client_socket.connect(('localhost', 6548))
-            client_socket.sendall(command.encode('utf-8'))
+        if config.DEBUG_MODE == 0:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+                client_socket.connect(('localhost', 6548))
+                client_socket.sendall(command.encode('utf-8'))
+        else:
+            print(command)
 
     def run(self):
         self.send_message_to_mini_display(f"Server listening on {self.host}:{self.port}")
@@ -395,6 +402,7 @@ def main():
     except KeyboardInterrupt:
         RGBLEDController.deactivate_loop()
         print("LED Controller application stopped.")
+
 
 if __name__ == "__main__":
     main()

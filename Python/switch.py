@@ -5,11 +5,14 @@ import time
 import threading
 import socket
 
-def send_message_to_mini_display(command):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-        client_socket.connect(('localhost', 6548))
-        client_socket.sendall(command.encode('utf-8'))
 
+def send_message_to_mini_display(command):
+    if config.DEBUG_MODE == 0:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+            client_socket.connect(('localhost', 6548))
+            client_socket.sendall(command.encode('utf-8'))
+    else:
+        print(command)
 
 def send_message_to_app(message):
     try:

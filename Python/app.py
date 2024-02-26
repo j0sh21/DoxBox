@@ -9,6 +9,7 @@ import os
 import random
 import config  #config.py from the same directory
 
+
 # A class for managing the DoxBox state and communication with other python subprocesses
 class AppState(QObject):
     stateChanged = pyqtSignal(str)
@@ -45,9 +46,12 @@ class VendingMachineDisplay(QWidget):
         self.LED_PORT = config.LED_SERVER_PORT
 
     def send_message_to_mini_display(self, command):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-            client_socket.connect(('localhost', 6548))
-            client_socket.sendall(command.encode('utf-8'))
+        if config.DEBUG_MODE == 0:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+                client_socket.connect(('localhost', 6548))
+                client_socket.sendall(command.encode('utf-8'))
+        else:
+            print(command)
 
     def send_msg_to_LED(self, command):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
@@ -175,11 +179,6 @@ class VendingMachineDisplay(QWidget):
         except FileNotFoundError:
             self.send_message_to_mini_display(f"The folder {gif_folder_path} does not exist.")
 
-    def updatePicture(self, imagePath):
-        pixmap = QPixmap(imagePath)
-        self.pictureLabel.setPixmap(pixmap.scaled(800, 600, Qt.KeepAspectRatio))
-        self.pictureLabel.show()
-
     def initUI(self):
         self.layout = QVBoxLayout(self)
         self.setLayout(self.layout)
@@ -304,10 +303,14 @@ class VendingMachineDisplay(QWidget):
         self.movie.stop()
         self.updateGIF(state)
 
+
 def send_message_to_mini_display(command):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-        client_socket.connect(('localhost', 6548))
-        client_socket.sendall(command.encode('utf-8'))
+    if config.DEBUG_MODE == 0:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+            client_socket.connect(('localhost', 6548))
+            client_socket.sendall(command.encode('utf-8'))
+    else:
+        print(command)
 
 def handle_client_connection(client_socket, appState):
     try:
@@ -330,6 +333,7 @@ def start_server(appState):
             send_message_to_mini_display(f"Connection established with {addr}")
         client_thread = threading.Thread(target=handle_client_connection, args=(client_socket, appState))
         client_thread.start()
+
 
 if __name__ == '__main__':
     send_message_to_mini_display("app.py is now running")

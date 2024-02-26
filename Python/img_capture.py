@@ -9,11 +9,14 @@ import subprocess
 import sh
 #Make sure to install gphoto2
 
-def send_message_to_mini_display(command):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-        client_socket.connect(('localhost', 6548))
-        client_socket.sendall(command.encode('utf-8'))
 
+def send_message_to_mini_display(command):
+    if config.DEBUG_MODE == 0:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+            client_socket.connect(('localhost', 6548))
+            client_socket.sendall(command.encode('utf-8'))
+    else:
+        print(command)
 
 def send_message_to_app(message):
     try:
@@ -186,6 +189,7 @@ def main():
     gp(clear_files_cmd)
     end_clear = datetime.now()
     send_message_to_mini_display(f"Cleared file from Camera in {(end_clear - start_clear).total_seconds()} seconds.\n\n")
+
 
 if __name__ == '__main__':
     cwd = ""
