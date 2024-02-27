@@ -116,7 +116,6 @@ class VendingMachineDisplay(QWidget):
                     if self.loopCount == 1: #Only after 1st Loop
                         self.send_msg_to_LED("fade 0")
                         self.appState.state = "3.5"
-                        self.playGIF()
                         photo_thread = threading.Thread(target=self.photo_subprocess)
                         photo_thread.start()
                 except Exception as e:
@@ -147,37 +146,41 @@ class VendingMachineDisplay(QWidget):
         self.movie.start()
 
     def updateGIF(self, state):
-        subfolder_map = {
-            "0": "0_welcome",
-            "1": "1_payment",
-            "2": "2_countdown",
-            "3": "3_smile",
-            "3.5": "3_smile",
-            "3.9": "4_print",
-            "4": "4_print",
-            "204": "4_print",
-            "5": "5_thx",
-            "100": "100_error"
-        }
+        if state != "3.5":
+            subfolder_map = {
+                "0": "0_welcome",
+                "1": "1_payment",
+                "2": "2_countdown",
+                "3": "3_smile",
+                "3.5": "3_smile",
+                "3.9": "4_print",
+                "4": "4_print",
+                "204": "4_print",
+                "5": "5_thx",
+                "100": "100_error"
+            }
 
-        subfolder = subfolder_map.get(state, "100_error")
-        gif_folder_path = os.path.join("..", "images", "gifs", subfolder)
+            subfolder = subfolder_map.get(state, "100_error")
+            gif_folder_path = os.path.join("..", "images", "gifs", subfolder)
 
-        try:
-            gifs = [file for file in os.listdir(gif_folder_path) if file.endswith(".gif")]
-            if gifs:
-                selected_gif = random.choice(gifs)
-                self.gif_path = os.path.join(gif_folder_path, selected_gif)
-                self.gifLabel.setAlignment(Qt.AlignCenter)
-                try:
-                    self.gifLabel.show()
-                    self.playGIF()
-                except Exception as e:
-                    self.send_message_to_mini_display(f"Error while trying to start playing GIF: {str(e)}")
-            else:
-                self.send_message_to_mini_display("No GIFs found in the specified folder.")
-        except FileNotFoundError:
-            self.send_message_to_mini_display(f"The folder {gif_folder_path} does not exist.")
+            try:
+                gifs = [file for file in os.listdir(gif_folder_path) if file.endswith(".gif")]
+                if gifs:
+                    selected_gif = random.choice(gifs)
+                    self.gif_path = os.path.join(gif_folder_path, selected_gif)
+                    self.gifLabel.setAlignment(Qt.AlignCenter)
+                    try:
+                        self.gifLabel.show()
+                        self.playGIF()
+                    except Exception as e:
+                        self.send_message_to_mini_display(f"Error while trying to start playing GIF: {str(e)}")
+                else:
+                    self.send_message_to_mini_display("No GIFs found in the specified folder.")
+            except FileNotFoundError:
+                self.send_message_to_mini_display(f"The folder {gif_folder_path} does not exist.")
+        else:
+            self.send_message_to_mini_display("Replay same smile gif...")
+            self.playGIF()
 
     def initUI(self):
         self.layout = QVBoxLayout(self)
