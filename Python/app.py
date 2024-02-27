@@ -63,7 +63,8 @@ class VendingMachineDisplay(QWidget):
         frame_rate = self.movie.nextFrameDelay()  # Delay between frames in milliseconds
         self.total_duration = frame_count * frame_rate / 1000
         if not self.appState.state == 0:
-            self.send_message_to_mini_display(f"Start playing gif with {str(self.total_duration)} seconds total duration")
+            if self.total_duration > 0.16:
+                self.send_message_to_mini_display(f"Start playing gif with {str(self.total_duration)} seconds total duration")
 
     def onFrameChanged(self):
         if self.movie.currentFrameNumber() == 0:
