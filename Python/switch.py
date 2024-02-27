@@ -36,8 +36,12 @@ def main_loop():
     prevHash = ''
     currHash = ''
     rsJson = ''
-    response = requests.get(config.API_URL, headers={'X-API-Key': config.API_KEY})
-    prevHash = response.json()[0]['payment_hash']
+    if check_connection():
+        response = requests.get(config.API_URL, headers={'X-API-Key': config.API_KEY})
+        prevHash = response.json()[0]['payment_hash']
+    else:
+        print("No Connection to the internet")
+
     response = None
 
     while True:
