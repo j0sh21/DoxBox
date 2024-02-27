@@ -285,7 +285,7 @@ class VendingMachineDisplay(QWidget):
         if state == "4":
             self.send_message_to_mini_display(f"{'_' * 10}State changed to 4: Start printing{'_' * 10}")
             self.send_msg_to_LED("color 226 0 116")
-            self.send_msg_to_LED("breathbrightness 0.35 0.8")
+            self.send_msg_to_LED("breathbrightness 0.1 0.9")
             self.send_msg_to_LED("breathspeed 0.1")
             self.send_msg_to_LED("breath 1")
             try:
