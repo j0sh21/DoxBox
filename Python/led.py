@@ -303,7 +303,8 @@ class ServerThread(Thread):
         self.send_message_to_mini_display(f"Server listening on {self.host}:{self.port}")
         while True:
             client_socket, address = self.server_socket.accept()
-            self.send_message_to_mini_display(f"Connection from {address} has been established.")
+            if config.DEBUG_MODE !=0:
+                self.send_message_to_mini_display(f"Connection from {address} has been established.")
             self.handle_client(client_socket)
 
     def handle_client(self, client_socket):
