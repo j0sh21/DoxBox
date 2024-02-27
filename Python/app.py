@@ -115,15 +115,14 @@ class VendingMachineDisplay(QWidget):
                 try:
                     if self.loopCount == 1: #Only after 1st Loop
                         self.send_msg_to_LED("fade 0")
-                        self.appState.state = "3.5"
-                        self.updateGIF(self.appState.state)
+                        self.playGIF()
                         photo_thread = threading.Thread(target=self.photo_subprocess)
                         photo_thread.start()
                 except Exception as e:
                     self.send_message_to_mini_display(f"Failed to start img_capture.py: {e}")
                     self.appState.state = "100"
                     self.updateGIF(self.appState.state)
-            elif self.appState.state in("3.5", "4", "100", "0", "3.9", "204"):
+            elif self.appState.state in("4", "100", "0", "3.9", "204"):
                 self.send_message_to_mini_display(f"GIF for state {self.appState.state} finished play next gif for state {self.appState.state} until external state change")
                 self.updateGIF(self.appState.state)
             elif self.appState.state == "5":
@@ -152,7 +151,6 @@ class VendingMachineDisplay(QWidget):
             "1": "1_payment",
             "2": "2_countdown",
             "3": "3_smile",
-            "3.5": "4_print",
             "3.9": "4_print",
             "4": "4_print",
             "204": "4_print",
