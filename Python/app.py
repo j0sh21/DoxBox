@@ -115,6 +115,7 @@ class VendingMachineDisplay(QWidget):
                 try:
                     if self.loopCount == 1: #Only after 1st Loop
                         self.send_msg_to_LED("fade 0")
+                        self.appState.state = "3.5"
                         self.playGIF()
                         photo_thread = threading.Thread(target=self.photo_subprocess)
                         photo_thread.start()
@@ -151,6 +152,7 @@ class VendingMachineDisplay(QWidget):
             "1": "1_payment",
             "2": "2_countdown",
             "3": "3_smile",
+            "3.5": "3_smile",
             "3.9": "4_print",
             "4": "4_print",
             "204": "4_print",
