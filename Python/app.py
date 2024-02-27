@@ -297,7 +297,7 @@ class VendingMachineDisplay(QWidget):
         if state == "5":
             self.send_message_to_mini_display(f"{'_' * 10}State changed to 5: Thank You!{'_' * 10}")
             self.send_msg_to_LED("breath 0")
-            self.send_msg_to_LED("fadespeed 1")
+            self.send_msg_to_LED("fadespeed 3")
             self.send_msg_to_LED("fade 1")
         if state in("100", "101", "102", "103", "104", "110", "112", "113", "114", "115", "119"):
             self.send_msg_to_LED("color 255 0 0")
