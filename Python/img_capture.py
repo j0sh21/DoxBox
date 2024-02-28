@@ -176,7 +176,7 @@ def main():
             send_message_to_mini_display("Error: No camera found. Please ensure the camera is connected properly.")
             send_message_to_app("102")
         else:
-            send_message_to_mini_display("An unexpected error occurred:", error_message)
+            send_message_to_mini_display(f"An unexpected error occurred: {error_message}")
             send_message_to_app("100")
 
     create_output_folder()
