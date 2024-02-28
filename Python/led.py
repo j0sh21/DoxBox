@@ -7,6 +7,7 @@ import time
 import config
 import math
 
+
 class RGBLEDController:
     def __init__(self, red_pin, green_pin, blue_pin, steps=config.fade_steps, brightness_steps=config.brightness_steps):
         self.red_pin, self.green_pin, self.blue_pin = red_pin, green_pin, blue_pin # GPIO Pins
@@ -25,6 +26,14 @@ class RGBLEDController:
         self.animation_lock = threading.Lock()
         self.animation_active = threading.Event()
         self.stop_requested = False
+
+    def send_message_to_mini_display(self, command):
+        if config.DEBUG_MODE == 0:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+                client_socket.connect(('localhost', 6548))
+                client_socket.sendall(command.encode('utf-8'))
+        else:
+            print(command)
 
     #Functions for changing speed and other LED effect related settings by external input while loop is running.
     def set_fade_speed(self, speed):
@@ -70,7 +79,7 @@ class RGBLEDController:
             if self.current_animation is None or not self.current_animation.is_alive():
                 self.activate_loop()
         else:
-            print("Animation queue is full. Please wait or interrupt current animation.")
+            self.send_message_to_mini_display("Animation queue is full. Please wait or interrupt current animation.")
 
     def set_fade(self):
         self.deactivate_loop()
@@ -84,17 +93,17 @@ class RGBLEDController:
             if not self.animation_queue.empty() and (self.current_animation is None or not self.current_animation.is_alive()):
                 animation_type = self.animation_queue.get()
                 if animation_type in("breath", "breathcount"):
-                    print("Activating breath...")
+                    self.send_message_to_mini_display("Activating breath...")
                     self.breath_active = 1
                     self.loop_type = animation_type
                     self.current_animation = threading.Thread(target=self.breath_led)
                 elif animation_type == "fade":
-                    print("Activating fade...")
+                    self.send_message_to_mini_display("Activating fade...")
                     self.fade_active = 1
                     self.loop_type = animation_type
                     self.current_animation = threading.Thread(target=self.fade_led)
                 elif animation_type in("blink", "blinkcount"):
-                    print("Activating blink...")
+                    self.send_message_to_mini_display("Activating blink...")
                     self.blink_active = 1
                     self.loop_type = animation_type
                     self.current_animation = threading.Thread(target=self.blink_led)
@@ -106,7 +115,7 @@ class RGBLEDController:
             if self.current_animation and self.current_animation.is_alive():
                 self.stop_requested = True  # Signal the thread to stop
                 self.current_animation.join()  # Wait for the thread to terminate
-                print(f"Stopped {self.loop_type} loop")
+                self.send_message_to_mini_display(f"Stopped {self.loop_type} loop")
                 self.stop_requested = False  # Reset the stop signal for future use
             self.interrupt_current_animation()  # Reset the state of animation variables
 
@@ -132,7 +141,7 @@ class RGBLEDController:
         if r or g or b:
             self.deactivate_loop()
             self.animation_active.wait(timeout=3)
-            print("Previous loop finished successfully.")
+            self.send_message_to_mini_display("Previous loop finished successfully.")
 
             # Set the new color after ensuring the animations have stopped
             self.r, self.g, self.b = self.update_brightness(r, g, b)
@@ -259,14 +268,14 @@ class RGBLEDController:
 
             # Update the LEDs based on the current colors
             self.update_leds()
-            # Debugging: print(f"Set color to {self.r}, {self.g}, {self.b}")
+            # Debugging: self.send_message_to_mini_display(f"Set color to {self.r}, {self.g}, {self.b}")
             time.sleep(0.01)  # Small delay to prevent high CPU usage
         else:
             self.animation_active.set()
 
     def run(self):
         #initialization
-        print("LED Controller is running...")
+        self.send_message_to_mini_display("LED Controller is running...")
         self.set_color(226, 0, 116)  # Set to a default color (lnbits color)
         time.sleep(0.1)  # Sleep to prevent high CPU usage
 
@@ -282,11 +291,20 @@ class ServerThread(Thread):
         self.server_socket.bind((self.host, self.port))
         self.server_socket.listen()
 
+    def send_message_to_mini_display(self, command):
+        if config.DEBUG_MODE == 0:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+                client_socket.connect(('localhost', 6548))
+                client_socket.sendall(command.encode('utf-8'))
+        else:
+            print(command)
+
     def run(self):
-        print(f"Server listening on {self.host}:{self.port}")
+        self.send_message_to_mini_display(f"Server listening on {self.host}:{self.port}")
         while True:
             client_socket, address = self.server_socket.accept()
-            print(f"Connection from {address} has been established.")
+            if config.DEBUG_MODE !=0:
+                self.send_message_to_mini_display(f"Connection from {address} has been established.")
             self.handle_client(client_socket)
 
     def handle_client(self, client_socket):
@@ -295,7 +313,7 @@ class ServerThread(Thread):
                 msg = client_socket.recv(1024).decode('utf-8')
                 if not msg:
                     break
-                print(f"Received: {msg}")
+                self.send_message_to_mini_display(f"Received: {msg}")
                 self.parse_command(msg)
 
     def parse_command(self, command):
@@ -305,17 +323,17 @@ class ServerThread(Thread):
                 r, g, b = map(int, parts[1:])
                 if 0 <= r <= 255 and 0 <= g <= 255 and 0 <= b <= 255:
                     self.led_controller.set_color(r, g, b)
-                    print(f"Set color to {r}, {g}, {b}")
+                    self.send_message_to_mini_display(f"Set color to {r}, {g}, {b}")
                 else:
-                    print("Color values must be between 0 and 255.")
+                    self.send_message_to_mini_display("Color values must be between 0 and 255.")
             elif parts[0] == "brightness" and len(parts) == 2:
                 brightness = int(parts[1])
                 if 0 <= brightness <= 255:
                     self.led_controller.brightness = brightness
                     self.led_controller.set_color(False, False, False)
-                    print(f"Set brightness to {brightness}")
+                    self.send_message_to_mini_display(f"Set brightness to {brightness}")
                 else:
-                    print("Brightness value must be between 0 and 255.")
+                    self.send_message_to_mini_display("Brightness value must be between 0 and 255.")
             elif parts[0] == "fade" and len(parts) == 2:
                 fade = int(parts[1])
                 if fade == 1:
@@ -323,7 +341,7 @@ class ServerThread(Thread):
                 elif fade == 0:
                     self.led_controller.deactivate_loop()
                 else:
-                    print("Fading state must be 0 = off or 1 = on.")
+                    self.send_message_to_mini_display("Fading state must be 0 = off or 1 = on.")
             elif parts[0] == "blink" and len(parts) == 2:
                 blink = int(parts[1])
                 if blink >= 1:
@@ -331,13 +349,13 @@ class ServerThread(Thread):
                 elif blink == 0:
                     self.led_controller.deactivate_loop()
                 else:
-                    print("Blinking count must be one or more.")
+                    self.send_message_to_mini_display("Blinking count must be one or more.")
             elif parts[0] == "blinkspeed" and len(parts) == 3:
                 on, off = map(float, parts[1:])
                 if on > 0 and off > 0:
                     self.led_controller.set_blink_times(on, off)
                 else:
-                    print("On and off time must both be bigger than 0 seconds.")
+                    self.send_message_to_mini_display("On and off time must both be bigger than 0 seconds.")
             elif parts[0] == "breath" and len(parts) == 2:
                 breath = int(parts[1])
                 if breath >= 1:
@@ -345,33 +363,33 @@ class ServerThread(Thread):
                 elif breath == 0:
                     self.led_controller.deactivate_loop()
                 else:
-                    print("Breath count must be one or more.")
+                    self.send_message_to_mini_display("Breath count must be one or more.")
             elif parts[0] == "breathspeed" and len(parts) == 2:
                 speed = float(parts[1])
                 if speed > 0:
                     self.led_controller.set_breath_speed(speed)
                 else:
-                    print("Breath speed must be bigger than 0.")
+                    self.send_message_to_mini_display("Breath speed must be bigger than 0.")
             elif parts[0] == "fadespeed" and len(parts) == 2:
                 speed = float(parts[1])
                 if speed > 0:
                     self.led_controller.set_fade_speed(speed)
                 else:
-                    print("Fade speed must be bigger than 0.")
+                    self.send_message_to_mini_display("Fade speed must be bigger than 0.")
             elif parts[0] == "breathbrightness" and len(parts) == 3:
                 lower, upper = map(float, parts[1:])
                 if lower+upper > 0 and lower < 1 and upper <= 1 and lower < upper:
                     self.led_controller.set_breath_lights(lower, upper)
                 else:
-                    print("Upper and / or lower brightness must be >= 0 and <= 1.")
+                    self.send_message_to_mini_display("Upper and / or lower brightness must be >= 0 and <= 1.")
             elif parts[0] == "interrupt" and len(parts) == 1:
                 self.led_controller.deactivate_loop()
             else:
-                print(f"Unrecognized command: {command}")
+                self.send_message_to_mini_display(f"Unrecognized command: {command}")
         except ValueError as e:
-            print(f"Error processing command '{command}': {e}")
+            self.send_message_to_mini_display(f"Error processing command '{command}': {e}")
         except Exception as e:
-            print(f"Unexpected error: {e}")
+            self.send_message_to_mini_display(f"Unexpected error: {e}")
 
 def main():
     controller = RGBLEDController(config.red_pin, config.green_pin, config.blue_pin)
@@ -385,6 +403,7 @@ def main():
     except KeyboardInterrupt:
         RGBLEDController.deactivate_loop()
         print("LED Controller application stopped.")
+
 
 if __name__ == "__main__":
     main()
