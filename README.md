@@ -5,7 +5,7 @@
 </p>
 
 The Doxbox prints captured pictures upon bitcoin lightning payments to its [LNbits](https://github.com/lnbits/lnbits) wallet. 
-You can set it up on any wedding, a conferece, a meetup or a festival. We build it in a modular way so that you can easily travel with it. 
+You can set it up on any wedding, a conferece, a meetup or a festival. We built it in a modular way so that you can easily travel with it. 
 
 
 ## Hardware Requirements
