@@ -3,7 +3,7 @@
 
 
 <p align="center">
-<img src="https://github.com/j0sh21/DoxBox/assets/63317640/7eda15cf-c3a2-4236-9e24-a084b4512d96" width="200">
+<img src="https://raw.githubusercontent.com/j0sh21/DoxBox/main/docs/images/Box.jpeg" width="200">
 </p>
 
 ## Schlüsselkomponenten
@@ -15,23 +15,24 @@
 - **print.py (In Arbeit)**: Verbindet sich mit Druckern über CUPS, um Bilder zu drucken, mit Funktionen zur Druckerauswahl und Druckauftragsverwaltung.
 - **config.py**: Enthält Konfigurationseinstellungen, die in der gesamten Anwendung verwendet werden, wie API-Schlüssel, Gerätenamen und Dateipfade.
 
-## Hardwareanforderungen
+## Hardware-Anforderungen
 
-- **Raspberry Pi 4** mit [Debian-Firmware](https://www.raspberrypi.com/software/operating-systems/)
-- **DSLR-Kamera**: Canon EOS 450D mit mindestens 1 GB SD-Karte. Bei Verwendung einer anderen Kamera ist die Kompatibilität mit gphoto2 sicherzustellen.
+- **Raspberry Pi 4**, läuft mit dem Debian-basierten Betriebssystem, [verfügbar auf der offiziellen Raspberry Pi-Softwareseite.](https://www.raspberrypi.com/software/operating-systems/)
+- **DSLR-Kamera**: Canon EOS 450D mit mindestens 1GB SD-Karte. Bei Verwendung einer anderen Kamera [stellen Sie die Kompatibilität mit gphoto2 auf der offiziellen Website sicher](http://www.gphoto.org/proj/libgphoto2/support.php)
 - **Display**: Waveshare 10,4" QLED Quantum Dot Kapazitiver Bildschirm (1600 x 720)
-- **Drucker**: Xiaomi-Instant-Photo-Printer-1S, kompatibel mit CUPS, 6" Fotopapier
-- **LED**: 4-polige RGB-Leiste, Steckplatine, Kabel, 4 Mosfets
-- **Holz**: 3 x 80x80 cm Sperrholz, eventuell ein Laserschneider
-- **Magnete**: 20 Eckmagnete (je 2 Stück), 40 x 4 mm Schrauben, 120 x 4 mm Muttern
-- **Sprühfarbe**: 1 Dose Grundierung, 4 Dosen Farbe
+- **Drucker**: Xiaomi-Instant-Photo-Printer-1S, unterstützt das CUPS-Drucksystem, 6" Fotopapier
+- **LED**: 4-Kanal-RGB-LED-Streifen zusammen mit einem Steckbrett, Verbindungskabeln und 4 Mosfets zur Steuerung.
+- **Baumaterial**: Drei Platten aus 80x80cm Sperrholz; Zugang zu einem Laserschneider könnte von Vorteil sein.
+- **Montagematerial**: 20 Eckmagnete (je 2 Stück pro Ecke), 40 Schrauben mit 4mm Durchmesser und 120 Muttern mit 4mm Durchmesser zur Befestigung der Komponenten.
+- **Sprühfarbe**: 1 Dose Grundierung, 4 Dosen der eigentlichen Farbe
+
 
   <img src="https://github.com/j0sh21/DoxBox/assets/63317640/384280e0-cc6e-4bd0-9953-c318b5e12f15" height="200">
 
   <img src="https://github.com/j0sh21/DoxBox/assets/63317640/e446af16-d840-4cbc-87f9-3d5f67b3a15d" height="200">
   <img src="docs/images/poc.gif" height="200">
 ## Beispiel Programmablauf:
-<img src="docs/images/flowchart.JPG" height="900">
+<img src="docs/images/flowchart.JPG" height="1100">
 
 ## Einrichtungsanleitung
 

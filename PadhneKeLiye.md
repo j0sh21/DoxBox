@@ -2,22 +2,24 @@
 # Doxbox - एक बिटकॉइन ⚡️ लाइटनिंग फोटोबॉक्स 
 
 <p align="center">
-<img src="https://github.com/j0sh21/DoxBox/assets/63317640/7eda15cf-c3a2-4236-9e24-a084b4512d96" width="200">
+<img src="https://raw.githubusercontent.com/j0sh21/DoxBox/main/docs/images/Box.jpeg" width="200">
 </p>
 
 Doxbox [LNbits](https://github.com/lnbits/lnbits) वॉलेट में बिटकॉइन लाइटनिंग भुगतान पर कैप्चर की गई तस्वीरें प्रिंट करता है।
 आप इसे किसी भी शादी, सम्मेलन, मीटअप या त्यौहार पर सेटअप कर सकते हैं। हमने इसे मॉड्यूलर तरीके से बनाया है ताकि आप आसानी से इसके साथ यात्रा कर सकें।
 
-## हार्डवेयर आवश्यकताएँ
 
-- **Raspberry Pi 4** [डेबियन फर्मवेयर](https://www.raspberrypi.com/software/operating-systems/) पर चल रहा है
-- **DSLR कैमरा**: कम से कम 1GB SD-कार्ड के साथ Canon EOS 450D। यदि आप कोई अन्य उपयोग कर रहे हैं तो gphoto2 के साथ संगतता सुनिश्चित करें
-- **डिस्प्ले**: Waveshare 10.4" QLED Quantum Dot Capacitive Display (1600 x 720)
-- **प्रिंटर**: Xiaomi-Instant-Photo-Printer-1S, CUPS के साथ संगत, 6" फोटोपेपर
-- **LED**: 4 पोल RGB लाइन, ब्रेडबोर्ड, केबल्स, 4 Mosfets
-- **लकड़ी**: 3 x 80x80cm प्लाईवुड, संभवतः एक लेज़रकटर
-- **मैग्नेट्स**: 20 कोने मैग्नेट्स (प्रत्येक 2pc), 40 x 4mm शिकंजे, 120 x 4mm नट्स
-- **स्प्रे कलर**: 1 कैन ग्राउंडिंग कलर, 4 कैन्स एक्चुअल कलर
+## हार्डवेयर आवश्यकताएं
+
+- **Raspberry Pi 4** जो Debian-आधारित ऑपरेटिंग सिस्टम पर चलता है, [Raspberry Pi की आधिकारिक सॉफ्टवेयर पृष्ठ से प्राप्त किया जा सकता है](https://www.raspberrypi.com/software/operating-systems/)।
+- **DSLR कैमरा**: Canon EOS 450D, कम से कम 1GB SD-कार्ड के साथ। यदि आप दूसरा उपयोग करते हैं, [सुनिश्चित करें कि यह gphoto2 के साथ संगत है आधिकारिक वेबसाइट पर](http://www.gphoto.org/proj/libgphoto2/support.php)।
+- **डिस्प्ले**: Waveshare 10.4" QLED Quantum Dot Capacitive Display (1600 x 720)।
+- **प्रिंटर**: Xiaomi Instant Photo Printer 1S, CUPS प्रिंटिंग सिस्टम का समर्थन करता है, 6" फोटोपेपर।
+- **LED**: 4 चैनल RGB LED स्ट्रिप, ब्रेडबोर्ड, कनेक्टिंग केबल्स, और 4 Mosfets के साथ।
+- **निर्माण सामग्री**: 80x80cm के तीन प्लाईवुड शीट्स; एक लेजर कटर की पहुंच होना लाभकारी हो सकता है।
+- **असेंबली हार्डवेयर**: कोने के 20 मैग्नेट्स के सेट्स (प्रत्येक में 2 टुकड़े), 4mm व्यास के 40 स्क्रू, और 4mm व्यास के 120 नट्स घटकों को सुरक्षित करने के लिए।
+- **स्प्रे रंग**: 1 कैन प्राइमर, 4 कैन वास्तविक रंग।
+
 
 
   <img src="https://github.com/j0sh21/DoxBox/assets/63317640/384280e0-cc6e-4bd0-9953-c318b5e12f15" height="200">

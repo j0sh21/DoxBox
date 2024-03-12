@@ -1,23 +1,23 @@
 # Doxbox - a bitcoin ⚡️ lightning photobox 
 
 <p align="center">
-<img src="https://github.com/j0sh21/DoxBox/assets/63317640/7eda15cf-c3a2-4236-9e24-a084b4512d96" width="200">
+<img src="https://raw.githubusercontent.com/j0sh21/DoxBox/main/docs/images/Box.jpeg" width="200">
 </p>
 
-The Doxbox prints captured pictures upon bitcoin lightning payments to its [LNbits](https://github.com/lnbits/lnbits) wallet. 
+The Doxbox prints captured pictures upon bitcoin lightning payments to its [LNbits wallet.] (https://github.com/lnbits/lnbits)
 You can set it up on any wedding, a conferece, a meetup or a festival. We built it in a modular way so that you can easily travel with it. 
 
 
 ## Hardware Requirements
 
-- **Raspberry Pi 4** running [debian firmware](https://www.raspberrypi.com/software/operating-systems/)
-- **DSLR Camera**: Canon EOS 450D with at least 1GB SD-Card. If you use another one ensure compatibility with gphoto2 
-- **Display**: Waveshare 10.4" QLED Quantum Dot Capacitive Display (1600 x 720) 
-- **Printer**: Xiaomi-Instant-Photo-Printer-1S, compatible with CUPS, 6" fotopaper
-- **LED**: 4 pole RGB line, breadboard, cables, 4 Mosfets
-- **wood**: 3 x 80x80cm plywood, possibly a lasercutter 
-- **magnets**: 20 corner magnets (each 2pc), 40 x 4mm screws, 120 x 4mm nuts
-- **spray colour**: 1 can grounding colour, 4 cans actual colour
+- **Raspberry Pi 4** running the Debian-based operating system [available from Raspberry Pi's official software page.](https://www.raspberrypi.com/software/operating-systems/)
+- **DSLR Camera**: Canon EOS 450D with at least 1GB SD-Card. If you use another one [ensure compatibility with gphoto2 on the official website](http://www.gphoto.org/proj/libgphoto2/support.php)
+- **Display**: Waveshare 10.4" QLED Quantum Dot Capacitive Display (1600 x 720)
+- **Printer**: Xiaomi-Instant-Photo-Printer-1S, supports CUPS printing system, 6" fotopaper
+- **LED**: 4-channel RGB LED strip, along with a breadboard, connecting cables, and 4 Mosfets for control.
+- **Construction Material**: Three sheets of 80x80cm plywood; access to a laser cutter may be beneficial.
+- **Assembly Hardware**: 20 sets of corner magnets (2 pieces per set), 40 screws of 4mm diameter, and 120 nuts of 4mm diameter to secure the components.
+- **spray colour**: 1 can of primer, 4 cans of actual colour
 
   <img src="https://github.com/j0sh21/DoxBox/assets/63317640/384280e0-cc6e-4bd0-9953-c318b5e12f15" height="200">
 
@@ -29,7 +29,6 @@ You can set it up on any wedding, a conferece, a meetup or a festival. We built 
 ## Example program flow:
 
 <img src="./docs/images/flowchart.JPG" height="1100">
-
 
 
 ## Setup Instructions

@@ -2,7 +2,7 @@
 # Doxbox - una fotocabina de bitcoin ⚡️ lightning
 
 <p align="center">
-<img src="https://github.com/j0sh21/DoxBox/assets/63317640/7eda15cf-c3a2-4236-9e24-a084b4512d96" width="200">
+<img src="https://raw.githubusercontent.com/j0sh21/DoxBox/main/docs/images/Box.jpeg" width="200">
 </p>
 
 La Doxbox imprime fotos capturadas tras recibir pagos a través de bitcoin lightning en su billetera [LNbits](https://github.com/lnbits/lnbits).
@@ -11,14 +11,15 @@ Puedes configurarla en cualquier boda, conferencia, meetup o festival. La hemos 
 
 ## Requisitos de Hardware
 
-- **Raspberry Pi 4** con [firmware debian](https://www.raspberrypi.com/software/operating-systems/)
-- **Cámara DSLR**: Canon EOS 450D con al menos 1GB de tarjeta SD. Si usas otra, asegúrate de la compatibilidad con gphoto2
-- **Pantalla**: Waveshare 10.4" QLED Quantum Dot Capacitive Display (1600 x 720)
-- **Impresora**: Xiaomi-Instant-Photo-Printer-1S, compatible con CUPS, papel fotográfico de 6"
-- **LED**: línea RGB de 4 polos, protoboard, cables, 4 Mosfets
-- **madera**: 3 placas de contrachapado de 80x80cm, posiblemente un cortador láser
-- **imanes**: 20 imanes de esquina (2 unidades cada uno), 40 tornillos de 4mm, 120 tuercas de 4mm
-- **pintura en spray**: 1 lata de color de imprimación, 4 latas de color actual
+- **Raspberry Pi 4** ejecutando el sistema operativo basado en Debian [disponible en la página oficial de software de Raspberry Pi](https://www.raspberrypi.com/software/operating-systems/).
+- **Cámara DSLR**: Canon EOS 450D con al menos 1GB de tarjeta SD. Si usas otra, [asegúrate de verificar la compatibilidad con gphoto2 en la página oficial](http://www.gphoto.org/proj/libgphoto2/support.php).
+- **Pantalla**: Waveshare 10.4" QLED Quantum Dot Display Capacitivo (1600 x 720).
+- **Impresora**: Xiaomi-Instant-Photo-Printer-1S, compatible con el sistema de impresión CUPS, papel fotográfico de 6".
+- **LED**: Tira de LED RGB de 4 canales, junto con una protoboard, cables de conexión y 4 Mosfets para el control.
+- **Material de Construcción**: Tres láminas de madera contrachapada de 80x80cm; el acceso a una cortadora láser puede ser beneficioso.
+- **Hardware de Montaje**: 20 sets de imanes de esquina (2 piezas por set), 40 tornillos de 4mm de diámetro y 120 tuercas de 4mm de diámetro para asegurar los componentes.
+- **Color de spray**: 1 lata de imprimación, 4 latas del color real.
+
 
   
 <img src="https://github.com/j0sh21/DoxBox/assets/63317640/384280e0-cc6e-4bd0-9953-c318b5e12f15" height="200">

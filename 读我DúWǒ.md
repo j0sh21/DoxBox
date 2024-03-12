@@ -2,7 +2,7 @@
 # Doxbox - ⚡️比特币闪电网络照片盒
 
 <p align="center">
-<img src="https://github.com/j0sh21/DoxBox/assets/63317640/7eda15cf-c3a2-4236-9e24-a084b4512d96" width="200">
+<img src="https://raw.githubusercontent.com/j0sh21/DoxBox/main/docs/images/Box.jpeg" width="200">
 </p>
 
 Doxbox 通过其 [LNbits](https://github.com/lnbits/lnbits) 钱包接收比特币闪电支付来打印捕获的照片。
@@ -11,14 +11,15 @@ Doxbox 通过其 [LNbits](https://github.com/lnbits/lnbits) 钱包接收比特�
 
 ## 硬件要求
 
-- **Raspberry Pi 4** 运行 [debian 固件](https://www.raspberrypi.com/software/operating-systems/)
-- **DSLR 相机**：Canon EOS 450D，至少配备 1GB SD-卡。如果使用其他相机，请确保与 gphoto2 兼容
-- **显示器**：Waveshare 10.4" QLED 量子点电容显示屏（1600 x 720）
-- **打印机**：小米即时照片打印机 1S，兼容 CUPS，6 英寸照片纸
-- **LED**：4 极 RGB 线，面包板，电缆，4 个 Mosfets
-- **木材**：3 x 80x80cm 胶合板，可能需要激光切割机
-- **磁铁**：20 个角落磁铁（每个 2 件），40 x 4mm 螺丝，120 x 4mm 螺母
-- **喷漆**：1 罐底漆，4 罐实际颜色
+- **Raspberry Pi 4** 运行基于 Debian 的操作系统 [可从 Raspberry Pi 官方软件页面获取](https://www.raspberrypi.com/software/operating-systems/)。
+- **DSLR 相机**：Canon EOS 450D，至少需要 1GB 的 SD 卡。如果使用其他相机，请[确保在官网上与 gphoto2 兼容](http://www.gphoto.org/proj/libgphoto2/support.php)。
+- **显示器**：Waveshare 10.4 英寸 QLED 量子点电容显示屏（1600 x 720）。
+- **打印机**：Xiaomi Instant Photo Printer 1S，支持 CUPS 打印系统，6 英寸照片纸。
+- **LED**：4 通道 RGB LED 条，包括面包板、连接电缆和 4 个 Mosfets 控制器。
+- **建筑材料**：三块 80x80cm 的胶合板；如果可能，使用激光切割器会更好。
+- **组装硬件**：20 套角落磁铁（每套 2 个），40 个 4mm 直径的螺丝和 120 个 4mm 直径的螺帽来固定组件。
+- **喷涂颜色**：1 罐底漆，4 罐实际颜色。
+
 
   
 <img src="https://github.com/j0sh21/DoxBox/assets/63317640/384280e0-cc6e-4bd0-9953-c318b5e12f15" height="200">

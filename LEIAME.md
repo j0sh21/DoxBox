@@ -1,7 +1,7 @@
 # Doxbox - uma cabine fotográfica com bitcoin ⚡️ lightning
 
 <p align="center">
-<img src="https://github.com/j0sh21/DoxBox/assets/63317640/7eda15cf-c3a2-4236-9e24-a084b4512d96" width="200">
+<img src="https://raw.githubusercontent.com/j0sh21/DoxBox/main/docs/images/Box.jpeg" width="200">
 </p>
 
 
@@ -19,22 +19,22 @@
 
 ## Requisitos de Hardware
 
-- **Raspberry Pi 4** rodando [firmware debian](https://www.raspberrypi.com/software/operating-systems/)
-- **Câmera DSLR**: Canon EOS 450D com pelo menos 1GB de cartão SD. Se usar outra, certifique-se de compatibilidade com gphoto2
-- **Display**: Waveshare 10.4" QLED Quantum Dot Capacitive Display (1600 x 720)
-- **Impressora**: Xiaomi-Instant-Photo-Printer-1S, compatível com CUPS, papel fotográfico de 6"
-- **LED**: Linha RGB de 4 polos, placa de ensaio, cabos, 4 Mosfets
-- **Madeira**: 3 x 80x80cm de compensado, possivelmente um cortador a laser
-- **Ímãs**: 20 ímãs de canto (cada 2 peças), 40 parafusos de 4mm, 120 porcas de 4mm
-- **Tinta spray**: 1 lata de tinta de fundo, 4 latas de tinta de cor real
+- **Raspberry Pi 4** executando o sistema operacional baseado em Debian [disponível na página oficial de software do Raspberry Pi](https://www.raspberrypi.com/software/operating-systems/).
+- **Câmera DSLR**: Canon EOS 450D com pelo menos 1GB de cartão SD. Se usar outra, [verifique a compatibilidade com o gphoto2 no site oficial](http://www.gphoto.org/proj/libgphoto2/support.php).
+- **Display**: Waveshare 10.4" QLED Quantum Dot Display Capacitivo (1600 x 720).
+- **Impressora**: Xiaomi-Instant-Photo-Printer-1S, suporta o sistema de impressão CUPS, papel fotográfico de 6".
+- **LED**: Tira de LED RGB de 4 canais, junto com uma placa de ensaio, cabos de conexão e 4 Mosfets para controle.
+- **Material de Construção**: Três chapas de madeira compensada de 80x80cm; o acesso a um cortador a laser pode ser benéfico.
+- **Hardware de Montagem**: 20 conjuntos de ímãs de canto (2 peças por conjunto), 40 parafusos de 4mm de diâmetro e 120 porcas de 4mm de diâmetro para fixar os componentes.
+- **Cor de spray**: 1 lata de primer, 4 latas da cor real.
+
 
   <img src="https://github.com/j0sh21/DoxBox/assets/63317640/384280e0-cc6e-4bd0-9953-c318b5e12f15" height="200">
-
   <img src="https://github.com/j0sh21/DoxBox/assets/63317640/e446af16-d840-4cbc-87f9-3d5f67b3a15d" height="200">
   <img src="docs/images/poc.gif" height="200">
 
 ## Exemplo de fluxo de programa:
-<img src="docs/images/flowchart.JPG" height="1300">
+<img src="docs/images/flowchart.JPG" height="1100">
 
 ## Instruções de Configuração
 

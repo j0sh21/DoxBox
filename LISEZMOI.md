@@ -2,22 +2,23 @@
 # Doxbox - une photobox bitcoin ⚡️ lightning
 
 <p align="center">
-<img src="https://github.com/j0sh21/DoxBox/assets/63317640/7eda15cf-c3a2-4236-9e24-a084b4512d96" width="200">
+<img src="https://raw.githubusercontent.com/j0sh21/DoxBox/main/docs/images/Box.jpeg" width="200">
 </p>
 
 Le Doxbox imprime les photos capturées lors de paiements par bitcoin lightning à son portefeuille [LNbits](https://github.com/lnbits/lnbits). 
 Vous pouvez l'installer lors de n'importe quel mariage, conférence, meetup ou festival. Nous l'avons construit de manière modulaire afin que vous puissiez facilement voyager avec.
 
-## Matériel Nécessaire
+## Exigences Matérielles
 
-- **Raspberry Pi 4** fonctionnant avec le [firmware debian](https://www.raspberrypi.com/software/operating-systems/)
-- **Appareil photo DSLR** : Canon EOS 450D avec au moins 1 Go de carte SD. Si vous utilisez un autre modèle, assurez-vous de la compatibilité avec gphoto2
-- **Écran** : Écran capacitif QLED Quantum Dot de Waveshare 10,4 pouces (1600 x 720)
-- **Imprimante** : Imprimante photo instantanée Xiaomi-1S, compatible avec CUPS, papier photo 6 pouces
-- **LED** : Ligne RGB à 4 pôles, planche à pain, câbles, 4 Mosfets
-- **Bois** : 3 panneaux de contreplaqué de 80x80cm, éventuellement une découpeuse laser
-- **Aimants** : 20 aimants d'angle (2 pièces chacun), 40 vis de 4mm, 120 écrous de 4mm
-- **Peinture en aérosol** : 1 bombe de peinture d'apprêt, 4 bombes de peinture de couleur finale
+- **Raspberry Pi 4** exécutant le système d'exploitation basé sur Debian [disponible sur la page officielle des logiciels de Raspberry Pi](https://www.raspberrypi.com/software/operating-systems/).
+- **Appareil photo DSLR** : Canon EOS 450D avec au moins 1Go de carte SD. Si vous utilisez un autre modèle, [assurez-vous de vérifier la compatibilité avec gphoto2 sur le site officiel](http://www.gphoto.org/proj/libgphoto2/support.php).
+- **Écran** : Waveshare 10,4 pouces QLED Quantum Dot Display Capacitif (1600 x 720).
+- **Imprimante** : Xiaomi-Instant-Photo-Printer-1S, compatible avec le système d'impression CUPS, papier photo de 6 pouces.
+- **LED** : Bande LED RGB à 4 canaux, accompagnée d'une planche à pain, de câbles de connexion et de 4 Mosfets pour le contrôle.
+- **Matériau de Construction** : Trois feuilles de contreplaqué de 80x80cm ; l'accès à une découpeuse laser peut être avantageux.
+- **Matériel d'Assemblage** : 20 ensembles d'aimants d'angle (2 pièces par ensemble), 40 vis de 4mm de diamètre et 120 écrous de 4mm de diamètre pour fixer les composants.
+- **Couleur en spray** : 1 bombe de peinture d'apprêt, 4 bombes de la couleur réelle.
+
   
 <img src="https://github.com/j0sh21/DoxBox/assets/63317640/384280e0-cc6e-4bd0-9953-c318b5e12f15" height="200">
 <img src="https://github.com/j0sh21/DoxBox/assets/63317640/e446af16-d840-4cbc-87f9-3d5f67b3a15d" height="200">
