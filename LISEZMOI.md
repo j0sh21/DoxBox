@@ -1,11 +1,11 @@
 
-# Doxbox - une photobox bitcoin ⚡️ lightning
+# DoxBox - une photobox bitcoin ⚡️ lightning
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/j0sh21/DoxBox/main/docs/images/Box.jpeg" width="200">
 </p>
 
-Le Doxbox imprime les photos capturées lors de paiements par bitcoin lightning à son portefeuille [LNbits](https://github.com/lnbits/lnbits). 
+Le DoxBox imprime les photos capturées lors de paiements par bitcoin lightning à son portefeuille [LNbits](https://github.com/lnbits/lnbits). 
 Vous pouvez l'installer lors de n'importe quel mariage, conférence, meetup ou festival. Nous l'avons construit de manière modulaire afin que vous puissiez facilement voyager avec.
 
 ## Exigences Matérielles

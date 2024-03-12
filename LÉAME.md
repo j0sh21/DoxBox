@@ -1,11 +1,11 @@
 
-# Doxbox - una fotocabina de bitcoin ⚡️ lightning
+# DoxBox - una fotocabina de bitcoin ⚡️ lightning
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/j0sh21/DoxBox/main/docs/images/Box.jpeg" width="200">
 </p>
 
-La Doxbox imprime fotos capturadas tras recibir pagos a través de bitcoin lightning en su billetera [LNbits](https://github.com/lnbits/lnbits).
+La DoxBox imprime fotos capturadas tras recibir pagos a través de bitcoin lightning en su billetera [LNbits](https://github.com/lnbits/lnbits).
 Puedes configurarla en cualquier boda, conferencia, meetup o festival. La hemos construido de manera modular para que puedas viajar fácilmente con ella.
 
 

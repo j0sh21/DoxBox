@@ -1,5 +1,5 @@
 
-# Doxbox - eine Bitcoin ⚡️ Lightning Fotobox
+# DoxBox - eine Bitcoin ⚡️ Lightning Fotobox
 
 
 <p align="center">

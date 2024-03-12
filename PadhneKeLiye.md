@@ -1,11 +1,11 @@
 
-# Doxbox - एक बिटकॉइन ⚡️ लाइटनिंग फोटोबॉक्स 
+# DoxBox - एक बिटकॉइन ⚡️ लाइटनिंग फोटोबॉक्स 
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/j0sh21/DoxBox/main/docs/images/Box.jpeg" width="200">
 </p>
 
-Doxbox [LNbits](https://github.com/lnbits/lnbits) वॉलेट में बिटकॉइन लाइटनिंग भुगतान पर कैप्चर की गई तस्वीरें प्रिंट करता है।
+DoxBox [LNbits](https://github.com/lnbits/lnbits) वॉलेट में बिटकॉइन लाइटनिंग भुगतान पर कैप्चर की गई तस्वीरें प्रिंट करता है।
 आप इसे किसी भी शादी, सम्मेलन, मीटअप या त्यौहार पर सेटअप कर सकते हैं। हमने इसे मॉड्यूलर तरीके से बनाया है ताकि आप आसानी से इसके साथ यात्रा कर सकें।
 
 

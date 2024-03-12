@@ -1,11 +1,11 @@
 
-# Doxbox - ⚡️比特币闪电网络照片盒
+# DoxBox - ⚡️比特币闪电网络照片盒
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/j0sh21/DoxBox/main/docs/images/Box.jpeg" width="200">
 </p>
 
-Doxbox 通过其 [LNbits](https://github.com/lnbits/lnbits) 钱包接收比特币闪电支付来打印捕获的照片。
+DoxBox 通过其 [LNbits](https://github.com/lnbits/lnbits) 钱包接收比特币闪电支付来打印捕获的照片。
 你可以在任何婚礼、会议、聚会或节日上设置它。我们以模块化的方式构建它，以便你可以轻松地随身携带。
 
 

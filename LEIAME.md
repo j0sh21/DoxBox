@@ -1,4 +1,4 @@
-# Doxbox - uma cabine fotográfica com bitcoin ⚡️ lightning
+# DoxBox - uma cabine fotográfica com bitcoin ⚡️ lightning
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/j0sh21/DoxBox/main/docs/images/Box.jpeg" width="200">
