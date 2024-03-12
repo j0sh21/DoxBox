@@ -85,6 +85,42 @@ python3 img_capture.py
 
     python print.py
 
+## Contributing
+
+Contributions to the project are welcome! Please refer to the contribution guidelines for information on how to submit pull requests, report issues, or suggest improvements.
+
+
+## Changelog for DoxBox Project
+### Version 0.1, released 25 Feb 2024
+
+### Features
+- Updated `app.py` to use new frame and new GIFs.
+- Integrated new GIFs from @arbadacarbaYK, removing empty background frames and watermarks. Countdown GIFs now have consistent timing between numbers.
+- Added `self.isreplay` to reset GIF loop count only once.
+- Introduced new error codes from `switch.py` to the documentation in English, German, and Portuguese.
+- Implemented new state 3.5: Transition to `img_capture.py` after the first smile GIF finishes.
+- Implemented new state 3.9: Photo successfully transferred from camera, initiating print preparation.
+- Advanced state 4: Triggered earlier to commence printing before the photo is deleted from the camera.
+- Refactored camera-specific error handling in `img_capture.py`.
+- Introduced maximum retry attempts and variable wait times for camera-related errors.
+
+### Improvements
+- Added network connectivity checks before polling LNbits API.
+- Enhanced and cleaned up console output styling.
+- Hidden mouse cursor for a cleaner UI.
+- Improved log message clarity and detail.
+- Removed corrupted files and performed general cleanup.
+- Adjusted LED effects for better visual feedback.
+
+### Fixes
+- Corrected `def kill_process()` to ensure proper process termination.
+- Fixed issue where multiple smile GIFs could be displayed simultaneously.
+- Resolved a bug where state 204 could hang indefinitely on print job failure checks.
+
+### Infrastructure
+- Created an output folder for print jobs. **TODO:** Automate folder creation using `os.mkdir` instead of including an empty folder in the repository.
+- **TODO:** Fine-tune `check_print_job_status` functionality.
+
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details. 
 Contributions to the project are welcome! 

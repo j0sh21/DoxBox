@@ -91,6 +91,42 @@ python3 print.py
  ```
 ## Contribuições
 Contribuições para o projeto são bem-vindas! Consulte as diretrizes de contribuição para obter mais informações sobre como enviar solicitações de pull, relatar problemas ou sugerir melhorias.
+
+# Registro de Alterações para o Projeto FotoBox
+## Versão 0.1 lançado 25 de Fev 2024
+
+### Funcionalidades
+- Atualizado `app.py` para usar novos quadros e novos GIFs.
+- Integrados novos GIFs de @arbadacarbaYK, removendo quadros de fundo vazios e marcas d'água. GIFs de contagem regressiva agora têm tempos consistentes entre os números.
+- Adicionado `self.isreplay` para resetar a contagem de loops do GIF apenas uma vez.
+- Introduzidos novos códigos de erro de `switch.py` na documentação em Português, Inglês e Alemão.
+- Implementado novo estado 3.5: Transição para `img_capture.py` após o primeiro GIF de sorriso terminar.
+- Implementado novo estado 3.9: Foto transferida com sucesso da câmera, iniciando a preparação para impressão.
+- Antecipado o estado 4: Acionado mais cedo para começar a impressão antes da foto ser deletada da câmera.
+- Refatorado o tratamento de erros específicos da câmera em `img_capture.py`.
+- Introduzidas tentativas máximas de repetição e tempos de espera variáveis para erros relacionados à câmera.
+
+### Melhorias
+- Verificação de conectividade de rede antes de consultar a API LNbits.
+- Melhorado e limpo o estilo da saída do console.
+- Cursor do mouse ocultado para uma interface mais limpa.
+- Mensagens de log aprimoradas em clareza e detalhe.
+- Arquivos corrompidos removidos e limpeza geral realizada.
+- Efeitos de LED ajustados para um feedback visual melhor.
+
+### Correções
+- Corrigido `def kill_process()` para garantir o término adequado do processo.
+- Corrigido o problema onde vários GIFs de sorriso poderiam ser exibidos simultaneamente.
+- Resolvido um bug onde o estado 204 poderia permanecer indefinidamente em falhas na verificação de trabalhos de impressão.
+
+### Infraestrutura
+- Criada uma pasta de saída para trabalhos de impressão. **TODO:** Automatizar a criação de pastas usando `os.mkdir` em vez de incluir uma pasta vazia no repositório.
+- **TODO:** Ajustar a funcionalidade de `check_print_job_status`.
+
+## Contribuindo
+
+Contribuições para o projeto são bem-vindas! Por favor, consulte as diretrizes de contribuição para informações sobre como enviar pull requests, relatar problemas ou sugerir melhorias.
+
 ## Licença
 Este projeto está licenciado sob a Licença MIT - consulte o arquivo LICENSE para obter detalhes.
 ## Agradecimentos

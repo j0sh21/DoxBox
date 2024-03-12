@@ -86,6 +86,42 @@ python3 img_capture.py
  python print.py
  ```
 
+## Journal des modifications pour le projet DoxBox
+### Version 0.1, publiée le 25 février 2024
+
+### Fonctionnalités
+- Mise à jour de `app.py` pour utiliser de nouveaux cadres et de nouveaux GIFs.
+- Intégration de nouveaux GIFs de @arbadacarbaYK, supprimant les cadres d'arrière-plan vides et les filigranes. Les GIFs de compte à rebours ont maintenant un timing constant entre les numéros.
+- Ajout de `self.isreplay` pour réinitialiser le compteur de boucle des GIF une seule fois.
+- Introduction de nouveaux codes d'erreur de `switch.py` dans la documentation en anglais, allemand et portugais.
+- Implémentation du nouvel état 3.5 : Transition vers `img_capture.py` après la fin du premier GIF de sourire.
+- Implémentation du nouvel état 3.9 : Photo transférée avec succès depuis la caméra, initiation de la préparation à l'impression.
+- Avancement de l'état 4 : Déclenché plus tôt pour commencer l'impression avant que la photo ne soit supprimée de la caméra.
+- Refonte de la gestion des erreurs spécifiques à la caméra dans `img_capture.py`.
+- Introduction du nombre maximal de tentatives de reprise et des temps d'attente variables pour les erreurs liées à la caméra.
+
+### Améliorations
+- Ajout de vérifications de la connectivité réseau avant l'interrogation de l'API LNbits.
+- Amélioration et nettoyage du style de sortie de la console.
+- Caché le curseur de la souris pour une interface utilisateur plus propre.
+- Amélioration de la clarté et du détail des messages de journalisation.
+- Suppression des fichiers corrompus et nettoyage général.
+- Ajustement des effets LED pour un meilleur retour visuel.
+
+### Corrections
+- Correction de `def kill_process()` pour garantir la terminaison correcte du processus.
+- Résolution du problème où plusieurs GIFs de sourire pouvaient être affichés simultanément.
+- Résolution d'un bug où l'état 204 pouvait rester indéfiniment en attente lors de la vérification des échecs de travaux d'impression.
+
+### Infrastructure
+- Création d'un dossier de sortie pour les travaux d'impression. **À FAIRE :** Automatiser la création de dossiers en utilisant `os.mkdir` au lieu d'inclure un dossier vide dans le dépôt.
+- **À FAIRE :** Ajuster finement la fonctionnalité de `check_print_job_status`.
+
+## Contribuer
+
+Les contributions au projet sont les bienvenues ! Veuillez consulter les directives de contribution pour savoir comment soumettre des pull requests, signaler des problèmes ou suggérer des améliorations.
+
+
 ## Licence
 Ce projet est sous licence MIT - voir le fichier LICENSE pour plus de détails.
 Les contributions au projet sont les bienvenues !

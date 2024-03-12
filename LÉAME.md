@@ -32,7 +32,6 @@ Puedes configurarla en cualquier boda, conferencia, meetup o festival. La hemos 
 <img src="docs/images/flowchart.JPG" height="1100">
 
 
-
 ## Instrucciones de Configuración
 
 ### Componentes Clave
@@ -88,6 +87,42 @@ python3 img_capture.py
  ```sh
   python print.py
  ```
+
+## Registro de cambios para el proyecto DoxBox
+### Versión 0.1, lanzada el 25 de febrero de 2024
+
+### Características
+- Actualizado `app.py` para usar nuevos marcos y nuevos GIFs.
+- Integrados nuevos GIFs de @arbadacarbaYK, eliminando marcos de fondo vacíos y marcas de agua. Los GIFs de cuenta regresiva ahora tienen una temporización consistente entre números.
+- Añadido `self.isreplay` para restablecer el conteo de bucles del GIF solo una vez.
+- Introducidos nuevos códigos de error de `switch.py` en la documentación en inglés, alemán y portugués.
+- Implementado nuevo estado 3.5: Transición a `img_capture.py` después de finalizar el primer GIF de sonrisa.
+- Implementado nuevo estado 3.9: Foto transferida con éxito desde la cámara, iniciando la preparación para la impresión.
+- Avanzado estado 4: Activado antes para comenzar la impresión antes de que la foto sea eliminada de la cámara.
+- Refactorizado el manejo de errores específicos de la cámara en `img_capture.py`.
+- Introducidos máximos intentos de reintentos y tiempos de espera variables para errores relacionados con la cámara.
+
+### Mejoras
+- Añadidas verificaciones de conectividad de red antes de consultar la API de LNbits.
+- Mejorado y limpiado el estilo de salida de la consola.
+- Cursor del ratón oculto para una interfaz más limpia.
+- Mejorada la claridad y el detalle de los mensajes de log.
+- Eliminados archivos corruptos y realizada una limpieza general.
+- Ajustados efectos de LED para un mejor feedback visual.
+
+### Correcciones
+- Corregido `def kill_process()` para asegurar una terminación adecuada del proceso.
+- Solucionado el problema donde se podían mostrar múltiples GIFs de sonrisa simultáneamente.
+- Resuelto un bug donde el estado 204 podía quedar colgado indefinidamente en las comprobaciones de fallos de trabajos de impresión.
+
+### Infraestructura
+- Creada una carpeta de salida para trabajos de impresión. **POR HACER:** Automatizar la creación de carpetas usando `os.mkdir` en lugar de incluir una carpeta vacía en el repositorio.
+- **POR HACER:** Ajustar la funcionalidad de `check_print_job_status`.
+
+## Contribuir
+
+¡Las contribuciones al proyecto son bienvenidas! Consulte las pautas de contribución para obtener información sobre cómo enviar solicitudes de extracción, informar de problemas o sugerir mejoras.
+
 ## Licencia
 Este proyecto está licenciado bajo la Licencia MIT - ver el archivo LICENSE para detalles. 
 ¡Las contribuciones al proyecto son bienvenidas! 

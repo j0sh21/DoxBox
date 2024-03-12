@@ -79,6 +79,38 @@ für die Bildaufnahme
 python3 print.py
 ```
 
+
+# Changelog für das DoxBox Projekt
+## Version 0.1 veröffentlich am 25. Feb 2024
+
+### Funktionen
+- `app.py` aktualisiert, um neue Rahmen und neue GIFs zu verwenden.
+- Neue GIFs von @arbadacarbaYK integriert, ohne leere Hintergrundrahmen und Wasserzeichen. Countdown-GIFs haben jetzt eine gleichmäßige Zeit zwischen den Zahlen.
+- `self.isreplay` hinzugefügt, um die GIF-Schleifenzählung nur einmal zurückzusetzen.
+- Neue Fehlercodes aus `switch.py` in die Dokumentation in Deutsch, Englisch und Portugiesisch aufgenommen.
+- Neuer Zustand 3.5 implementiert: Übergang zu `img_capture.py` nach dem ersten Lächeln-GIF.
+- Neuer Zustand 3.9 implementiert: Foto erfolgreich von der Kamera übertragen, Vorbereitung des Druckvorgangs eingeleitet.
+- Zustand 4 vorgezogen: Wird früher ausgelöst, um den Druckvorgang zu starten, bevor das Foto von der Kamera gelöscht wird.
+- Kamera-spezifische Fehlerbehandlung in `img_capture.py` überarbeitet.
+- Maximale Wiederholungsversuche und variable Wartezeiten für kamerabezogene Fehler eingeführt.
+
+### Verbesserungen
+- Netzwerkverbindung wird überprüft, bevor die LNbits-API abgefragt wird.
+- Konsolenausgabe in Stil und Übersichtlichkeit verbessert.
+- Mauszeiger für eine sauberere Benutzeroberfläche ausgeblendet.
+- Log-Nachrichten in Klarheit und Detail verbessert.
+- Beschädigte Dateien entfernt und allgemeine Aufräumarbeiten durchgeführt.
+- LED-Effekte für besseres visuelles Feedback angepasst.
+
+### Korrekturen
+- `def kill_process()` korrigiert, um sicherzustellen, dass Prozesse ordnungsgemäß beendet werden.
+- Problem behoben, bei dem mehrere Lächeln-GIFs gleichzeitig angezeigt werden konnten.
+- Ein Fehler behoben, bei dem Zustand 204 unendlich lange bei der Überprüfung von Druckauftragsfehlern hängen bleiben konnte.
+
+### Infrastruktur
+- Ein Ausgabeordner für Druckaufträge erstellt. **TODO:** Ordnererstellung automatisieren mit `os.mkdir`, statt einen leeren Ordner im Repository zu inkludieren.
+- **TODO:** Funktionalität von `check_print_job_status` feinjustieren.
+
 ## Mitwirken
 
 Beiträge zum Projekt sind willkommen! Bitte beachten Sie die Richtlinien für Beiträge, um Informationen darüber zu erhalten, wie Sie Pull Requests einreichen, Probleme melden oder Verbesserungen vorschlagen können.
