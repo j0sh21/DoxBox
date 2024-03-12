@@ -4,8 +4,8 @@
 <img src="https://raw.githubusercontent.com/j0sh21/DoxBox/main/docs/images/Box.jpeg" width="200">
 </p>
 
-Die DoxBox druckt aufgenommene Bilder aus, sobald Bitcoin Lightning-Zahlungen an sein [LNbits-Wallet](https://github.com/lnbits/lnbits) getätigt werden. Sie können es auf jeder Hochzeit, einer Konferenz, einem Treffen oder einem Festival einrichten. Wir haben es modular konstruiert, damit Sie es problemlos mitnehmen können.
-
+The DoxBox prints captured pictures upon bitcoin lightning payments to its [LNbits wallet.](https://github.com/lnbits/lnbits)
+You can set it up on any wedding, a conferece, a meetup or a festival. We built it in a modular way so that you can easily travel with it. 
 
 ## Hardware Requirements
 
