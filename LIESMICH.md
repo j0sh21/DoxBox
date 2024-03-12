@@ -1,10 +1,9 @@
-
 # DoxBox - eine Bitcoin ⚡️ Lightning Fotobox
-
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/j0sh21/DoxBox/main/docs/images/Box.jpeg" width="200">
 </p>
+
 Die DoxBox druckt aufgenommene Bilder aus, sobald Bitcoin Lightning-Zahlungen an sein LNbits-Wallet getätigt werden. Sie können es auf jeder Hochzeit, einer Konferenz, einem Treffen oder einem Festival einrichten. Wir haben es modular konstruiert, damit Sie es problemlos mitnehmen können.
 
 ## Schlüsselkomponenten
@@ -32,6 +31,7 @@ Die DoxBox druckt aufgenommene Bilder aus, sobald Bitcoin Lightning-Zahlungen an
 
   <img src="https://github.com/j0sh21/DoxBox/assets/63317640/e446af16-d840-4cbc-87f9-3d5f67b3a15d" height="200">
   <img src="docs/images/poc.gif" height="200">
+
 ## Beispiel Programmablauf:
 <img src="docs/images/flowchart.JPG" height="1100">
 
